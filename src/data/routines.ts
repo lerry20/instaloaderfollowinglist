@@ -353,6 +353,68 @@ export const PRESET_ROUTINES: Routine[] = [
       },
     ],
   },
+
+  // ─────────────────── UPPER-FRONT SPECIALIZATION 2-DAY ───────────────────
+  {
+    id: 'upper-front-spec-2day',
+    name: 'Upper-Front Specialization (2-day) — Chest, Shoulders, Biceps, Abs',
+    description:
+      'A specialization block. Hits all three chest regions across two sessions (upper, mid, AND lower — most splits neglect lower), plus shoulders, biceps and abs. Each muscle is trained twice a week, which is the sweet spot for growth. Run this for 6–8 weeks max, then rotate back to a balanced split so your back doesn\'t fall behind. Lower-chest emphasis lives in chest dips (forward lean) and the high-to-low cable fly angle.',
+    builtIn: true,
+    workouts: [
+      {
+        id: 'ufs-day-a',
+        name: 'Day A — Chest (Lower + Mid) + Shoulders + Abs',
+        items: [
+          // Heaviest compound first: builds the most chest mass.
+          { exerciseId: 'bench-press', targetSets: 4, targetReps: '5–6', targetRPE: 8 },
+          // The lower-chest specialist. Lean FORWARD ~30° on the dip — that pulls the load
+          // onto the lower-chest fibers. Upright = triceps.
+          { exerciseId: 'chest-dip', targetSets: 4, targetReps: '6–10', targetRPE: 8 },
+          // Upper-chest accessory so the upper region doesn't go untouched.
+          { exerciseId: 'incline-db-press', targetSets: 3, targetReps: '8–10', targetRPE: 9 },
+          // Stretched-position chest finisher. Cable fly hits the chest where dumbbells
+          // run out of tension.
+          { exerciseId: 'cable-fly', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          // Shoulder compound — front delts already got smashed by chest work, but the
+          // overhead press hits side and front together for shoulder thickness.
+          { exerciseId: 'ohp', targetSets: 3, targetReps: '6–8', targetRPE: 8 },
+          // Side-delt isolation for shoulder width.
+          { exerciseId: 'lateral-raise', targetSets: 4, targetReps: '12–20', targetRPE: 9 },
+          // Loadable ab work — actually progresses over time, unlike bodyweight crunches.
+          { exerciseId: 'cable-crunch', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          // Lower-abdominal emphasis.
+          { exerciseId: 'hanging-leg-raise', targetSets: 3, targetReps: '8–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'ufs-day-b',
+        name: 'Day B — Chest (Upper + Mid) + Biceps + Abs',
+        items: [
+          // Upper-chest specialist. Bench at 30° (steeper turns it into a shoulder press).
+          { exerciseId: 'incline-bench', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          // Mid chest with a deeper stretch than the barbell gives.
+          { exerciseId: 'db-bench-press', targetSets: 3, targetReps: '8–10', targetRPE: 9 },
+          // Mid-chest pump. Pinned shoulders, no momentum.
+          { exerciseId: 'pec-deck', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          // Lower-chest emphasis: set the cables HIGH and pull them down-and-in (high-to-low
+          // fly). The downward angle biases the lower fibers.
+          { exerciseId: 'cable-fly', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          // Rear delts: under-trained in chest-heavy splits. Keeps posture / shoulder health
+          // intact.
+          { exerciseId: 'rear-delt-fly', targetSets: 3, targetReps: '15', targetRPE: 9 },
+          // Bicep mass builder.
+          { exerciseId: 'barbell-curl', targetSets: 4, targetReps: '8–10', targetRPE: 8 },
+          // Long head of the bicep — the part that creates the peak.
+          { exerciseId: 'incline-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          // Brachialis (underneath the bicep) — adds arm thickness fast.
+          { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          // Bracing-strength carryover for everything else.
+          { exerciseId: 'plank', targetSets: 3, targetReps: '45 sec', targetRPE: 8 },
+        ],
+      },
+    ],
+  },
 ]
 
 export const DEFAULT_ACTIVE_ROUTINE_ID = 'ppl-6day'
