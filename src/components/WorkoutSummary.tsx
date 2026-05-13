@@ -4,6 +4,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Units } from '../db/schema'
 import { sessionHasPRs } from '../db/queries'
 import { kgToDisplay } from '../lib/units'
+import { estimateOneRepMax, formatDuration } from '../lib/strength'
+import { shareWorkoutImage } from '../lib/shareImage'
+import { toast } from '../state/toasts'
 
 interface Props {
   sessionId: number
@@ -20,6 +23,7 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
   )
   const exercises = useLiveQuery(() => db.exercises.toArray(), [])
   const [prs, setPrs] = useState<string[]>([])
+  const [sharing, setSharing] = useState(false)
 
   useEffect(() => {
     sessionHasPRs(sessionId).then(setPrs).catch(() => setPrs([]))
@@ -31,6 +35,21 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
   const totalVolumeKg = working.reduce((s, l) => s + l.weight * l.reps, 0)
   const setsCount = working.length
   const exerciseIds = Array.from(new Set(working.map((l) => l.exerciseId)))
+  const durationMs =
+    session.completedAt && session.startedAt ? session.completedAt - session.startedAt : 0
+
+  async function onShare() {
+    setSharing(true)
+    try {
+      await shareWorkoutImage(sessionId)
+      toast('Workout image ready', { kind: 'success' })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast(`Share failed: ${msg}`, { kind: 'danger' })
+    } finally {
+      setSharing(false)
+    }
+  }
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -59,6 +78,10 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
             </strong>
           </div>
           <div>
+            <span className="muted small">Duration</span>
+            <strong className="tabnum stat-big">{durationMs > 0 ? formatDuration(durationMs) : '—'}</strong>
+          </div>
+          <div>
             <span className="muted small">PRs</span>
             <strong className={`tabnum stat-big${prs.length > 0 ? ' stat-pr' : ''}`}>{prs.length}</strong>
           </div>
@@ -84,11 +107,19 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
               const ex = exercises.find((e) => e.id === id)
               const plan = session.items.find((p) => p.exerciseId === id)
               const exLogs = working.filter((l) => l.exerciseId === id)
-              const top = exLogs.reduce((m, l) => Math.max(m, l.weight), 0)
+              const top = exLogs.reduce(
+                (best, l) =>
+                  best === null || l.weight > best.weight
+                    ? { weight: l.weight, reps: l.reps }
+                    : best,
+                null as { weight: number; reps: number } | null,
+              )
+              const isPR = prs.includes(id)
+              const e1rmKg = top ? estimateOneRepMax(top.weight, top.reps) : null
               return (
                 <div key={id} className="summary-row">
                   <div>
-                    <strong>{ex?.name ?? id}</strong>
+                    <strong>{isPR ? '🥇 ' : ''}{ex?.name ?? id}</strong>
                     {plan ? (
                       <span className="muted small">
                         {' · planned '}{plan.targetSets} × {plan.targetReps}
@@ -96,7 +127,8 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
                     ) : null}
                   </div>
                   <div className="muted small tabnum">
-                    {exLogs.length} sets · top {kgToDisplay(top, units).toFixed(units === 'kg' ? 1 : 0)} {units}
+                    {exLogs.length} sets · top {top ? kgToDisplay(top.weight, units).toFixed(units === 'kg' ? 1 : 0) : '—'} {units}
+                    {e1rmKg ? ` · est max ${kgToDisplay(e1rmKg, units).toFixed(units === 'kg' ? 1 : 0)} ${units}` : ''}
                   </div>
                 </div>
               )
@@ -105,6 +137,9 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
         </div>
 
         <div className="modal-foot">
+          <button className="btn block" onClick={onShare} disabled={sharing}>
+            {sharing ? 'Generating image…' : '📤 Share as image'}
+          </button>
           <button className="btn primary block" onClick={() => navigate('/progress')}>
             Done — go to Progress
           </button>
@@ -115,7 +150,6 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
 }
 
 function ConfettiBanner() {
-  // Pure CSS confetti — 24 absolutely-positioned squares that fall + rotate.
   const pieces = Array.from({ length: 24 })
   const colors = [
     'var(--primary)',

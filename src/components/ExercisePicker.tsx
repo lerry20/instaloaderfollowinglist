@@ -7,6 +7,8 @@ interface Props {
   title: string
   onClose: () => void
   onPick: (id: string) => void
+  initialMuscle?: MuscleKey
+  initialEquipment?: string
 }
 
 const MUSCLE_FILTERS: { key: 'all' | MuscleKey; label: string }[] = [
@@ -60,11 +62,17 @@ function equipmentMatches(eq: string, filter: string) {
   return e.includes(filter)
 }
 
-export default function ExercisePicker({ title, onClose, onPick }: Props) {
+export default function ExercisePicker({
+  title,
+  onClose,
+  onPick,
+  initialMuscle,
+  initialEquipment,
+}: Props) {
   const curated = useAllExercises() ?? []
   const [q, setQ] = useState('')
-  const [muscle, setMuscle] = useState<'all' | MuscleKey>('all')
-  const [equipment, setEquipment] = useState<string>('all')
+  const [muscle, setMuscle] = useState<'all' | MuscleKey>(initialMuscle ?? 'all')
+  const [equipment, setEquipment] = useState<string>(initialEquipment ?? 'all')
   const [extra, setExtra] = useState<Exercise[]>([])
   const [loadingExtra, setLoadingExtra] = useState(true)
   const [extraError, setExtraError] = useState<string | null>(null)

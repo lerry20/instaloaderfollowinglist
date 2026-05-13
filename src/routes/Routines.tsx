@@ -54,6 +54,19 @@ export default function Routines() {
       <h1 className="big-title">Routines</h1>
       <p className="muted small">Pick a routine to activate it. Tap any routine to view or edit.</p>
 
+      <details className="glossary-card">
+        <summary>What do <strong>RPE</strong>, <strong>RIR</strong>, and <strong>AMRAP</strong> mean?</summary>
+        <ul className="glossary-list">
+          <li><strong>RPE 7</strong> — effort 7 out of 10. About <em>3 reps short of failure</em>.</li>
+          <li><strong>RPE 8</strong> — about <em>2 reps short of failure</em>. The sweet spot for most sets.</li>
+          <li><strong>RPE 9</strong> — about <em>1 rep short of failure</em>. For your last set or two.</li>
+          <li><strong>RPE 10</strong> — total failure. Save for occasional finishers.</li>
+          <li><strong>RIR</strong> — same idea, reverse number. "RIR 2" = 2 reps in reserve = RPE 8.</li>
+          <li><strong>AMRAP</strong> — "as many reps as possible." Do as many clean reps as you can.</li>
+          <li><strong>PR</strong> — personal record. A new heaviest weight or rep total for that lift.</li>
+        </ul>
+      </details>
+
       <div className="routine-list">
         {routines.map((r) => (
           <article key={r.id} className={`routine-card${active?.id === r.id ? ' active' : ''}`}>

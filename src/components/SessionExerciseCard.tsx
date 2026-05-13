@@ -365,6 +365,7 @@ export default function SessionExerciseCard({
         <ExercisePicker
           title={`Swap ${exercise?.name ?? 'exercise'}`}
           onClose={() => setShowSwap(false)}
+          initialMuscle={exercise?.primaryMuscle}
           onPick={(id) => {
             onSwap(id)
             setShowSwap(false)
