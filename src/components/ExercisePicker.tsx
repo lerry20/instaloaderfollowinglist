@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { db, type Exercise, type MuscleKey } from '../db/schema'
+import { db, MUSCLE_LABEL, type Exercise, type MuscleKey } from '../db/schema'
 import { useAllExercises } from '../db/queries'
-import { loadExtendedCatalog } from '../lib/extendedCatalog'
+import { loadFullCatalog } from '../lib/extendedCatalog'
 
 interface Props {
   title: string
@@ -11,58 +11,71 @@ interface Props {
 
 const MUSCLE_FILTERS: { key: 'all' | MuscleKey; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'chest', label: 'Chest' },
+  { key: 'chest', label: MUSCLE_LABEL.chest },
   { key: 'lat', label: 'Back' },
   { key: 'frontDelt', label: 'Shoulders' },
-  { key: 'bicep', label: 'Biceps' },
-  { key: 'tricep', label: 'Triceps' },
-  { key: 'quad', label: 'Quads' },
-  { key: 'hamstring', label: 'Hamstrings' },
-  { key: 'glute', label: 'Glutes' },
-  { key: 'calf', label: 'Calves' },
-  { key: 'core', label: 'Core' },
+  { key: 'bicep', label: MUSCLE_LABEL.bicep },
+  { key: 'tricep', label: MUSCLE_LABEL.tricep },
+  { key: 'quad', label: MUSCLE_LABEL.quad },
+  { key: 'hamstring', label: MUSCLE_LABEL.hamstring },
+  { key: 'glute', label: MUSCLE_LABEL.glute },
+  { key: 'calf', label: MUSCLE_LABEL.calf },
+  { key: 'core', label: MUSCLE_LABEL.core },
 ]
 
 export default function ExercisePicker({ title, onClose, onPick }: Props) {
-  const core = useAllExercises() ?? []
+  const curated = useAllExercises() ?? []
   const [q, setQ] = useState('')
   const [muscle, setMuscle] = useState<'all' | MuscleKey>('all')
-  const [showExtended, setShowExtended] = useState(false)
-  const [extended, setExtended] = useState<Exercise[] | null>(null)
-  const [loadingExt, setLoadingExt] = useState(false)
-  const [extError, setExtError] = useState<string | null>(null)
+  const [extra, setExtra] = useState<Exercise[]>([])
+  const [loadingExtra, setLoadingExtra] = useState(true)
+  const [extraError, setExtraError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!showExtended || extended) return
-    setLoadingExt(true)
-    setExtError(null)
-    loadExtendedCatalog()
-      .then((list) => setExtended(list))
-      .catch((err) => setExtError(err.message ?? 'Failed to load extended catalog'))
-      .finally(() => setLoadingExt(false))
-  }, [showExtended, extended])
+    loadFullCatalog()
+      .then((list) => setExtra(list))
+      .catch((err) => setExtraError(err.message ?? 'Failed to load full catalog'))
+      .finally(() => setLoadingExtra(false))
+  }, [])
 
   const list = useMemo(() => {
-    const all = showExtended ? [...core, ...(extended ?? [])] : core
     const seen = new Set<string>()
-    const dedup = all.filter((e) => (seen.has(e.id) ? false : seen.add(e.id)))
-    return dedup
-      .filter((e) => (muscle === 'all' ? true : e.primaryMuscle === muscle || e.muscleHighlights.includes(muscle)))
-      .filter(
-        (e) =>
-          e.name.toLowerCase().includes(q.toLowerCase()) ||
-          e.primaryMuscle.toLowerCase().includes(q.toLowerCase()) ||
-          e.equipment.toLowerCase().includes(q.toLowerCase()),
+    const merged: Exercise[] = []
+    // Curated rise to the top (and override duplicates).
+    for (const e of curated) {
+      if (!seen.has(e.id)) {
+        merged.push(e)
+        seen.add(e.id)
+      }
+    }
+    for (const e of extra) {
+      if (!seen.has(e.id) && !curated.some((c) => c.name.toLowerCase() === e.name.toLowerCase())) {
+        merged.push(e)
+        seen.add(e.id)
+      }
+    }
+    return merged
+      .filter((e) =>
+        muscle === 'all'
+          ? true
+          : e.primaryMuscle === muscle || e.secondaryMuscles.includes(muscle),
       )
-      .slice(0, 80)
-  }, [core, extended, q, muscle, showExtended])
+      .filter((e) => {
+        if (!q) return true
+        const ql = q.toLowerCase()
+        return (
+          e.name.toLowerCase().includes(ql) ||
+          e.primaryMuscle.toLowerCase().includes(ql) ||
+          e.equipment.toLowerCase().includes(ql)
+        )
+      })
+      .slice(0, 100)
+  }, [curated, extra, q, muscle])
 
   async function pick(ex: Exercise) {
-    // Persist extended exercise into local db so plans + sessions can reference it.
-    if (ex.source === 'extended') {
-      const existing = await db.exercises.get(ex.id)
-      if (!existing) await db.exercises.put(ex)
-    }
+    // Persist non-curated picks so plans + sessions can reference them.
+    const existing = await db.exercises.get(ex.id)
+    if (!existing) await db.exercises.put(ex)
     onPick(ex.id)
   }
 
@@ -95,32 +108,25 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
           ))}
         </div>
 
-        <div className="picker-source-row">
-          <label className="ext-toggle">
-            <input
-              type="checkbox"
-              checked={showExtended}
-              onChange={(e) => setShowExtended(e.target.checked)}
-            />
-            <span>Include extended catalog (700+ exercises)</span>
-          </label>
-          {loadingExt ? <span className="muted small">Loading…</span> : null}
-          {extError ? <span className="danger small">{extError}</span> : null}
-        </div>
+        {loadingExtra ? (
+          <p className="muted small">Loading full catalog…</p>
+        ) : extraError ? (
+          <p className="muted small">Offline: only the curated 25 are available.</p>
+        ) : null}
 
         <ul className="picker-list">
           {list.length === 0 ? (
-            <li className="picker-empty">No matches. {showExtended ? 'Try a different muscle filter.' : 'Toggle extended catalog above.'}</li>
+            <li className="picker-empty">No matches.</li>
           ) : (
             list.map((e) => (
               <li key={e.id}>
                 <button className="picker-row" onClick={() => pick(e)}>
                   <span className="picker-row-head">
                     <strong>{e.name}</strong>
-                    {e.source === 'extended' ? <span className="ext-pill">Extended</span> : null}
+                    {e.isCurated ? <span className="curated-pill">★ Core</span> : null}
                   </span>
                   <span className="muted small">
-                    {e.primaryMuscle}
+                    {MUSCLE_LABEL[e.primaryMuscle]}
                     {e.equipment && e.equipment !== '—' ? ` · ${e.equipment}` : ''}
                   </span>
                 </button>

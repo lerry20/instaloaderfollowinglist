@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Layout from './components/Layout'
-import Dashboard from './routes/Dashboard'
-import Plan from './routes/Plan'
-import Workout from './routes/Workout'
+import Train from './routes/Train'
+import Routines from './routes/Routines'
+import Progress from './routes/Progress'
 import ExerciseDetail from './routes/ExerciseDetail'
-import History from './routes/History'
-import Bodyweight from './routes/Bodyweight'
-import Settings from './routes/Settings'
 import Onboarding from './routes/Onboarding'
 import { seedIfEmpty } from './db/seed'
 import { useSettings } from './db/queries'
@@ -38,13 +35,11 @@ export default function App() {
       <Routes>
         <Route path="/welcome" element={<Onboarding />} />
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/plan" element={<Plan />} />
-          <Route path="/workout/:day" element={<Workout />} />
+          <Route path="/" element={<Train />} />
+          <Route path="/train" element={<Train />} />
+          <Route path="/routines" element={<Routines />} />
+          <Route path="/progress" element={<Progress />} />
           <Route path="/exercise/:id" element={<ExerciseDetail />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/bodyweight" element={<Bodyweight />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
