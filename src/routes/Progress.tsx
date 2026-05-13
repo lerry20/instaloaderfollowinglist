@@ -27,6 +27,8 @@ import {
 import { displayToKg, kgToDisplay } from '../lib/units'
 import ProgressChart from '../components/ProgressChart'
 import VolumeBars from '../components/VolumeBars'
+import TrainingCalendar from '../components/TrainingCalendar'
+import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
 
 export default function Progress() {
@@ -38,6 +40,13 @@ export default function Progress() {
     <div className="page">
       <h1 className="big-title">Progress</h1>
       <PRTicker units={units} />
+      <section className="card">
+        <header className="section-head">
+          <h3>Training calendar</h3>
+          <span className="muted small">last 13 weeks</span>
+        </header>
+        <TrainingCalendar />
+      </section>
       <WeeklyVolumeBarsSection />
       <BodyweightSection units={units} />
       <TopSetCards units={units} />
@@ -52,12 +61,13 @@ function WeeklyVolumeBarsSection() {
     <section className="card">
       <header className="section-head">
         <h3>Weekly volume by muscle</h3>
-        <span className="muted small">last 7 days · MEV / MAV / MRV (Israetel)</span>
+        <span className="muted small">last 7 days · working sets vs. growth landmarks</span>
       </header>
       <VolumeBars />
       <p className="muted small">
-        Below MEV → not enough stimulus. Past MAV → diminishing returns. Past MRV → likely junk volume.
-        Aim for the green band.
+        Each bar shows your working sets for the last 7 days against the range where growth happens.
+        Grey = under-trained (not enough stimulus). Green = the sweet spot. Yellow = diminishing
+        returns. Red = junk volume that won't grow anything new.
       </p>
     </section>
   )
@@ -348,6 +358,7 @@ function HistorySection({ units }: { units: Units }) {
               </header>
               <span className="muted small">
                 {working.length} working sets · volume {Math.round(kgToDisplay(volume, units)).toLocaleString()} {units}·reps
+                {s.completedAt && s.startedAt ? ` · ${formatDuration(s.completedAt - s.startedAt)}` : ''}
               </span>
               {prs.length > 0 ? (
                 <div className="pr-pills">

@@ -36,9 +36,9 @@ export default function VolumeBars() {
             <div className="volume-track">
               <div className="volume-zone optimal" style={{ left: `${mevPct}%`, width: `${mavPct - mevPct}%` }} />
               <div className="volume-zone past-mav" style={{ left: `${mavPct}%`, width: `${mrvPct - mavPct}%` }} />
-              <div className="volume-marker mev" style={{ left: `${mevPct}%` }} title={`MEV ${v.landmarks.mev}`} />
-              <div className="volume-marker mav" style={{ left: `${mavPct}%` }} title={`MAV ${v.landmarks.mav}`} />
-              <div className="volume-marker mrv" style={{ left: `${mrvPct}%` }} title={`MRV ${v.landmarks.mrv}`} />
+              <div className="volume-marker mev" style={{ left: `${mevPct}%` }} title={`${v.landmarks.mev} sets · the minimum for growth`} />
+              <div className="volume-marker mav" style={{ left: `${mavPct}%` }} title={`${v.landmarks.mav} sets · top of the optimal range`} />
+              <div className="volume-marker mrv" style={{ left: `${mrvPct}%` }} title={`${v.landmarks.mrv} sets · past this is junk volume`} />
               <div className="volume-fill" style={{ width: `${setsPct}%` }} />
             </div>
             <span className="volume-count tabnum">{Math.round(v.workingSets * 10) / 10}</span>

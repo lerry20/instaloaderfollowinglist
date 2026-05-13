@@ -2291,3 +2291,94 @@ html[data-theme='light'] .progress-strip-fill {
   position: relative;
   overflow-x: hidden;
 }
+
+/* === Training calendar heat-map === */
+.cal-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.cal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cal-row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.cal-row-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cal-row-cells {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 3px;
+}
+.cal-cell {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  min-width: 8px;
+}
+.cal-cell.intensity-0 { background: var(--bg-elev-2); }
+.cal-cell.intensity-1 { background: color-mix(in srgb, var(--primary) 25%, var(--bg-elev-2)); }
+.cal-cell.intensity-2 { background: color-mix(in srgb, var(--primary) 50%, var(--bg-elev-2)); }
+.cal-cell.intensity-3 { background: color-mix(in srgb, var(--primary) 78%, var(--bg-elev-2)); }
+.cal-cell.intensity-4 { background: var(--primary); }
+.cal-cell.cal-empty {
+  background: transparent;
+  border-color: transparent;
+}
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+.cal-legend .cal-cell {
+  width: 12px;
+  height: 12px;
+  aspect-ratio: auto;
+}
+
+/* === Glossary card on Routines === */
+.glossary-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+}
+.glossary-card > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  list-style: none;
+}
+.glossary-card > summary::-webkit-details-marker { display: none; }
+.glossary-card > summary::before {
+  content: '▸ ';
+  color: var(--text-muted);
+  transition: transform 150ms;
+  display: inline-block;
+}
+.glossary-card[open] > summary::before { content: '▾ '; }
+.glossary-list {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+.glossary-list li { color: var(--text); }
+.glossary-list em { color: var(--text-muted); font-style: normal; }
