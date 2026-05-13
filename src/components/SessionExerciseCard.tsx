@@ -35,7 +35,9 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
     useLiveQuery(
       () =>
         db.setLogs
-          .where({ sessionId, exerciseId: item.exerciseId })
+          .where('sessionId')
+          .equals(sessionId)
+          .filter((l) => l.exerciseId === item.exerciseId)
           .toArray()
           .then((arr) => arr.sort((a, b) => a.loggedAt - b.loggedAt)),
       [sessionId, item.exerciseId],

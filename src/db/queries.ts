@@ -89,9 +89,11 @@ export async function startSession(
 ): Promise<number> {
   // Reuse an in-progress session for the same workout if it exists.
   const existing = await db.sessions
-    .where({ routineId: routine.id, workoutId: workout.id })
-    .reverse()
-    .sortBy('startedAt')
+    .where('routineId')
+    .equals(routine.id)
+    .filter((s) => s.workoutId === workout.id)
+    .toArray()
+  existing.sort((a, b) => b.startedAt - a.startedAt)
   const open = existing.find((s) => s.completedAt === null)
   if (open) return open.id!
   return await db.sessions.add({
