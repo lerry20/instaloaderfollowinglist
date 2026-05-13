@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import {
@@ -107,16 +107,26 @@ export default function SessionExerciseCard({
   }
 
   // Auto-advance when the last set of the exercise is logged.
+  // Use refs to avoid re-scheduling the timer on every parent re-render
+  // (onAdvance is typically a fresh closure each render).
+  const onAdvanceRef = useRef(onAdvance)
   useEffect(() => {
-    if (!onAdvance) return
+    onAdvanceRef.current = onAdvance
+  })
+  const lastAdvanceTriggerRef = useRef<number | null>(null)
+  const lastLogTime = workingLogs[workingLogs.length - 1]?.loggedAt ?? null
+
+  useEffect(() => {
+    if (!onAdvanceRef.current) return
     if (workingLogs.length === 0) return
     if (workingLogs.length < totalSetsPlanned) return
-    const lastLogTime = workingLogs[workingLogs.length - 1].loggedAt
-    const isRecent = Date.now() - lastLogTime < 3000
-    if (!isRecent) return
-    const t = window.setTimeout(() => onAdvance?.(), 1400)
+    if (lastLogTime === null) return
+    if (lastAdvanceTriggerRef.current === lastLogTime) return
+    if (Date.now() - lastLogTime > 3000) return
+    lastAdvanceTriggerRef.current = lastLogTime
+    const t = window.setTimeout(() => onAdvanceRef.current?.(), 1400)
     return () => window.clearTimeout(t)
-  }, [workingLogs.length, totalSetsPlanned, onAdvance])
+  }, [workingLogs.length, totalSetsPlanned, lastLogTime])
 
   function handleLog(
     rowIdx: number,

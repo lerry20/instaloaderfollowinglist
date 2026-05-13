@@ -17,9 +17,9 @@ export default function SettingsModal({ onClose }: Props) {
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     if (!settings) return
-    db.settings.put({ ...settings, [key]: value }).then(() => {
-      toast('Saved', { kind: 'success', duration: 1200 })
-    })
+    // Settings persist silently; the UI reflects the change. No toast spam on
+    // every theme/units/rest tap.
+    db.settings.put({ ...settings, [key]: value })
   }
 
   return (
