@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { useRestTimer } from '../state/restTimer'
 
 export default function RestTimerBar() {
-  const { totalSec, stop, addSec } = useRestTimer()
+  const { totalSec, stop, addSec, pause, resume } = useRestTimer()
   const remaining = useRestTimer((s) => s.remainingSec())
+  const isPaused = useRestTimer((s) => s.isPaused())
   const tick = useRestTimer((s) => s.tick)
   const [, setForce] = useState(0)
   useEffect(() => {
@@ -12,15 +13,22 @@ export default function RestTimerBar() {
 
   if (totalSec === 0) return null
   const pct = totalSec > 0 ? ((totalSec - remaining) / totalSec) * 100 : 100
-  const done = remaining === 0
+  const done = remaining === 0 && !isPaused
   const mm = String(Math.floor(remaining / 60))
   const ss = String(remaining % 60).padStart(2, '0')
+
   return (
-    <div className={`rest-bar${done ? ' done' : ''}`} role="status" aria-live="polite">
+    <div
+      className={`rest-bar${done ? ' done' : ''}${isPaused ? ' paused' : ''}`}
+      role="status"
+      aria-live="polite"
+    >
       <div className="rest-bar-progress" style={{ width: `${pct}%` }} />
       <div className="rest-bar-content">
-        <span className="rest-bar-label">{done ? 'Rest complete · go!' : 'Rest'}</span>
-        <span className="rest-bar-time">
+        <span className="rest-bar-label">
+          {done ? 'Rest complete · go!' : isPaused ? 'Paused' : 'Rest'}
+        </span>
+        <span className="rest-bar-time tabnum">
           {mm}:{ss}
         </span>
         <div className="rest-bar-actions">
@@ -30,8 +38,17 @@ export default function RestTimerBar() {
           <button onClick={() => addSec(15)} disabled={done} aria-label="Add 15 seconds">
             +15
           </button>
+          {isPaused ? (
+            <button onClick={resume} aria-label="Resume rest">
+              ▶ Resume
+            </button>
+          ) : !done ? (
+            <button onClick={pause} aria-label="Pause rest">
+              ⏸ Pause
+            </button>
+          ) : null}
           <button onClick={stop} className="primary">
-            {done ? 'Done' : 'Skip'}
+            {done ? 'Dismiss' : 'End rest'}
           </button>
         </div>
       </div>

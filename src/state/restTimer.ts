@@ -4,17 +4,23 @@ interface RestTimerState {
   totalSec: number
   startedAt: number | null
   endsAt: number | null
+  pausedRemainingMs: number | null
   tick: number
   start: (seconds: number) => void
   stop: () => void
+  pause: () => void
+  resume: () => void
   addSec: (delta: number) => void
   remainingSec: () => number
   isActive: () => boolean
+  isPaused: () => boolean
+  isDone: () => boolean
 }
 
 let tickInterval: number | null = null
 let wakeLock: WakeLockSentinel | null = null
 let visibilityHandler: (() => void) | null = null
+let autoClearTimer: number | null = null
 
 interface WakeLockSentinel {
   released: boolean
@@ -23,7 +29,9 @@ interface WakeLockSentinel {
 
 async function acquireWakeLock() {
   try {
-    const nav = navigator as Navigator & { wakeLock?: { request: (t: string) => Promise<WakeLockSentinel> } }
+    const nav = navigator as Navigator & {
+      wakeLock?: { request: (t: string) => Promise<WakeLockSentinel> }
+    }
     if (nav.wakeLock) {
       wakeLock = await nav.wakeLock.request('screen')
       visibilityHandler = async () => {
@@ -38,7 +46,7 @@ async function acquireWakeLock() {
       document.addEventListener('visibilitychange', visibilityHandler)
     }
   } catch {
-    // ignore — feature unsupported or denied
+    // ignore
   }
 }
 
@@ -64,7 +72,9 @@ function fireEnd() {
     // ignore
   }
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     const ctx = new Ctx()
     const playBeep = (start: number, freq: number) => {
       const osc = ctx.createOscillator()
@@ -81,7 +91,7 @@ function fireEnd() {
     playBeep(0, 880)
     playBeep(0.55, 880)
   } catch {
-    // ignore — audio likely needs user gesture
+    // ignore
   }
   try {
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -120,52 +130,128 @@ export async function ensureNotificationPermission() {
   }
 }
 
+function clearTickInterval() {
+  if (tickInterval) {
+    window.clearInterval(tickInterval)
+    tickInterval = null
+  }
+}
+
+function clearAutoClear() {
+  if (autoClearTimer) {
+    window.clearTimeout(autoClearTimer)
+    autoClearTimer = null
+  }
+}
+
 export const useRestTimer = create<RestTimerState>((set, get) => ({
   totalSec: 0,
   startedAt: null,
   endsAt: null,
+  pausedRemainingMs: null,
   tick: 0,
   start(seconds) {
+    // If a timer is already running and a new set is logged, auto-clear any
+    // "done" state so the bar doesn't linger after the next log.
+    clearAutoClear()
     const now = Date.now()
-    set({ totalSec: seconds, startedAt: now, endsAt: now + seconds * 1000, tick: 0 })
-    if (tickInterval) window.clearInterval(tickInterval)
+    set({
+      totalSec: seconds,
+      startedAt: now,
+      endsAt: now + seconds * 1000,
+      pausedRemainingMs: null,
+      tick: 0,
+    })
+    clearTickInterval()
     void acquireWakeLock()
     let fired = false
     tickInterval = window.setInterval(() => {
       const s = get()
-      if (!s.endsAt) return
+      if (!s.endsAt || s.pausedRemainingMs !== null) return
       const remaining = Math.max(0, Math.ceil((s.endsAt - Date.now()) / 1000))
       set({ tick: s.tick + 1 })
       if (remaining <= 0 && !fired) {
         fired = true
         fireEnd()
         void releaseWakeLock()
-        if (tickInterval) {
-          window.clearInterval(tickInterval)
-          tickInterval = null
-        }
+        clearTickInterval()
+        // Auto-dismiss the "done" bar after 8 s if the user doesn't touch it.
+        autoClearTimer = window.setTimeout(() => {
+          get().stop()
+        }, 8000)
       }
     }, 250)
   },
   stop() {
-    if (tickInterval) {
-      window.clearInterval(tickInterval)
-      tickInterval = null
-    }
+    clearTickInterval()
+    clearAutoClear()
     void releaseWakeLock()
-    set({ totalSec: 0, startedAt: null, endsAt: null, tick: 0 })
+    set({
+      totalSec: 0,
+      startedAt: null,
+      endsAt: null,
+      pausedRemainingMs: null,
+      tick: 0,
+    })
+  },
+  pause() {
+    const s = get()
+    if (!s.endsAt || s.pausedRemainingMs !== null) return
+    const remainingMs = Math.max(0, s.endsAt - Date.now())
+    clearTickInterval()
+    set({ pausedRemainingMs: remainingMs })
+  },
+  resume() {
+    const s = get()
+    if (s.pausedRemainingMs === null) return
+    const now = Date.now()
+    set({ endsAt: now + s.pausedRemainingMs, pausedRemainingMs: null, tick: s.tick + 1 })
+    clearTickInterval()
+    void acquireWakeLock()
+    let fired = false
+    tickInterval = window.setInterval(() => {
+      const inner = get()
+      if (!inner.endsAt || inner.pausedRemainingMs !== null) return
+      const remaining = Math.max(0, Math.ceil((inner.endsAt - Date.now()) / 1000))
+      set({ tick: inner.tick + 1 })
+      if (remaining <= 0 && !fired) {
+        fired = true
+        fireEnd()
+        void releaseWakeLock()
+        clearTickInterval()
+        autoClearTimer = window.setTimeout(() => get().stop(), 8000)
+      }
+    }, 250)
   },
   addSec(delta) {
     const s = get()
+    if (s.pausedRemainingMs !== null) {
+      set({
+        pausedRemainingMs: Math.max(0, s.pausedRemainingMs + delta * 1000),
+        totalSec: Math.max(0, s.totalSec + delta),
+      })
+      return
+    }
     if (!s.endsAt) return
     set({ endsAt: s.endsAt + delta * 1000, totalSec: Math.max(0, s.totalSec + delta) })
   },
   remainingSec() {
     const s = get()
+    if (s.pausedRemainingMs !== null) return Math.ceil(s.pausedRemainingMs / 1000)
     if (!s.endsAt) return 0
     return Math.max(0, Math.ceil((s.endsAt - Date.now()) / 1000))
   },
   isActive() {
-    return get().endsAt !== null
+    const s = get()
+    return s.endsAt !== null || s.pausedRemainingMs !== null
+  },
+  isPaused() {
+    return get().pausedRemainingMs !== null
+  },
+  isDone() {
+    const s = get()
+    if (s.pausedRemainingMs !== null) return false
+    if (!s.endsAt) return false
+    return s.endsAt - Date.now() <= 0
   },
 }))

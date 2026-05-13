@@ -23,13 +23,53 @@ const MUSCLE_FILTERS: { key: 'all' | MuscleKey; label: string }[] = [
   { key: 'core', label: MUSCLE_LABEL.core },
 ]
 
+const EQUIPMENT_FILTERS: { key: 'all' | string; label: string }[] = [
+  { key: 'all', label: 'Any' },
+  { key: 'barbell', label: 'Barbell' },
+  { key: 'dumbbell', label: 'Dumbbell' },
+  { key: 'cable', label: 'Cable' },
+  { key: 'machine', label: 'Machine' },
+  { key: 'body', label: 'Bodyweight' },
+]
+
+const RECENTS_KEY = 'bulklog:recentExercises'
+const MAX_RECENTS = 8
+
+function loadRecents(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENTS_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as string[]
+  } catch {
+    return []
+  }
+}
+
+function saveRecents(ids: string[]) {
+  try {
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(ids.slice(0, MAX_RECENTS)))
+  } catch {
+    // ignore
+  }
+}
+
+function equipmentMatches(eq: string, filter: string) {
+  const e = eq.toLowerCase()
+  if (filter === 'all') return true
+  if (filter === 'body') return e.includes('body') || e === '—' || e.includes('bodyweight')
+  return e.includes(filter)
+}
+
 export default function ExercisePicker({ title, onClose, onPick }: Props) {
   const curated = useAllExercises() ?? []
   const [q, setQ] = useState('')
   const [muscle, setMuscle] = useState<'all' | MuscleKey>('all')
+  const [equipment, setEquipment] = useState<string>('all')
   const [extra, setExtra] = useState<Exercise[]>([])
   const [loadingExtra, setLoadingExtra] = useState(true)
   const [extraError, setExtraError] = useState<string | null>(null)
+  const [showInfo, setShowInfo] = useState(false)
+  const [recents, setRecents] = useState<string[]>(() => loadRecents())
 
   useEffect(() => {
     loadFullCatalog()
@@ -38,10 +78,9 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
       .finally(() => setLoadingExtra(false))
   }, [])
 
-  const list = useMemo(() => {
+  const allExercises = useMemo(() => {
     const seen = new Set<string>()
     const merged: Exercise[] = []
-    // Curated rise to the top (and override duplicates).
     for (const e of curated) {
       if (!seen.has(e.id)) {
         merged.push(e)
@@ -55,27 +94,45 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
       }
     }
     return merged
-      .filter((e) =>
-        muscle === 'all'
-          ? true
-          : e.primaryMuscle === muscle || e.secondaryMuscles.includes(muscle),
+  }, [curated, extra])
+
+  const recentExercises = useMemo(() => {
+    return recents
+      .map((id) => allExercises.find((e) => e.id === id))
+      .filter((e): e is Exercise => !!e)
+  }, [recents, allExercises])
+
+  const filteredList = useMemo(() => {
+    let list = allExercises
+    if (muscle !== 'all') {
+      list = list.filter(
+        (e) => e.primaryMuscle === muscle || e.secondaryMuscles.includes(muscle as MuscleKey),
       )
-      .filter((e) => {
-        if (!q) return true
-        const ql = q.toLowerCase()
-        return (
+    }
+    if (equipment !== 'all') {
+      list = list.filter((e) => equipmentMatches(e.equipment, equipment))
+    }
+    if (q) {
+      const ql = q.toLowerCase()
+      list = list.filter(
+        (e) =>
           e.name.toLowerCase().includes(ql) ||
           e.primaryMuscle.toLowerCase().includes(ql) ||
-          e.equipment.toLowerCase().includes(ql)
-        )
-      })
-      .slice(0, 100)
-  }, [curated, extra, q, muscle])
+          e.equipment.toLowerCase().includes(ql),
+      )
+    }
+    return list
+  }, [allExercises, q, muscle, equipment])
+
+  const visible = filteredList.slice(0, 200)
+  const truncated = filteredList.length > 200
 
   async function pick(ex: Exercise) {
-    // Persist non-curated picks so plans + sessions can reference them.
     const existing = await db.exercises.get(ex.id)
     if (!existing) await db.exercises.put(ex)
+    const next = [ex.id, ...recents.filter((id) => id !== ex.id)].slice(0, MAX_RECENTS)
+    setRecents(next)
+    saveRecents(next)
     onPick(ex.id)
   }
 
@@ -96,17 +153,46 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
           className="picker-search"
         />
 
-        <div className="muscle-filters">
-          {MUSCLE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              className={`chip${muscle === f.key ? ' active' : ''}`}
-              onClick={() => setMuscle(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <details className="picker-filter-details" open={!q}>
+          <summary>
+            Filters{' '}
+            <span className="muted small">
+              {muscle !== 'all' || equipment !== 'all'
+                ? `· ${[muscle !== 'all' ? MUSCLE_LABEL[muscle as MuscleKey] : '', equipment !== 'all' ? equipment : '']
+                    .filter(Boolean)
+                    .join(', ')}`
+                : ''}
+            </span>
+          </summary>
+          <div className="filter-block">
+            <span className="muted small">Muscle group</span>
+            <div className="muscle-filters">
+              {MUSCLE_FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  className={`chip${muscle === f.key ? ' active' : ''}`}
+                  onClick={() => setMuscle(f.key)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="filter-block">
+            <span className="muted small">Equipment</span>
+            <div className="muscle-filters">
+              {EQUIPMENT_FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  className={`chip${equipment === f.key ? ' active' : ''}`}
+                  onClick={() => setEquipment(f.key)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </details>
 
         {loadingExtra ? (
           <p className="muted small">Loading full catalog…</p>
@@ -114,16 +200,44 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
           <p className="muted small">Offline: only the curated 25 are available.</p>
         ) : null}
 
+        {recentExercises.length > 0 && !q ? (
+          <div className="recents-block">
+            <span className="muted small recents-label">Recent</span>
+            <ul className="recents-row">
+              {recentExercises.map((e) => (
+                <li key={e.id}>
+                  <button className="chip" onClick={() => pick(e)}>
+                    {e.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         <ul className="picker-list">
-          {list.length === 0 ? (
+          {visible.length === 0 ? (
             <li className="picker-empty">No matches.</li>
           ) : (
-            list.map((e) => (
+            visible.map((e) => (
               <li key={e.id}>
                 <button className="picker-row" onClick={() => pick(e)}>
                   <span className="picker-row-head">
                     <strong>{e.name}</strong>
-                    {e.isCurated ? <span className="curated-pill">★ Core</span> : null}
+                    {e.isCurated ? (
+                      <span
+                        className="curated-pill"
+                        onClick={(ev) => {
+                          ev.stopPropagation()
+                          ev.preventDefault()
+                          setShowInfo(true)
+                        }}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        ★ Core
+                      </span>
+                    ) : null}
                   </span>
                   <span className="muted small">
                     {MUSCLE_LABEL[e.primaryMuscle]}
@@ -134,6 +248,30 @@ export default function ExercisePicker({ title, onClose, onPick }: Props) {
             ))
           )}
         </ul>
+
+        {truncated ? (
+          <p className="muted small">Showing top 200 — refine search to narrow down.</p>
+        ) : null}
+
+        {showInfo ? (
+          <div className="modal-backdrop nested" onClick={() => setShowInfo(false)}>
+            <div className="modal small-modal" onClick={(e) => e.stopPropagation()}>
+              <header className="modal-head">
+                <h3>★ Core exercises</h3>
+                <button className="link" onClick={() => setShowInfo(false)}>Close</button>
+              </header>
+              <p>
+                The 25 ★ Core lifts are the curated set with hand-written technique cues and
+                bulking-specific tips. Everything else comes from the open free-exercise-db
+                catalog with generic instructions.
+              </p>
+              <p className="muted small">
+                When picking an exercise, both kinds work identically — Core just gets richer
+                content on its detail page.
+              </p>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   )

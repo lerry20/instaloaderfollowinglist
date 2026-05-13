@@ -8,6 +8,7 @@ import {
 } from '../db/schema'
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
 import ExercisePicker from '../components/ExercisePicker'
+import { toast } from '../state/toasts'
 
 export default function Routines() {
   const routines = useAllRoutines()
@@ -19,18 +20,22 @@ export default function Routines() {
 
   async function activate(id: string) {
     if (!settings) return
+    const r = routines?.find((x) => x.id === id)
     await db.settings.put({ ...settings, activeRoutineId: id })
+    toast(`Activated: ${r?.name ?? id}`, { kind: 'success' })
   }
 
   async function clone(r: Routine) {
     const id = `custom-${Date.now()}`
-    await db.routines.put({
+    const dup: Routine = {
       ...r,
       id,
       name: `${r.name} (copy)`,
       builtIn: false,
-    })
+    }
+    await db.routines.put(dup)
     await activate(id)
+    setEditing(dup)
   }
 
   async function deleteRoutine(r: Routine) {
@@ -41,6 +46,7 @@ export default function Routines() {
       const fallback = routines?.find((x) => x.id !== r.id)
       if (fallback) await activate(fallback.id)
     }
+    toast('Routine deleted', { kind: 'warn' })
   }
 
   return (
@@ -74,8 +80,13 @@ export default function Routines() {
                 </button>
               ) : null}
               <button className="btn small" onClick={() => setEditing(r)}>
-                {r.builtIn ? 'View / clone' : 'Edit'}
+                {r.builtIn ? 'Preview' : 'Edit'}
               </button>
+              {r.builtIn ? (
+                <button className="btn small ghost" onClick={() => clone(r)}>
+                  Clone
+                </button>
+              ) : null}
               {!r.builtIn ? (
                 <button className="btn small danger" onClick={() => deleteRoutine(r)}>
                   Delete
@@ -133,6 +144,7 @@ function RoutineEditor({
   async function patch(updates: Partial<Routine>) {
     if (isBuiltIn) return
     await db.routines.put({ ...routine, ...updates })
+    toast('Saved', { kind: 'success', duration: 1200 })
   }
 
   async function addWorkout() {
@@ -154,13 +166,40 @@ function RoutineEditor({
     await patch({ workouts: routine.workouts.filter((w) => w.id !== wid) })
   }
 
+  async function duplicateWorkout(wid: string) {
+    if (isBuiltIn) return
+    const src = routine.workouts.find((w) => w.id === wid)
+    if (!src) return
+    const newId = `${routine.id}-w${Date.now()}`
+    const dup: WorkoutDef = {
+      ...src,
+      id: newId,
+      name: `${src.name} (B)`,
+    }
+    const srcIdx = routine.workouts.findIndex((w) => w.id === wid)
+    const workouts = [...routine.workouts]
+    workouts.splice(srcIdx + 1, 0, dup)
+    await patch({ workouts })
+  }
+
+  async function moveWorkout(wid: string, dir: -1 | 1) {
+    if (isBuiltIn) return
+    const idx = routine.workouts.findIndex((w) => w.id === wid)
+    if (idx < 0) return
+    const target = idx + dir
+    if (target < 0 || target >= routine.workouts.length) return
+    const workouts = [...routine.workouts]
+    ;[workouts[idx], workouts[target]] = [workouts[target], workouts[idx]]
+    await patch({ workouts })
+  }
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal big" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
           <div>
             <h3>{routine.name}</h3>
-            <span className="muted small">{isBuiltIn ? 'Built-in (read-only)' : 'Custom'}</span>
+            <span className="muted small">{isBuiltIn ? 'Built-in (read-only)' : 'Custom · auto-saves'}</span>
           </div>
           <button className="link" onClick={onClose}>Close</button>
         </header>
@@ -193,8 +232,12 @@ function RoutineEditor({
               key={w.id}
               workout={w}
               readOnly={isBuiltIn}
+              canMoveUp={routine.workouts.indexOf(w) > 0}
+              canMoveDown={routine.workouts.indexOf(w) < routine.workouts.length - 1}
               onPatch={(updates) => patchWorkout(w.id, updates)}
               onRemove={() => removeWorkout(w.id)}
+              onDuplicate={() => duplicateWorkout(w.id)}
+              onMove={(dir) => moveWorkout(w.id, dir)}
             />
           ))}
         </div>
@@ -218,13 +261,21 @@ function RoutineEditor({
 function WorkoutEditor({
   workout,
   readOnly,
+  canMoveUp,
+  canMoveDown,
   onPatch,
   onRemove,
+  onDuplicate,
+  onMove,
 }: {
   workout: WorkoutDef
   readOnly: boolean
+  canMoveUp: boolean
+  canMoveDown: boolean
   onPatch: (updates: Partial<WorkoutDef>) => void
   onRemove: () => void
+  onDuplicate: () => void
+  onMove: (dir: -1 | 1) => void
 }) {
   const exercises = useLiveQuery(() => db.exercises.toArray(), []) ?? []
   const [adding, setAdding] = useState(false)
@@ -260,9 +311,12 @@ function WorkoutEditor({
           />
         )}
         {!readOnly ? (
-          <button className="link danger small" onClick={onRemove}>
-            Remove workout
-          </button>
+          <div className="row small-gap">
+            <button className="link" onClick={() => onMove(-1)} disabled={!canMoveUp} aria-label="Move workout up">↑</button>
+            <button className="link" onClick={() => onMove(1)} disabled={!canMoveDown} aria-label="Move workout down">↓</button>
+            <button className="link" onClick={onDuplicate}>Duplicate</button>
+            <button className="link danger" onClick={onRemove}>Remove</button>
+          </div>
         ) : null}
       </div>
       <ul className="workout-items">
