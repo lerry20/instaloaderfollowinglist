@@ -7,11 +7,13 @@ export const DEFAULT_SETTINGS: Settings = {
   units: 'kg',
   defaultRestSec: 90,
   goalNotes:
-    'Bulk: gain ~0.25 kg / week. Push every working set to RPE 8 and add load when you hit the top of the rep range two sessions in a row.',
+    'Bulk: gain ~0.25 kg / week. Push every working set hard, stop one rep short of failure, and add 2.5 kg whenever you hit the top of the rep range two sessions in a row.',
   goal: 'bulk',
   onboarded: false,
   notificationsEnabled: false,
   activeRoutineId: DEFAULT_ACTIVE_ROUTINE_ID,
+  skillLevel: 'beginner',
+  theme: 'system',
 }
 
 export async function seedIfEmpty() {
@@ -24,8 +26,15 @@ export async function seedIfEmpty() {
   const existingSettings = await db.settings.get(1)
   if (!existingSettings) {
     await db.settings.put(DEFAULT_SETTINGS)
-  } else if (!existingSettings.activeRoutineId) {
-    await db.settings.put({ ...existingSettings, activeRoutineId: DEFAULT_ACTIVE_ROUTINE_ID })
+  } else {
+    // Backfill any new fields on upgrade without overwriting user choices.
+    await db.settings.put({
+      ...DEFAULT_SETTINGS,
+      ...existingSettings,
+      activeRoutineId: existingSettings.activeRoutineId || DEFAULT_ACTIVE_ROUTINE_ID,
+      skillLevel: existingSettings.skillLevel ?? 'beginner',
+      theme: existingSettings.theme ?? 'system',
+    })
   }
 }
 

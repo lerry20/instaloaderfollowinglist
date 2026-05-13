@@ -18,7 +18,7 @@ export default function SettingsModal({ onClose }: Props) {
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     if (!settings) return
     db.settings.put({ ...settings, [key]: value }).then(() => {
-      toast('Settings saved', { kind: 'success', duration: 1500 })
+      toast('Saved', { kind: 'success', duration: 1200 })
     })
   }
 
@@ -29,6 +29,40 @@ export default function SettingsModal({ onClose }: Props) {
           <h3>Settings</h3>
           <button className="link" onClick={onClose}>Close</button>
         </header>
+
+        <SettingsRow label="Theme">
+          <div className="seg">
+            {(['system', 'light', 'dark'] as const).map((t) => (
+              <button
+                key={t}
+                className={settings.theme === t ? 'active' : ''}
+                onClick={() => update('theme', t)}
+              >
+                {t === 'system' ? 'Auto' : t[0].toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+        </SettingsRow>
+
+        <SettingsRow label="Detail level">
+          <div className="seg">
+            <button
+              className={settings.skillLevel === 'beginner' ? 'active' : ''}
+              onClick={() => update('skillLevel', 'beginner')}
+            >
+              Beginner
+            </button>
+            <button
+              className={settings.skillLevel === 'advanced' ? 'active' : ''}
+              onClick={() => update('skillLevel', 'advanced')}
+            >
+              Advanced
+            </button>
+          </div>
+        </SettingsRow>
+        <p className="muted small inline-explainer">
+          Beginner shows technique cues + bulking tips on each exercise. Advanced hides them for a cleaner session screen.
+        </p>
 
         <SettingsRow label="Goal">
           <div className="seg">

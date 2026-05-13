@@ -21,13 +21,15 @@ export default function Onboarding() {
       goal,
       goalNotes:
         goal === 'bulk'
-          ? 'Bulk: gain ~0.25 kg / week. Push every working set to RPE 8 and add load when you hit the top of the rep range two sessions in a row.'
+          ? 'Bulk: gain ~0.25 kg / week. Push every working set hard, stop one rep short of failure, and add 2.5 kg whenever you hit the top of the rep range two sessions in a row.'
           : goal === 'cut'
           ? 'Cut: lose ~0.5 kg / week. Maintain working weights — strength preservation matters more than progression.'
           : 'Recomp: hold bodyweight steady, push working sets to grow muscle while body-fat slowly drops.',
       onboarded: true,
       notificationsEnabled: existing?.notificationsEnabled ?? false,
       activeRoutineId: routineId,
+      skillLevel: existing?.skillLevel ?? 'beginner',
+      theme: existing?.theme ?? 'system',
     })
     navigate('/')
   }

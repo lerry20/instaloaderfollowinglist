@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Routine, type Session, type WorkoutDef } from '../db/schema'
@@ -14,7 +14,7 @@ import {
   useSessionSetLogs,
   useSettings,
 } from '../db/queries'
-import SessionExerciseCard from '../components/SessionExerciseCard'
+import SessionPager from '../components/SessionPager'
 import WorkoutSummary from '../components/WorkoutSummary'
 import PlateSheet from '../components/PlateSheet'
 import { kgToDisplay } from '../lib/units'
@@ -150,6 +150,14 @@ function ActiveSessionView({
   const progress = totalPlanned > 0 ? Math.min(100, (workingLogs.length / totalPlanned) * 100) : 0
   const unloggedSets = Math.max(0, totalPlanned - workingLogs.length)
 
+  const workingLogsByExercise = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const l of workingLogs) {
+      map[l.exerciseId] = (map[l.exerciseId] ?? 0) + 1
+    }
+    return map
+  }, [workingLogs])
+
   async function swap(oldId: string, newId: string) {
     const item = session.items.find((i) => i.exerciseId === oldId)
     if (!item) return
@@ -168,8 +176,8 @@ function ActiveSessionView({
   }
 
   return (
-    <div className="page session-page">
-      <header className="session-header">
+    <div className="page session-page-shell">
+      <header className="session-header compact">
         <div className="session-title-row">
           <div>
             <span className="muted small">{routine.name}</span>
@@ -199,19 +207,15 @@ function ActiveSessionView({
           <p className="muted">All exercises skipped or removed. Finish or discard the workout.</p>
         </section>
       ) : (
-        session.items.map((item, idx) => (
-          <SessionExerciseCard
-            key={item.exerciseId}
-            item={item}
-            sessionId={session.id!}
-            units={units}
-            positionIndex={idx}
-            totalExercises={session.items.length}
-            onSwap={(newId) => swap(item.exerciseId, newId)}
-            onSkip={() => skipExercise(item.exerciseId)}
-            onFocus={(kg) => setFocusedKg(kg)}
-          />
-        ))
+        <SessionPager
+          items={session.items}
+          sessionId={session.id!}
+          units={units}
+          onSwap={swap}
+          onSkip={skipExercise}
+          onFocus={(kg) => setFocusedKg(kg)}
+          workingLogsByExercise={workingLogsByExercise}
+        />
       )}
 
       <button
