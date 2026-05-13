@@ -8,10 +8,15 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,gif,webp,woff2}'],
+        navigateFallback: 'index.html',
+      },
       manifest: {
-        name: 'Instaloader Following List',
-        short_name: 'FollowingList',
-        description: 'A minimal Vite + React + TypeScript PWA.',
+        name: 'BulkLog — Workout Dashboard',
+        short_name: 'BulkLog',
+        description:
+          'Personal workout dashboard for hypertrophy and bulking — weekly plan, set logger, technique cues, fully offline.',
         theme_color: '#0b1020',
         background_color: '#0b1020',
         display: 'standalone',
