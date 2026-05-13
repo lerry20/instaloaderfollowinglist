@@ -2198,3 +2198,96 @@ html[data-theme='light'] .progress-strip-fill {
 @media (max-width: 480px) {
   .settings-grid-2 { grid-template-columns: 1fr; }
 }
+
+/* === Proactive message on Train start === */
+.proactive {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.proactive-streak { border-left-color: var(--accent); }
+.proactive-gap { border-left-color: var(--warning); }
+.proactive-deload { border-left-color: var(--warning); }
+.proactive-volume-high { border-left-color: var(--danger); }
+.proactive-plateau { border-left-color: var(--gold); }
+
+/* === Streak badge === */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  border-radius: 999px;
+  color: var(--accent);
+  margin-left: 0.35rem;
+}
+
+/* === Skeleton loaders === */
+.skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.skeleton-bar {
+  border-radius: 7px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-elev) 0%,
+    var(--bg-elev-2) 50%,
+    var(--bg-elev) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* === Workout-summary "big" stats === */
+.summary-stats.big > div {
+  padding: 0.85rem 0.5rem;
+}
+.stat-big { font-size: 1.8rem; line-height: 1; }
+.stat-pr {
+  color: var(--gold);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 45%, transparent);
+}
+
+/* === Confetti === */
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.confetti-piece {
+  position: absolute;
+  top: -16px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.85;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.6, 0.7, 1);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-16px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.95; }
+  100% { transform: translateY(420px) rotate(720deg); opacity: 0; }
+}
+.modal.summary {
+  position: relative;
+  overflow-x: hidden;
+}
