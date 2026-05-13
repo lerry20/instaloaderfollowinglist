@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Train from './routes/Train'
 import Routines from './routes/Routines'
 import Progress from './routes/Progress'
+import Daily from './routes/Daily'
 import ExerciseDetail from './routes/ExerciseDetail'
 import Onboarding from './routes/Onboarding'
 import { seedIfEmpty } from './db/seed'
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/" element={<Train />} />
             <Route path="/train" element={<Train />} />
             <Route path="/routines" element={<Routines />} />
+            <Route path="/daily" element={<Daily />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/exercise/:id" element={<ExerciseDetail />} />
             <Route path="*" element={<Navigate to="/" replace />} />

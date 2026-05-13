@@ -26,6 +26,7 @@ import {
 } from '../db/queries'
 import { displayToKg, kgToDisplay } from '../lib/units'
 import ProgressChart from '../components/ProgressChart'
+import VolumeBars from '../components/VolumeBars'
 import { toast } from '../state/toasts'
 
 export default function Progress() {
@@ -37,11 +38,28 @@ export default function Progress() {
     <div className="page">
       <h1 className="big-title">Progress</h1>
       <PRTicker units={units} />
+      <WeeklyVolumeBarsSection />
       <BodyweightSection units={units} />
       <TopSetCards units={units} />
       <WeeklyVolumeSection units={units} />
       <HistorySection units={units} />
     </div>
+  )
+}
+
+function WeeklyVolumeBarsSection() {
+  return (
+    <section className="card">
+      <header className="section-head">
+        <h3>Weekly volume by muscle</h3>
+        <span className="muted small">last 7 days · MEV / MAV / MRV (Israetel)</span>
+      </header>
+      <VolumeBars />
+      <p className="muted small">
+        Below MEV → not enough stimulus. Past MAV → diminishing returns. Past MRV → likely junk volume.
+        Aim for the green band.
+      </p>
+    </section>
   )
 }
 

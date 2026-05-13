@@ -104,10 +104,39 @@ export interface BodyweightLog {
   weightKg: number
 }
 
+export interface NutritionLog {
+  date: string
+  kcal: number
+  proteinG: number
+  notes?: string
+}
+
+export interface SleepLog {
+  date: string
+  hours: number
+  soreness: number // 1-5
+  notes?: string
+}
+
+export interface MeasurementLog {
+  date: string
+  waistCm?: number
+  chestCm?: number
+  armCm?: number
+}
+
+export interface CoachMessage {
+  id?: number
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  ts: number
+}
+
 export type Units = 'kg' | 'lb'
 export type Goal = 'bulk' | 'cut' | 'recomp'
 export type SkillLevel = 'beginner' | 'advanced'
 export type Theme = 'system' | 'light' | 'dark'
+export type PeriodizationPhase = 'volume' | 'intensification' | 'deload'
 
 export interface Settings {
   id: 1
@@ -120,6 +149,11 @@ export interface Settings {
   activeRoutineId: string
   skillLevel: SkillLevel
   theme: Theme
+  kcalTarget?: number
+  proteinTargetG?: number
+  aiApiKey?: string
+  periodizationPhase: PeriodizationPhase
+  periodizationWeek: number
 }
 
 class WorkoutDB extends Dexie {
@@ -129,6 +163,10 @@ class WorkoutDB extends Dexie {
   setLogs!: Table<SetLog, number>
   bodyweight!: Table<BodyweightLog, string>
   settings!: Table<Settings, number>
+  nutrition!: Table<NutritionLog, string>
+  sleep!: Table<SleepLog, string>
+  measurements!: Table<MeasurementLog, string>
+  coachMessages!: Table<CoachMessage, number>
   // Old "plans" table kept for migration path; not used after v4.
   plans!: Table<unknown, string>
 
@@ -221,6 +259,32 @@ class WorkoutDB extends Dexie {
             goal: settings.goal ?? 'bulk',
             onboarded: settings.onboarded ?? false,
             notificationsEnabled: settings.notificationsEnabled ?? false,
+          })
+        }
+      })
+
+    // v5 — daily check-in (nutrition / sleep / measurements) + AI coach
+    // + periodization phase tracking.
+    this.version(5)
+      .stores({
+        exercises: 'id, primaryMuscle',
+        routines: 'id',
+        sessions: '++id, date, routineId, workoutId',
+        setLogs: '++id, sessionId, exerciseId, loggedAt',
+        bodyweight: 'date',
+        settings: 'id',
+        nutrition: 'date',
+        sleep: 'date',
+        measurements: 'date',
+        coachMessages: '++id, ts',
+      })
+      .upgrade(async (tx) => {
+        const s = await tx.table('settings').get(1)
+        if (s) {
+          await tx.table('settings').put({
+            ...s,
+            periodizationPhase: s.periodizationPhase ?? 'volume',
+            periodizationWeek: s.periodizationWeek ?? 1,
           })
         }
       })

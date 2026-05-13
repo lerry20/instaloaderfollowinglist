@@ -14,6 +14,8 @@ export const DEFAULT_SETTINGS: Settings = {
   activeRoutineId: DEFAULT_ACTIVE_ROUTINE_ID,
   skillLevel: 'beginner',
   theme: 'system',
+  periodizationPhase: 'volume',
+  periodizationWeek: 1,
 }
 
 export async function seedIfEmpty() {
@@ -34,6 +36,8 @@ export async function seedIfEmpty() {
       activeRoutineId: existingSettings.activeRoutineId || DEFAULT_ACTIVE_ROUTINE_ID,
       skillLevel: existingSettings.skillLevel ?? 'beginner',
       theme: existingSettings.theme ?? 'system',
+      periodizationPhase: existingSettings.periodizationPhase ?? 'volume',
+      periodizationWeek: existingSettings.periodizationWeek ?? 1,
     })
   }
 }
@@ -46,6 +50,10 @@ export async function resetDatabase() {
     db.setLogs.clear(),
     db.bodyweight.clear(),
     db.settings.clear(),
+    db.nutrition.clear(),
+    db.sleep.clear(),
+    db.measurements.clear(),
+    db.coachMessages.clear(),
   ])
   await seedIfEmpty()
 }
