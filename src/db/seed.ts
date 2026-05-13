@@ -3,6 +3,8 @@ import { EXERCISES } from '../data/exercises'
 import { DEFAULT_PLAN, DEFAULT_SETTINGS } from '../data/defaultPlan'
 
 export async function seedIfEmpty() {
+  // Always upsert exercises so new fields (youtubeQuery, category, defaultRestSec)
+  // propagate on app upgrades.
   await db.exercises.bulkPut(EXERCISES)
 
   const existingPlan = await db.plans.get(DEFAULT_PLAN.id)

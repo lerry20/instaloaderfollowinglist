@@ -13,21 +13,21 @@ export default function RestTimerBar() {
   if (totalSec === 0) return null
   const pct = totalSec > 0 ? ((totalSec - remaining) / totalSec) * 100 : 100
   const done = remaining === 0
-  const mm = String(Math.floor(remaining / 60)).padStart(1, '0')
+  const mm = String(Math.floor(remaining / 60))
   const ss = String(remaining % 60).padStart(2, '0')
   return (
     <div className={`rest-bar${done ? ' done' : ''}`} role="status" aria-live="polite">
       <div className="rest-bar-progress" style={{ width: `${pct}%` }} />
       <div className="rest-bar-content">
-        <span className="rest-bar-label">{done ? 'Rest complete' : 'Rest'}</span>
+        <span className="rest-bar-label">{done ? 'Rest complete · go!' : 'Rest'}</span>
         <span className="rest-bar-time">
           {mm}:{ss}
         </span>
         <div className="rest-bar-actions">
-          <button onClick={() => addSec(-15)} disabled={done}>
+          <button onClick={() => addSec(-15)} disabled={done} aria-label="Subtract 15 seconds">
             −15
           </button>
-          <button onClick={() => addSec(15)} disabled={done}>
+          <button onClick={() => addSec(15)} disabled={done} aria-label="Add 15 seconds">
             +15
           </button>
           <button onClick={stop} className="primary">

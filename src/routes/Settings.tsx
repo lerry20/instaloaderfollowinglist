@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { db } from '../db/schema'
 import { resetDatabase } from '../db/seed'
 import { useSettings } from '../db/queries'
+import { ensureNotificationPermission } from '../state/restTimer'
 
 export default function Settings() {
   const settings = useSettings()
@@ -15,16 +16,39 @@ export default function Settings() {
       <h1>Settings</h1>
 
       <section className="card">
-        <h3>Goal notes</h3>
-        <textarea
-          rows={4}
-          value={settings.goalNotes}
-          onChange={(e) => db.settings.put({ ...settings, goalNotes: e.target.value })}
-        />
+        <h3>Goal</h3>
+        <div className="seg">
+          <button
+            className={settings.goal === 'bulk' ? 'active' : ''}
+            onClick={() => db.settings.put({ ...settings, goal: 'bulk' })}
+          >
+            Bulk
+          </button>
+          <button
+            className={settings.goal === 'cut' ? 'active' : ''}
+            onClick={() => db.settings.put({ ...settings, goal: 'cut' })}
+          >
+            Cut
+          </button>
+          <button
+            className={settings.goal === 'recomp' ? 'active' : ''}
+            onClick={() => db.settings.put({ ...settings, goal: 'recomp' })}
+          >
+            Recomp
+          </button>
+        </div>
+        <label className="field" style={{ marginTop: '0.6rem' }}>
+          <span>Notes</span>
+          <textarea
+            rows={4}
+            value={settings.goalNotes}
+            onChange={(e) => db.settings.put({ ...settings, goalNotes: e.target.value })}
+          />
+        </label>
       </section>
 
       <section className="card">
-        <h3>Units</h3>
+        <h3>Units (display)</h3>
         <div className="seg">
           <button
             className={settings.units === 'kg' ? 'active' : ''}
@@ -39,13 +63,13 @@ export default function Settings() {
             lb
           </button>
         </div>
-        <p className="muted small">Display unit only — stored values are not converted.</p>
+        <p className="muted small">All weights are converted on the fly. Underlying storage stays in kg, so toggling never loses precision.</p>
       </section>
 
       <section className="card">
         <h3>Default rest timer</h3>
         <div className="seg">
-          {[60, 90, 120, 180].map((s) => (
+          {[60, 90, 120, 180, 240].map((s) => (
             <button
               key={s}
               className={settings.defaultRestSec === s ? 'active' : ''}
@@ -55,6 +79,27 @@ export default function Settings() {
             </button>
           ))}
         </div>
+        <p className="muted small">Used when an exercise has no per-exercise default. Compounds get longer rests, isolations get shorter, automatically.</p>
+      </section>
+
+      <section className="card">
+        <h3>Notifications</h3>
+        {settings.notificationsEnabled ? (
+          <p className="muted small">✓ Rest-timer notifications are enabled in this browser.</p>
+        ) : (
+          <button
+            className="btn"
+            onClick={async () => {
+              const granted = await ensureNotificationPermission()
+              if (granted) {
+                await db.settings.put({ ...settings, notificationsEnabled: true })
+              }
+            }}
+          >
+            Enable rest-timer notifications
+          </button>
+        )}
+        <p className="muted small">Lets BulkLog ping you when your rest is up, even if the screen has dimmed.</p>
       </section>
 
       <section className="card">

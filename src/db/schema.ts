@@ -50,6 +50,8 @@ export type PostureKey =
   | 'calfRaise'
   | 'standing'
 
+export type ExerciseCategory = 'compound' | 'isolation'
+
 export interface Exercise {
   id: string
   name: string
@@ -60,6 +62,9 @@ export interface Exercise {
   muscleHighlights: MuscleKey[]
   cues: string[]
   bulkingTip: string
+  youtubeQuery: string
+  category: ExerciseCategory
+  defaultRestSec: number
 }
 
 export interface PlanItem {
@@ -85,6 +90,7 @@ export interface Session {
   date: string
   dayKey: DayKey
   planDayLabel: string
+  items: PlanItem[]
   startedAt: number
   completedAt: number | null
 }
@@ -97,6 +103,7 @@ export interface SetLog {
   weight: number
   reps: number
   rpe: number | null
+  isWarmup: boolean
   loggedAt: number
 }
 
@@ -105,11 +112,17 @@ export interface BodyweightLog {
   weightKg: number
 }
 
+export type Units = 'kg' | 'lb'
+export type Goal = 'bulk' | 'cut' | 'recomp'
+
 export interface Settings {
   id: 1
-  units: 'kg' | 'lb'
+  units: Units
   defaultRestSec: number
   goalNotes: string
+  goal: Goal
+  onboarded: boolean
+  notificationsEnabled: boolean
 }
 
 class WorkoutDB extends Dexie {
@@ -130,6 +143,38 @@ class WorkoutDB extends Dexie {
       bodyweight: 'date',
       settings: 'id',
     })
+    this.version(2)
+      .stores({
+        exercises: 'id, primaryMuscle',
+        plans: 'id',
+        sessions: '++id, date, dayKey',
+        setLogs: '++id, sessionId, exerciseId, loggedAt',
+        bodyweight: 'date',
+        settings: 'id',
+      })
+      .upgrade(async (tx) => {
+        const sessions = await tx.table<Session>('sessions').toArray()
+        for (const s of sessions) {
+          if (!s.items) {
+            await tx.table('sessions').update(s.id!, { items: [] })
+          }
+        }
+        const logs = await tx.table<SetLog>('setLogs').toArray()
+        for (const l of logs) {
+          if (l.isWarmup === undefined) {
+            await tx.table('setLogs').update(l.id!, { isWarmup: false })
+          }
+        }
+        const settings = await tx.table<Settings>('settings').get(1)
+        if (settings) {
+          await tx.table('settings').put({
+            ...settings,
+            goal: settings.goal ?? 'bulk',
+            onboarded: settings.onboarded ?? false,
+            notificationsEnabled: settings.notificationsEnabled ?? false,
+          })
+        }
+      })
   }
 }
 

@@ -70,10 +70,15 @@ export const DEFAULT_PLAN: Plan = {
   },
 }
 
-export const DEFAULT_SETTINGS = {
-  id: 1 as const,
-  units: 'kg' as const,
+import type { Settings } from '../db/schema'
+
+export const DEFAULT_SETTINGS: Settings = {
+  id: 1,
+  units: 'kg',
   defaultRestSec: 90,
   goalNotes:
     'Bulk: gain ~0.25 kg / week. Push every working set to RPE 8 and add load when you hit the top of the rep range two sessions in a row.',
+  goal: 'bulk',
+  onboarded: false,
+  notificationsEnabled: false,
 }

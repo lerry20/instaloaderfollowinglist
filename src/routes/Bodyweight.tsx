@@ -1,17 +1,21 @@
 import { useState } from 'react'
 import { db } from '../db/schema'
 import ProgressChart from '../components/ProgressChart'
-import { todayISO, useBodyweightLogs } from '../db/queries'
+import { todayISO, useBodyweightLogs, useSettings } from '../db/queries'
+import { displayToKg, kgToDisplay } from '../lib/units'
 
 export default function Bodyweight() {
   const logs = useBodyweightLogs()
+  const settings = useSettings()
   const [weight, setWeight] = useState<number | ''>('')
   const today = todayISO()
+  const units = settings?.units ?? 'kg'
   const todayLog = logs?.find((l) => l.date === today)
+  const todayDisplay = todayLog ? kgToDisplay(todayLog.weightKg, units) : null
 
   const series = (logs ?? []).slice(-60).map((l) => ({
     label: l.date.slice(5),
-    value: l.weightKg,
+    value: Number(kgToDisplay(l.weightKg, units).toFixed(1)),
   }))
 
   return (
@@ -25,49 +29,54 @@ export default function Bodyweight() {
             inputMode="decimal"
             step="0.1"
             value={weight}
-            placeholder={todayLog ? String(todayLog.weightKg) : 'kg'}
+            placeholder={todayDisplay !== null ? todayDisplay.toFixed(1) : units}
             onChange={(e) => setWeight(e.target.value === '' ? '' : Number(e.target.value))}
           />
+          <span className="muted small unit-label">{units}</span>
           <button
             className="btn primary"
             disabled={weight === '' || Number.isNaN(Number(weight))}
             onClick={async () => {
               if (weight === '') return
-              await db.bodyweight.put({ date: today, weightKg: Number(weight) })
+              const kg = displayToKg(Number(weight), units)
+              await db.bodyweight.put({ date: today, weightKg: kg })
               setWeight('')
             }}
           >
             {todayLog ? 'Update' : 'Log'}
           </button>
         </div>
-        {todayLog ? (
-          <p className="muted small">Today: {todayLog.weightKg} kg</p>
+        {todayDisplay !== null ? (
+          <p className="muted small">Today: {todayDisplay.toFixed(1)} {units}</p>
         ) : (
           <p className="muted small">No entry for today yet.</p>
         )}
       </section>
 
       <section className="card">
-        <h3>Trend (last 60 logs)</h3>
-        <ProgressChart data={series} unit="kg" height={240} />
+        <h3>Trend ({units}) — last 60 entries</h3>
+        <ProgressChart data={series} unit={units} height={240} />
       </section>
 
       {logs && logs.length > 0 ? (
         <section className="card">
           <h3>All entries</h3>
           <ul className="bw-list">
-            {[...logs].reverse().map((l) => (
-              <li key={l.date}>
-                <span>{l.date}</span>
-                <strong>{l.weightKg} kg</strong>
-                <button
-                  className="link danger"
-                  onClick={() => db.bodyweight.delete(l.date)}
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
+            {[...logs].reverse().map((l) => {
+              const v = kgToDisplay(l.weightKg, units)
+              return (
+                <li key={l.date}>
+                  <span>{l.date}</span>
+                  <strong>{v.toFixed(1)} {units}</strong>
+                  <button
+                    className="link danger"
+                    onClick={() => db.bodyweight.delete(l.date)}
+                  >
+                    Delete
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </section>
       ) : null}
