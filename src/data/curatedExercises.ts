@@ -19,13 +19,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Barbell_Bench_Press_-_Medium_Grip'),
     isCurated: true,
     cues: [
-      'Retract and depress shoulder blades into the bench.',
-      'Feet planted, slight arch, glutes on bench.',
-      'Bar path: touch low chest, press up and slightly back.',
-      'Elbows ~60–75° from torso, wrists stacked over elbows.',
+      'Pinch your shoulder blades together and pull them down toward your back pockets, into the bench.',
+      'Feet flat on the floor, butt on the bench, slight gap under your lower back.',
+      'Lower the bar to your lower chest, then press it back up and slightly toward your face — not straight up.',
+      'Keep your elbows tucked closer to your sides than flared out (~45°). Wrists stacked over elbows.',
     ],
     bulkingTip:
-      'Top compound for chest mass — push 4–5 working sets at RPE 8 and add 2.5 kg whenever you hit the top of the rep range.',
+      'The king of upper-body lifts. Push 4–5 working sets hard but stop one rep short of failure. When you can hit the top of your rep range two sessions in a row, add 2.5 kg next time.',
   },
   {
     id: 'incline-db-press',
@@ -39,13 +39,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Incline_Dumbbell_Press'),
     isCurated: true,
     cues: [
-      'Bench at 30°, not steeper — too high turns it into a shoulder press.',
-      'Press dumbbells up and slightly together at the top.',
-      'Lower under control to upper chest, full stretch.',
-      'Keep shoulder blades pinned back throughout.',
+      'Set the bench to about 30 degrees. Steeper than that and it stops working your chest.',
+      'Press the dumbbells up and slightly toward each other at the top.',
+      'Lower them slowly to the sides of your upper chest — let them stretch the muscle.',
+      'Keep your shoulder blades pinned to the bench the whole time.',
     ],
     bulkingTip:
-      'Upper-chest emphasis. Drive a full stretch — eccentric overload here builds the “shelf” look that lagging bench-only physiques miss.',
+      'Builds the upper chest — the part most lifters miss. Focus on a deep stretch at the bottom of each rep instead of how heavy you go.',
   },
   {
     id: 'ohp',
@@ -59,13 +59,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Standing_Military_Press'),
     isCurated: true,
     cues: [
-      'Bar on front delts, elbows just in front of the bar.',
-      'Brace core, squeeze glutes — no leg drive.',
-      'Press up, then shift head through the “window” at lockout.',
-      'Lock elbows fully overhead.',
+      'Rest the bar on your shoulders, elbows just in front of the bar.',
+      'Squeeze your abs and glutes tight so your lower back stays straight — no bouncing with your legs.',
+      'Press the bar straight up. Once it clears your forehead, push your head forward so the bar passes close to your face.',
+      'Finish with your elbows fully locked and your biceps near your ears.',
     ],
     bulkingTip:
-      'The single best vertical press for shoulder thickness. Treat it like a strength lift — 4×5 at RPE 8, focus on adding load.',
+      'The best builder for shoulder thickness. Treat it like a heavy strength lift — 4 sets of 5 reps, focused on adding weight over months.',
   },
   {
     id: 'lateral-raise',
@@ -79,33 +79,33 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Side_Lateral_Raise'),
     isCurated: true,
     cues: [
-      'Slight forward lean, tiny bend in elbows, locked there.',
-      'Lead with elbows — pinky a hair higher than thumb at the top.',
-      'Stop at shoulder height, don’t shrug.',
-      'Three-second negative on every rep.',
+      'Stand with a small forward lean. Bend your elbows just slightly and keep that bend locked.',
+      'Raise the dumbbells out to the sides by lifting your elbows — like pouring water out of two jugs.',
+      'Stop at shoulder height. Don\'t shrug your traps to help.',
+      'Lower the weights slowly, about 3 seconds down.',
     ],
     bulkingTip:
-      'Width is built here. Aim for 4–5 sets of 12–20 reps to failure — light weight, strict form beats heavy swinging every time.',
+      'This is what gives shoulders their width. Use light dumbbells and do 4–5 sets of 12–20 reps to near-failure — perfect form beats heavy swinging.',
   },
   {
     id: 'tricep-pushdown',
     name: 'Cable Tricep Pushdown',
     primaryMuscle: 'tricep',
     secondaryMuscles: [],
-    equipment: 'Cable + rope/bar',
+    equipment: 'Cable + rope or bar',
     category: 'isolation',
     defaultRestSec: 75,
     videoQuery: 'cable tricep pushdown form',
     imageUrls: imgs('Triceps_Pushdown'),
     isCurated: true,
     cues: [
-      'Elbows pinned to ribs — they do not drift forward.',
-      'Full lockout, brief squeeze at the bottom.',
-      'Control the negative back to a 90° bend.',
-      'Keep wrists neutral, no wrist flexion.',
+      'Keep your elbows pressed against your sides — only your forearms should move.',
+      'Push the bar all the way down and squeeze your triceps hard for a beat.',
+      'Let the bar come back up under control, stopping when your elbows are bent to about 90°.',
+      'Keep your wrists straight — don\'t let them bend backward.',
     ],
     bulkingTip:
-      'Triceps are 2/3 of your arm. Pair with overhead extensions across the week to hit both long-head and lateral-head fibers.',
+      'Triceps make up two thirds of your arm. Pair this (lateral head) with overhead extensions (long head) in the same week for full development.',
   },
   {
     id: 'overhead-tricep-ext',
@@ -119,13 +119,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Tricep_Dumbbell_Kickback'),
     isCurated: true,
     cues: [
-      'Stagger stance, lean forward slightly with rope behind head.',
-      'Elbows high and locked in position — only the forearms move.',
-      'Full stretch at the bottom, full extension at the top.',
-      'Don’t flare elbows out.',
+      'Stand with one foot slightly forward, lean forward a bit. The rope starts behind your head.',
+      'Keep your elbows pointing forward and high — they stay still. Only your forearms move.',
+      'Reach all the way back behind your head for a deep stretch, then straighten your arms fully.',
+      'Don\'t let your elbows flare out to the sides.',
     ],
     bulkingTip:
-      'Hits the long head of the tricep at full stretch — best mass builder for the “horseshoe” look.',
+      'The long head of the tricep grows best in a stretched position. This is the most direct way to hit it.',
   },
   {
     id: 'deadlift',
@@ -139,13 +139,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Barbell_Deadlift'),
     isCurated: true,
     cues: [
-      'Bar over mid-foot, shins ~2 cm from bar at start.',
-      'Hips high enough that shoulders are slightly ahead of the bar.',
-      'Big breath, brace, “wedge” into the bar before pulling.',
-      'Push the floor away — bar drags up your shins.',
+      'Position the bar over the middle of your feet. Your shins should be about a finger\'s width from it.',
+      'Bend down to grab the bar. Hips slightly above your knees, shoulders just over the bar.',
+      'Take a deep belly breath, brace hard, and pull the slack out of the bar before lifting.',
+      'Push the floor away with your feet. The bar should slide up your shins, not swing forward.',
     ],
     bulkingTip:
-      'Hardest mass builder for the entire posterior chain. 3 working sets of 3–5 reps is plenty — fatigue is brutal.',
+      'The single best builder for your entire posterior chain — hamstrings, glutes, lower back, traps. Three working sets of 3–5 reps is plenty; fatigue is brutal.',
   },
   {
     id: 'barbell-row',
@@ -159,13 +159,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Bent_Over_Barbell_Row'),
     isCurated: true,
     cues: [
-      'Hinge to ~45°, neutral spine, knees soft.',
-      'Pull bar to lower chest / upper abs.',
-      'Lead with elbows, squeeze shoulder blades together at top.',
-      'No torso swing — if you have to heave it, drop the weight.',
+      'Bend over until your torso is about 45 degrees. Keep your back flat, knees slightly bent.',
+      'Pull the bar up to your lower chest or upper belly.',
+      'Drive your elbows back and squeeze your shoulder blades together at the top.',
+      'Don\'t use your back to swing the weight up — if you have to cheat, drop the load.',
     ],
     bulkingTip:
-      'Builds back thickness more than width. Pair with pull-ups in the same week for a complete back.',
+      'Builds back thickness — the layer that fills out a shirt. Pair with pull-ups in the same week for thickness AND width.',
   },
   {
     id: 'pullup',
@@ -179,13 +179,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Pullups'),
     isCurated: true,
     cues: [
-      'Full hang at the bottom, shoulders engaged (no shrugging up).',
-      'Drive elbows down and back toward your hips.',
-      'Chin clears the bar without head-craning.',
-      'Slow 2-second negative.',
+      'Start fully hanging. Even at the bottom, keep your shoulders pulled down — don\'t let them shrug to your ears.',
+      'Pull yourself up by driving your elbows down and back toward your hips.',
+      'Bring your chin over the bar without straining your neck.',
+      'Lower yourself slowly, about 2 seconds down.',
     ],
     bulkingTip:
-      'Add load with a dip belt once you hit 8 clean reps. For width, prioritize stretch + control over rep count.',
+      'Best width builder for your back. Once you can do 8 strict reps, hang a 10 kg weight from a dip belt and keep progressing.',
   },
   {
     id: 'seated-cable-row',
@@ -199,13 +199,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Seated_Cable_Rows'),
     isCurated: true,
     cues: [
-      'Chest up, slight backward lean, neutral spine.',
-      'Pull handle to lower sternum, elbows skim ribs.',
-      'Pause and squeeze shoulder blades for a beat.',
-      'Allow a controlled stretch forward each rep.',
+      'Sit tall with your chest lifted and a slight backward lean. Back stays straight, not rounded.',
+      'Pull the handle to your lower chest with your elbows sliding along your sides.',
+      'Squeeze your shoulder blades together and hold for a moment.',
+      'Let the handle pull your arms forward for a full stretch each rep — but don\'t round your back.',
     ],
     bulkingTip:
-      'Great "junk volume" row for hypertrophy — use 10–15 rep sets with strict form to chase a back pump.',
+      'A great pump row for hypertrophy. Use 10–15 rep sets with strict form to chase a back pump after your heavier rowing work.',
   },
   {
     id: 'face-pull',
@@ -219,13 +219,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Face_Pull'),
     isCurated: true,
     cues: [
-      'Rope set just above eye level.',
-      'Pull rope to forehead, hands ending in “double biceps” position.',
-      'External rotation at the top — thumbs back.',
-      'Light weight, slow tempo — this is a corrective, not a power move.',
+      'Set the rope slightly above eye level.',
+      'Pull the rope toward your forehead. End with your hands next to your ears in a "double biceps flex".',
+      'Rotate your wrists so your thumbs point backward at the top.',
+      'Use light weight and slow control — this builds shoulder health, not strength.',
     ],
     bulkingTip:
-      'Cheapest shoulder insurance you can buy. Do 3×15 after every pressing day — keeps the rotator cuff and rear delts strong while you bulk.',
+      'Cheap shoulder insurance. Do 3 sets of 15 reps after every pressing day — keeps your shoulders healthy through heavy bench and overhead work.',
   },
   {
     id: 'barbell-curl',
@@ -239,13 +239,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Barbell_Curl'),
     isCurated: true,
     cues: [
-      'Elbows pinned to torso — they do not drift forward.',
-      'Curl up to ~45° past vertical, squeeze the bicep peak.',
-      'Lower under control to full extension.',
-      'No swinging from the lower back.',
+      'Keep your elbows tucked into your sides. They shouldn\'t drift forward as you curl.',
+      'Lift the bar up until your forearms are slightly past vertical, then squeeze your biceps hard.',
+      'Lower the bar all the way down until your arms are straight, slowly.',
+      'Don\'t rock your hips or use your back to swing the weight up.',
     ],
     bulkingTip:
-      'Treat one curl variation per week as a "heavy day" (5–6 reps) and one as a high-rep pump day (12–20).',
+      'Make one curl day per week heavy (5–6 reps) and another a pump day (12–20 reps) for the most bicep growth.',
   },
   {
     id: 'hammer-curl',
@@ -259,13 +259,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Hammer_Curls'),
     isCurated: true,
     cues: [
-      'Neutral grip throughout — thumbs up.',
-      'Elbows tight to your sides.',
-      'Curl alternating or both at once.',
-      'Squeeze at the top, slow eccentric.',
+      'Hold the dumbbells with your thumbs pointing up the whole time (like holding a hammer).',
+      'Keep your elbows pinned against your ribs.',
+      'Curl one arm at a time or both together. Stop when the dumbbell is near your shoulder.',
+      'Squeeze at the top, then lower the weight slowly.',
     ],
     bulkingTip:
-      'Best brachialis builder — that’s the muscle that pushes the bicep peak up. Adds visible arm thickness fast.',
+      'Hits the brachialis — the muscle underneath your bicep that pushes the peak up. Adds visible arm thickness fast.',
   },
   {
     id: 'back-squat',
@@ -279,13 +279,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Barbell_Squat'),
     isCurated: true,
     cues: [
-      'Bar in mid-trap groove, elbows under bar.',
-      'Brace core hard, big breath held until you rise.',
-      'Break at hips and knees together, sit between your heels.',
-      'Drive through whole foot, knees track over toes.',
+      'Rest the bar across the meaty part of your upper back (not on your neck). Pull your elbows down so they point toward the floor.',
+      'Take a big belly breath. Brace your stomach as if bracing for a punch. Hold that breath the whole way down and back up.',
+      'Squat by bending at your hips and knees at the same time. Push your knees out so your thighs follow the line of your toes.',
+      'Push the floor away with your whole foot. Stand all the way up, then breathe out.',
     ],
     bulkingTip:
-      'The single best leg-mass exercise. Even one heavy 5×5 day per week visibly thickens quads and glutes within a month.',
+      'King for leg size. Even one heavy day per week (around 5 sets of 5 hard reps) is enough to visibly thicken your quads and glutes within a month.',
   },
   {
     id: 'front-squat',
@@ -299,13 +299,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Clean_from_Blocks'),
     isCurated: true,
     cues: [
-      'Bar high on front delts, elbows up — "make a shelf".',
-      'Stay vertical, sit straight down.',
-      'Heels stay glued to the floor.',
-      'Drive elbows up out of the hole.',
+      'Rest the bar across the front of your shoulders. Push your elbows up so they\'re as high as possible — this creates a shelf for the bar.',
+      'Squat straight down — keep your torso upright, almost vertical.',
+      'Your heels should stay flat on the floor the whole time.',
+      'Out of the bottom, drive your elbows up and forward to keep your chest tall.',
     ],
     bulkingTip:
-      'Quad-dominant alternative that won’t blow up your lower back the way heavy back squats do. Useful on second leg day.',
+      'More quad focus, less lower-back stress than the back squat. Useful as a second leg day or an alternative when back squats wear you down.',
   },
   {
     id: 'rdl',
@@ -319,13 +319,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Romanian_Deadlift'),
     isCurated: true,
     cues: [
-      'Soft knees — bend ~15°, then lock them.',
-      'Hinge at the hips, pushing them back.',
-      'Bar travels down your thighs, stops just below the kneecap.',
-      'Feel the hamstring stretch, then drive hips forward to stand.',
+      'Slightly bend your knees (about 15°) and keep them locked in that bend the whole set.',
+      'Push your hips backward while keeping your back flat. Your torso lowers as your hips travel back.',
+      'Let the bar slide down the front of your thighs. Stop when it\'s just below your kneecaps.',
+      'When you feel a deep stretch in your hamstrings, drive your hips forward to stand back up.',
     ],
     bulkingTip:
-      'Best hamstring builder you can do without a leg-curl machine. Add to every leg day — sets of 8–10 at RPE 8.',
+      'The best hamstring builder you can do without a leg-curl machine. Add it to every leg day — sets of 8–10 reps stopped one rep short of failure.',
   },
   {
     id: 'leg-press',
@@ -339,13 +339,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Leg_Press'),
     isCurated: true,
     cues: [
-      'Feet shoulder-width, mid-foot on platform.',
-      'Lower until knees come close to ribs — full ROM.',
-      'Don’t let lower back round off the pad.',
-      'Push through whole foot, don’t lock knees hard.',
+      'Place your feet on the platform shoulder-width apart, with your mid-foot in the middle.',
+      'Lower the platform until your knees are nearly touching your ribs. Going deep is what builds muscle.',
+      'Stop before your lower back rounds off the seat — that\'s how backs get hurt.',
+      'Push through your whole foot to come back up. Don\'t snap your knees straight at the top.',
     ],
     bulkingTip:
-      'Safe way to add huge quad volume on top of squats — go 3×12–15 to failure for hypertrophy.',
+      'Lets you push huge volume on your quads safely. Go 3 sets of 12–15 reps to near-failure after squats for maximum growth.',
   },
   {
     id: 'leg-curl',
@@ -359,13 +359,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Lying_Leg_Curls'),
     isCurated: true,
     cues: [
-      'Pad just above your Achilles, knees just off the bench.',
-      'Hips pressed into the pad — don’t arch up.',
-      'Curl heels all the way to your glutes.',
-      'Slow 3-sec eccentric, no slamming.',
+      'Set the pad just above the back of your ankles. Your knees should sit just past the edge of the bench.',
+      'Keep your hips pressed into the pad — don\'t let your butt lift up to help.',
+      'Curl your heels all the way up toward your glutes.',
+      'Lower the weight slowly (about 3 seconds). Don\'t let it slam back down.',
     ],
     bulkingTip:
-      'Direct hamstring isolation. RDLs hit the hips, this hits the knee flexion — do both for a complete hammie.',
+      'RDLs hit hamstrings from the hip; this hits them from the knee. Do both for fully developed hamstrings.',
   },
   {
     id: 'walking-lunge',
@@ -379,13 +379,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Dumbbell_Lunges'),
     isCurated: true,
     cues: [
-      'Long step forward — front shin near vertical.',
-      'Back knee hovers just above the floor.',
-      'Push off the front heel into the next step.',
-      'Chest tall, ribs down.',
+      'Take a long step forward. At the bottom, your front shin should be roughly vertical.',
+      'Your back knee should hover just above the floor — don\'t slam it down.',
+      'Push off your front heel to bring your back leg through into the next step.',
+      'Keep your chest up and your ribs pulled down (don\'t arch your lower back).',
     ],
     bulkingTip:
-      'Brutal for glutes and quads. Do 2–3 sets of 20 total steps as a finisher and walking up stairs the next day will remind you it worked.',
+      'Brutal for quads and glutes. Do 2–3 sets of 20 total steps as a finisher and walking up stairs the next day will remind you it worked.',
   },
   {
     id: 'standing-calf-raise',
@@ -399,13 +399,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Standing_Calf_Raises'),
     isCurated: true,
     cues: [
-      'Ball of foot on the edge, heel free to drop.',
-      'Full stretch down, full contraction up onto toes.',
-      'Pause 1 second at the top.',
-      'No bouncing — calves love tempo work.',
+      'Stand with the balls of your feet on the edge of a block or platform, heels hanging off.',
+      'Drop your heels as low as they go for a deep stretch.',
+      'Push up onto your toes and hold the top position for a full second.',
+      'No bouncing. Calves grow from controlled tempo, not momentum.',
     ],
     bulkingTip:
-      'Calves are stubborn. Train them twice a week — once heavy (6–8 reps), once high rep (20+) with deep stretches.',
+      'Calves are stubborn. Train them twice a week — once heavy (6–8 reps) and once high-rep (20+) with deep stretches at the bottom.',
   },
   {
     id: 'hanging-leg-raise',
@@ -419,13 +419,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Hanging_Leg_Raise'),
     isCurated: true,
     cues: [
-      'Full dead hang, shoulders engaged.',
-      'Posteriorly tilt the pelvis first, then raise legs.',
-      'Knees to chest (or straight legs to bar for advanced).',
-      'Slow eccentric, don’t swing.',
+      'Hang from the bar with arms straight, but keep your shoulders pulled down (no shrugging up).',
+      'Before raising your legs, tilt your pelvis up by tucking your hips under — like pointing your belt buckle at your face.',
+      'Pull your knees up to your chest. (Advanced: keep your legs straight and bring them up to the bar.)',
+      'Lower your legs slowly. No swinging.',
     ],
     bulkingTip:
-      'Strong abs visually pop more on a bulk — keep them trained even when chasing weight gain.',
+      'Strong abs show through more on a bulk than you\'d think. Keep training them even when you\'re focused on weight gain.',
   },
   {
     id: 'plank',
@@ -439,13 +439,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Plank'),
     isCurated: true,
     cues: [
-      'Elbows under shoulders, feet hip-width.',
-      'Squeeze glutes, tuck pelvis under (no lumbar sag).',
-      'Drive elbows down into the floor.',
-      'Breathe — don’t hold your breath.',
+      'Forearms on the ground, elbows directly below your shoulders. Feet about hip-width apart.',
+      'Squeeze your glutes and tilt your hips forward so your lower back doesn\'t sag.',
+      'Push your elbows into the floor — this engages your shoulders and abs.',
+      'Breathe normally. Don\'t hold your breath.',
     ],
     bulkingTip:
-      'Bracing carries over to every barbell lift. 3 × 45 seconds is enough — once it’s easy, add weight on the back.',
+      'Bracing your core is the foundation of every barbell lift. 3 sets of 45 seconds is enough. Once that\'s easy, add a weight plate on your back.',
   },
   {
     id: 'db-shrug',
@@ -459,10 +459,10 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Dumbbell_Shrug'),
     isCurated: true,
     cues: [
-      'Stand tall, arms straight at your sides.',
-      'Shrug straight up, like trying to touch ears with shoulders.',
-      '1-second hold at the top, full controlled drop.',
-      'No head movement, no neck rolling.',
+      'Stand straight with dumbbells hanging at your sides, arms locked.',
+      'Lift your shoulders straight up — try to touch your ears with them.',
+      'Hold the squeeze for a full second at the top, then lower slowly.',
+      'Don\'t roll your neck or move your head. Just shoulders.',
     ],
     bulkingTip:
       'Heavy traps make a bulk look intentional rather than puffy. One direct shrug exercise per week is plenty.',
@@ -479,13 +479,13 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Incline_Dumbbell_Curl'),
     isCurated: true,
     cues: [
-      'Bench at 45°, arms hanging straight down — full stretch.',
-      'Curl with supination — pinky comes up at the top.',
-      'Elbows stay back, don’t cheat them forward.',
-      '2-second negative all the way to a dead hang.',
+      'Set the bench to 45 degrees. Let your arms hang straight down behind your body — this stretches the long head of the bicep.',
+      'Curl up while rotating your wrist so your pinky finger comes up toward your shoulder at the top.',
+      'Don\'t let your elbows drift forward as you curl. Keep them back near the bench.',
+      'Lower slowly (about 2 seconds) all the way back to a full hang.',
     ],
     bulkingTip:
-      'Best mass builder for the long head of the bicep — the part that creates the peak when you flex.',
+      'The best mass builder for the long head of the bicep — the part that creates the peak when you flex.',
   },
   {
     id: 'cable-fly',
@@ -499,12 +499,12 @@ export const CURATED_EXERCISES: Exercise[] = [
     imageUrls: imgs('Cable_Crossover'),
     isCurated: true,
     cues: [
-      'Slight forward lean, soft elbow bend locked in.',
-      'Bring hands together in front of your sternum, fists crossing.',
-      'Big stretch at the bottom of each rep.',
-      'Don’t turn it into a press — elbows stay wide.',
+      'Stand with a slight forward lean. Bend your elbows just slightly and keep that bend locked the whole set.',
+      'Bring your hands together in front of your chest, crossing them slightly at the bottom for an extra squeeze.',
+      'Let your arms travel back and out at the top for a deep stretch across your chest.',
+      'Don\'t bend your elbows more to help — keep them wide. This is a fly, not a press.',
     ],
     bulkingTip:
-      'Constant tension from cables hits the chest in the stretched position better than dumbbells — perfect chest finisher.',
+      'Cable tension hits the chest in the stretched position better than dumbbells. A perfect finisher after pressing.',
   },
 ]

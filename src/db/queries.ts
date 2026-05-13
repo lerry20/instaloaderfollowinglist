@@ -36,7 +36,10 @@ export function useExercise(id: string | undefined) {
 }
 
 export function useAllExercises() {
-  return useLiveQuery(() => db.exercises.orderBy('name').toArray(), [])
+  return useLiveQuery(async () => {
+    const all = await db.exercises.toArray()
+    return all.sort((a, b) => a.name.localeCompare(b.name))
+  }, [])
 }
 
 export function useSessionSetLogs(sessionId: number | undefined) {

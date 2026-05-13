@@ -53,7 +53,7 @@ export default function OneTapSetRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestedKg, suggestedReps, units])
 
-  // --- Logged state -----------------------------------------------------
+  // --- Logged state ----------------------------------------------------
   if (logged && !editing) {
     const display = kgToDisplay(logged.weight, units)
     const delta = lastSessionTopKg ? logged.weight - lastSessionTopKg : null
@@ -103,6 +103,24 @@ export default function OneTapSetRow({
   // --- Pending one-tap state -------------------------------------------
   if (!editing) {
     const hasSuggestion = weight > 0 && reps > 0
+    if (!hasSuggestion) {
+      // No history yet: prompt the user to enter values directly.
+      return (
+        <div className={`set-row-v2 pending${warmup ? ' warmup' : ''}`}>
+          <span className="set-pill">{warmup ? 'W' : `S${index + 1}`}</span>
+          <div className="set-row-main">
+            <button
+              type="button"
+              className="big-tap-button placeholder"
+              onClick={() => setEditing(true)}
+            >
+              <span className="big-tap-action">Enter weight &amp; reps</span>
+              <span className="big-tap-sub">Tap to set values</span>
+            </button>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className={`set-row-v2 pending${warmup ? ' warmup' : ''}`}>
         <span className="set-pill">{warmup ? 'W' : `S${index + 1}`}</span>
@@ -110,7 +128,6 @@ export default function OneTapSetRow({
           <button
             type="button"
             className="big-tap-button"
-            disabled={!hasSuggestion}
             onClick={() =>
               onLog({
                 weightKg: displayToKg(weight, units),
@@ -120,19 +137,13 @@ export default function OneTapSetRow({
               })
             }
           >
-            {hasSuggestion ? (
-              <>
-                <span className="big-tap-action">Tap to log</span>
-                <span className="big-tap-numbers tabnum">
-                  <strong>{fmt(weight, units)}</strong>
-                  <span className="muted unit-suffix">{units}</span>
-                  <span className="muted">×</span>
-                  <strong>{reps}</strong>
-                </span>
-              </>
-            ) : (
-              <span className="big-tap-action">Set weight & reps →</span>
-            )}
+            <span className="big-tap-action">Tap to log</span>
+            <span className="big-tap-numbers tabnum">
+              <strong>{fmt(weight, units)}</strong>
+              <span className="unit-suffix">{units}</span>
+              <span>×</span>
+              <strong>{reps}</strong>
+            </span>
           </button>
           <button
             type="button"
@@ -165,23 +176,29 @@ export default function OneTapSetRow({
           Close
         </button>
       </div>
-      <div className="edit-fields">
-        <Stepper
-          label={`Weight (${units})`}
-          value={weight}
-          step={inc}
-          bigStep={inc * 2}
-          onChange={setWeight}
-        />
-        <Stepper
-          label="Reps"
-          value={reps}
-          step={1}
-          bigStep={5}
-          onChange={(v) => setReps(Math.max(0, Math.round(v)))}
-        />
-        <label className="rpe-edit">
-          <span className="muted small">RPE</span>
+
+      <BigStepper
+        label={`Weight (${units})`}
+        value={weight}
+        step={inc}
+        bigStep={inc * 2}
+        min={0}
+        onChange={setWeight}
+        autoFocus={!logged}
+      />
+
+      <BigStepper
+        label="Reps"
+        value={reps}
+        step={1}
+        bigStep={5}
+        min={0}
+        onChange={(v) => setReps(Math.max(0, Math.round(v)))}
+      />
+
+      <div className="rpe-and-actions">
+        <label className="rpe-inline">
+          <span>RPE</span>
           <input
             type="number"
             inputMode="decimal"
@@ -192,72 +209,115 @@ export default function OneTapSetRow({
             placeholder="—"
             onChange={(e) => setRpe(e.target.value === '' ? '' : Number(e.target.value))}
           />
+          <span className="muted small rpe-help">optional</span>
         </label>
-      </div>
-      <div className="edit-foot">
-        {logged ? (
+
+        <div className="edit-foot-buttons">
+          {logged ? (
+            <button
+              className="btn small ghost"
+              onClick={() => {
+                onUnlog?.()
+                setEditing(false)
+              }}
+            >
+              Delete
+            </button>
+          ) : null}
           <button
-            className="link danger small"
+            className="btn primary"
+            disabled={!ready}
             onClick={() => {
-              onUnlog?.()
+              onLog({
+                weightKg: displayToKg(weight, units),
+                reps,
+                rpe: rpe === '' ? null : Number(rpe),
+                isWarmup: warmup,
+              })
               setEditing(false)
             }}
           >
-            Delete set
+            {logged ? 'Save' : 'Log set'}
           </button>
-        ) : <span />}
-        <button
-          className="btn primary"
-          disabled={!ready}
-          onClick={() => {
-            onLog({
-              weightKg: displayToKg(weight, units),
-              reps,
-              rpe: rpe === '' ? null : Number(rpe),
-              isWarmup: warmup,
-            })
-            setEditing(false)
-          }}
-        >
-          {logged ? 'Save changes' : 'Log set'}
-        </button>
+        </div>
       </div>
     </div>
   )
 }
 
-function Stepper({
+function BigStepper({
   label,
   value,
   step,
   bigStep,
+  min,
   onChange,
+  autoFocus,
 }: {
   label: string
   value: number
   step: number
   bigStep: number
+  min: number
   onChange: (v: number) => void
+  autoFocus?: boolean
 }) {
   function bump(delta: number) {
-    const next = Math.max(0, roundTo(value + delta, Math.min(step, 0.25)))
+    const next = Math.max(min, roundTo(value + delta, Math.min(step, 0.25)))
     onChange(next)
   }
   return (
-    <div className="stepper-block">
-      <span className="muted small stepper-label">{label}</span>
-      <div className="stepper-row">
-        <button className="stepper-btn" onClick={() => bump(-bigStep)} aria-label={`${label} minus ${bigStep}`}>−{bigStep}</button>
-        <button className="stepper-btn" onClick={() => bump(-step)} aria-label={`${label} minus ${step}`}>−{step}</button>
-        <input
-          type="number"
-          inputMode="decimal"
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-        />
-        <button className="stepper-btn" onClick={() => bump(step)} aria-label={`${label} plus ${step}`}>+{step}</button>
-        <button className="stepper-btn" onClick={() => bump(bigStep)} aria-label={`${label} plus ${bigStep}`}>+{bigStep}</button>
+    <div className="big-stepper">
+      <div className="big-stepper-label">{label}</div>
+      <div className="big-stepper-row">
+        <div className="step-side">
+          <button
+            type="button"
+            className="step-btn"
+            onClick={() => bump(-bigStep)}
+            aria-label={`${label} minus ${bigStep}`}
+          >
+            −{bigStep}
+          </button>
+          <button
+            type="button"
+            className="step-btn small-step"
+            onClick={() => bump(-step)}
+            aria-label={`${label} minus ${step}`}
+          >
+            −{step}
+          </button>
+        </div>
+        <div className="step-value-wrap">
+          <input
+            type="number"
+            inputMode="decimal"
+            step={step}
+            min={min}
+            value={value}
+            autoFocus={autoFocus}
+            onFocus={(e) => e.currentTarget.select()}
+            onChange={(e) => onChange(Math.max(min, Number(e.target.value) || 0))}
+          />
+        </div>
+        <div className="step-side">
+          <button
+            type="button"
+            className="step-btn small-step"
+            onClick={() => bump(step)}
+            aria-label={`${label} plus ${step}`}
+          >
+            +{step}
+          </button>
+          <button
+            type="button"
+            className="step-btn"
+            onClick={() => bump(bigStep)}
+            aria-label={`${label} plus ${bigStep}`}
+          >
+            +{bigStep}
+          </button>
+        </div>
       </div>
     </div>
   )
