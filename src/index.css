@@ -1166,3 +1166,79 @@ textarea {
   gap: 0.5rem;
   margin-top: 0.4rem;
 }
+
+.muscle-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.chip {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.chip.active {
+  background: var(--bg-elev-2);
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.picker-source-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.ext-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+.ext-toggle input {
+  accent-color: var(--primary);
+}
+
+.picker-row-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.ext-pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: rgba(184, 123, 255, 0.16);
+  color: #c8a8ff;
+  border: 1px solid rgba(184, 123, 255, 0.35);
+}
+.ext-pill.standalone {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+}
+
+.muted-card {
+  background: rgba(45, 55, 100, 0.4);
+}
+
+.picker-empty {
+  padding: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  list-style: none;
+}

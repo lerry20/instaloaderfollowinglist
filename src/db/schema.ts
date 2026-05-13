@@ -52,6 +52,8 @@ export type PostureKey =
 
 export type ExerciseCategory = 'compound' | 'isolation'
 
+export type ExerciseSource = 'core' | 'extended'
+
 export interface Exercise {
   id: string
   name: string
@@ -65,6 +67,8 @@ export interface Exercise {
   youtubeQuery: string
   category: ExerciseCategory
   defaultRestSec: number
+  source?: ExerciseSource
+  videoUrl?: string
 }
 
 export interface PlanItem {
@@ -145,7 +149,7 @@ class WorkoutDB extends Dexie {
     })
     this.version(2)
       .stores({
-        exercises: 'id, primaryMuscle',
+        exercises: 'id, primaryMuscle, source',
         plans: 'id',
         sessions: '++id, date, dayKey',
         setLogs: '++id, sessionId, exerciseId, loggedAt',
@@ -173,6 +177,12 @@ class WorkoutDB extends Dexie {
             onboarded: settings.onboarded ?? false,
             notificationsEnabled: settings.notificationsEnabled ?? false,
           })
+        }
+        const exs = await tx.table<Exercise>('exercises').toArray()
+        for (const e of exs) {
+          if (!e.source) {
+            await tx.table('exercises').update(e.id, { source: 'core' })
+          }
         }
       })
   }

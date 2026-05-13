@@ -31,7 +31,10 @@ export default function ExerciseDetail() {
     label: p.label,
     value: Number(kgToDisplay(p.value, units).toFixed(units === 'kg' ? 1 : 0)),
   }))
-  const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtubeQuery || ex.name + ' technique')}`
+  const isExtended = ex.source === 'extended'
+  const demoHref =
+    ex.videoUrl ??
+    `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtubeQuery || ex.name + ' technique')}`
 
   return (
     <div className="page exercise-detail">
@@ -46,9 +49,12 @@ export default function ExerciseDetail() {
           {' · '}
           {ex.equipment}
         </span>
+        {isExtended ? (
+          <span className="ext-pill standalone">Extended catalog</span>
+        ) : null}
       </header>
 
-      <a className="btn primary block demo-btn" href={ytUrl} target="_blank" rel="noopener noreferrer">
+      <a className="btn primary block demo-btn" href={demoHref} target="_blank" rel="noopener noreferrer">
         ▶ Watch technique demo
       </a>
 
@@ -66,7 +72,7 @@ export default function ExerciseDetail() {
       </section>
 
       <section className="card">
-        <h3>Technique cues</h3>
+        <h3>{isExtended ? 'Instructions' : 'Technique cues'}</h3>
         <ol className="cue-list">
           {ex.cues.map((c, i) => (
             <li key={i}>{c}</li>
@@ -74,10 +80,20 @@ export default function ExerciseDetail() {
         </ol>
       </section>
 
-      <section className="card bulk-tip">
-        <h3>Bulking tip</h3>
-        <p>{ex.bulkingTip}</p>
-      </section>
+      {!isExtended && ex.bulkingTip ? (
+        <section className="card bulk-tip">
+          <h3>Bulking tip</h3>
+          <p>{ex.bulkingTip}</p>
+        </section>
+      ) : null}
+
+      {isExtended ? (
+        <section className="card muted-card">
+          <p className="muted small">
+            Imported from the open <a className="link" href="https://github.com/exercemus/exercises" target="_blank" rel="noopener noreferrer">exercemus catalog</a>. No bulking-specific notes — the video link above is the best technique reference.
+          </p>
+        </section>
+      ) : null}
 
       <section className="card">
         <h3>Top-set weight ({units})</h3>
