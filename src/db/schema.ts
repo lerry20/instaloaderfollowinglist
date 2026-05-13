@@ -106,6 +106,8 @@ export interface BodyweightLog {
 
 export type Units = 'kg' | 'lb'
 export type Goal = 'bulk' | 'cut' | 'recomp'
+export type SkillLevel = 'beginner' | 'advanced'
+export type Theme = 'system' | 'light' | 'dark'
 
 export interface Settings {
   id: 1
@@ -116,6 +118,8 @@ export interface Settings {
   onboarded: boolean
   notificationsEnabled: boolean
   activeRoutineId: string
+  skillLevel: SkillLevel
+  theme: Theme
 }
 
 class WorkoutDB extends Dexie {

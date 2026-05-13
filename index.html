@@ -9,7 +9,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="BulkLog" />
     <link rel="apple-touch-icon" href="/icon.svg" />
+    <meta name="color-scheme" content="dark light" />
     <title>BulkLog — Workout Dashboard</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('bulklog:theme') || 'system';
+          var resolved =
+            stored === 'system'
+              ? window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark'
+              : stored;
+          document.documentElement.dataset.theme = resolved;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

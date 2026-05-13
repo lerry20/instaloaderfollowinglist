@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import {
@@ -9,15 +9,19 @@ import {
 } from '../db/schema'
 import {
   deleteSetLog,
+  exerciseProgression,
   lastWorkingSetsForExercise,
   logSet,
   suggestProgression,
+  useSettings,
 } from '../db/queries'
 import { useRestTimer } from '../state/restTimer'
 import { toast } from '../state/toasts'
+import { kgToDisplay } from '../lib/units'
 import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
 import ExercisePicker from './ExercisePicker'
+import MiniSparkline from './MiniSparkline'
 
 interface Props {
   item: PlanItem
@@ -28,6 +32,7 @@ interface Props {
   onSwap: (newId: string) => void
   onSkip: () => void
   onFocus: (suggestedKg: number | null) => void
+  onAdvance?: () => void
 }
 
 export default function SessionExerciseCard({
@@ -39,10 +44,13 @@ export default function SessionExerciseCard({
   onSwap,
   onSkip,
   onFocus,
+  onAdvance,
 }: Props) {
+  const settings = useSettings()
   const exercise = useLiveQuery(() => db.exercises.get(item.exerciseId), [item.exerciseId])
   const [showSwap, setShowSwap] = useState(false)
   const [pendingWarmup, setPendingWarmup] = useState(false)
+  const [showAllCues, setShowAllCues] = useState(false)
 
   const logs =
     useLiveQuery(
@@ -66,13 +74,19 @@ export default function SessionExerciseCard({
     [item.exerciseId, sessionId],
   )
 
+  // Mini sparkline of last 5 top-set weights
+  const sparklineData = useLiveQuery(
+    () => exerciseProgression(item.exerciseId, 5),
+    [item.exerciseId],
+  )
+
   const startTimer = useRestTimer((s) => s.start)
 
   const workingLogs = logs.filter((l) => !l.isWarmup)
   const warmupLogs = logs.filter((l) => l.isWarmup)
+  const skillLevel = settings?.skillLevel ?? 'beginner'
 
-  const repsLow =
-    Number(String(item.targetReps).split(/[–\-]/)[0]) || null
+  const repsLow = Number(String(item.targetReps).split(/[–\-]/)[0]) || null
   const repsHigh =
     Number(String(item.targetReps).split(/[–\-]/)[1] || String(item.targetReps).split(/[–\-]/)[0]) ||
     repsLow
@@ -92,6 +106,18 @@ export default function SessionExerciseCard({
     rows.push({ idx: i, logged: workingLogs[i] })
   }
 
+  // Auto-advance when the last set of the exercise is logged.
+  useEffect(() => {
+    if (!onAdvance) return
+    if (workingLogs.length === 0) return
+    if (workingLogs.length < totalSetsPlanned) return
+    const lastLogTime = workingLogs[workingLogs.length - 1].loggedAt
+    const isRecent = Date.now() - lastLogTime < 3000
+    if (!isRecent) return
+    const t = window.setTimeout(() => onAdvance?.(), 1400)
+    return () => window.clearTimeout(t)
+  }, [workingLogs.length, totalSetsPlanned, onAdvance])
+
   function handleLog(
     rowIdx: number,
     data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean },
@@ -105,34 +131,20 @@ export default function SessionExerciseCard({
       data.reps,
       data.rpe,
       data.isWarmup,
-    ).then((id) => {
+    ).then(() => {
       if (!data.isWarmup) startTimer(restSec)
       setPendingWarmup(false)
-      setTimeout(() => {
-        scrollToNext()
-      }, 80)
+      onFocus(data.weightKg)
       if (data.isWarmup) {
         toast('Warm-up logged', { kind: 'info', duration: 1800 })
       }
-      // Side effect: pass focus to parent so plate calc can update.
-      onFocus(data.weightKg)
-      void id
     })
   }
 
-  function scrollToNext() {
-    const card = document.querySelector(`[data-exercise-card="${item.exerciseId}"]`)
-    const next = card?.querySelector('.set-row-v2.pending') as HTMLElement | null
-    if (next) {
-      next.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    } else {
-      const sibling = card?.nextElementSibling as HTMLElement | null
-      sibling?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
+  const sparkValues = (sparklineData ?? []).map((p) => p.value)
 
   return (
-    <article className="session-card" data-exercise-card={item.exerciseId}>
+    <article className="session-card v2" data-exercise-card={item.exerciseId}>
       <header className="session-card-head">
         <Link
           to={`/exercise/${item.exerciseId}`}
@@ -142,7 +154,7 @@ export default function SessionExerciseCard({
           <ExerciseImage urls={exercise?.imageUrls ?? []} alt={exercise?.name ?? item.exerciseId} />
           <div className="session-card-titles">
             <span className="position-tag muted small">
-              {positionIndex + 1} / {totalExercises}
+              Exercise {positionIndex + 1} of {totalExercises}
             </span>
             <h2>{exercise?.name ?? item.exerciseId}</h2>
             <span className="muted small">
@@ -150,6 +162,12 @@ export default function SessionExerciseCard({
             </span>
           </div>
         </Link>
+        {sparkValues.length >= 2 ? (
+          <div className="sparkline-cell" title="Last 5 top-set weights">
+            <MiniSparkline values={sparkValues} />
+            <span className="muted small">progression</span>
+          </div>
+        ) : null}
       </header>
 
       <div className="target-line">
@@ -286,8 +304,27 @@ export default function SessionExerciseCard({
         </button>
       </div>
 
+      {/* Beginner-only: collapsible cues inline */}
+      {skillLevel === 'beginner' && exercise?.cues && exercise.cues.length > 0 ? (
+        <details
+          className="inline-cues"
+          open={showAllCues}
+          onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>How to do this exercise</summary>
+          <ol className="inline-cue-list">
+            {exercise.cues.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ol>
+          {exercise.isCurated && exercise.bulkingTip ? (
+            <p className="inline-tip muted small">💡 {exercise.bulkingTip}</p>
+          ) : null}
+        </details>
+      ) : null}
+
       {remaining === 0 && workingLogs.length > 0 ? (
-        <p className="muted small done-line">All sets done · 💪</p>
+        <p className="muted small done-line">All sets done · 💪 advancing to next…</p>
       ) : null}
 
       {showSwap ? (
@@ -309,8 +346,4 @@ function fmt(value: number, units: Units): string {
   if (units === 'lb') return Math.round(value).toString()
   if (Number.isInteger(value)) return String(value)
   return value.toFixed(1)
-}
-
-function kgToDisplay(kg: number, units: Units): number {
-  return units === 'kg' ? kg : kg / 0.45359237
 }

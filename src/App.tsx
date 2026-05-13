@@ -9,6 +9,7 @@ import ExerciseDetail from './routes/ExerciseDetail'
 import Onboarding from './routes/Onboarding'
 import { seedIfEmpty } from './db/seed'
 import { useSettings } from './db/queries'
+import { useThemeSync } from './state/theme'
 
 export default function App() {
   const [seeded, setSeeded] = useState(false)
@@ -33,6 +34,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        <ThemeManager />
         <OnboardingGate />
         <Routes>
           <Route path="/welcome" element={<Onboarding />} />
@@ -48,6 +50,11 @@ export default function App() {
       </BrowserRouter>
     </ErrorBoundary>
   )
+}
+
+function ThemeManager() {
+  useThemeSync()
+  return null
 }
 
 function OnboardingGate() {
