@@ -28,6 +28,13 @@ export default function SettingsModal({ onClose }: Props) {
   async function exportAll() {
     setExporting(true)
     try {
+      // Redact the API key on export — backup files commonly get shared
+      // via Slack / email / cloud storage and the key should never leave
+      // this device unencrypted.
+      const settingsForExport = (await db.settings.toArray()).map((s) => ({
+        ...s,
+        aiApiKey: undefined,
+      }))
       const dump = {
         version: 5,
         exportedAt: new Date().toISOString(),
@@ -38,8 +45,10 @@ export default function SettingsModal({ onClose }: Props) {
         sleep: await db.sleep.toArray(),
         measurements: await db.measurements.toArray(),
         routines: await db.routines.toArray(),
-        settings: await db.settings.toArray(),
-        coachMessages: await db.coachMessages.toArray(),
+        settings: settingsForExport,
+        // Coach chat history may contain personal training notes; skip it
+        // from the backup. Users can clear it manually if needed.
+        coachMessages: [],
       }
       const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
