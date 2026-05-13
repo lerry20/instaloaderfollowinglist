@@ -59,8 +59,10 @@ export function useBodyweightLogs() {
 
 export function useActiveSession() {
   return useLiveQuery(async () => {
-    const all = await db.sessions.orderBy('startedAt').reverse().limit(10).toArray()
-    return all.find((s) => s.completedAt === null)
+    const all = await db.sessions.toArray()
+    const open = all.filter((s) => s.completedAt === null)
+    open.sort((a, b) => b.startedAt - a.startedAt)
+    return open[0]
   }, [])
 }
 
@@ -71,11 +73,8 @@ export async function suggestNextWorkout(
     return { id: 'empty', name: 'Empty routine', items: [] }
   }
   // Look at the most recent completed session in this routine.
-  const recent = await db.sessions
-    .where('routineId')
-    .equals(routine.id)
-    .reverse()
-    .sortBy('startedAt')
+  const recent = await db.sessions.where('routineId').equals(routine.id).toArray()
+  recent.sort((a, b) => b.startedAt - a.startedAt)
   const lastCompleted = recent.find((s) => s.completedAt !== null)
   if (!lastCompleted) return routine.workouts[0]
   const idx = routine.workouts.findIndex((w) => w.id === lastCompleted.workoutId)
