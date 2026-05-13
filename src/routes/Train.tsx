@@ -33,8 +33,24 @@ export default function Train() {
     suggestNextWorkout(routine).then(setNext)
   }, [routine, session?.id, session?.completedAt])
 
-  if (!settings || !routine) {
+  if (!settings) {
     return <div className="page"><p className="muted">Loading…</p></div>
+  }
+
+  if (!routine) {
+    // Active routine id points to a routine that doesn't exist — graceful empty state
+    // instead of an infinite "Loading…".
+    return (
+      <div className="page">
+        <header className="hero">
+          <span className="muted small">No routine selected</span>
+          <h1 className="big-title">Pick a routine to start training</h1>
+        </header>
+        <Link to="/routines" className="btn primary block">
+          Browse routines
+        </Link>
+      </div>
+    )
   }
 
   if (session) {
@@ -63,12 +79,20 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const bw = useBodyweightLogs()
   const latestBw = bw && bw.length > 0 ? bw[bw.length - 1] : null
   const units = settings?.units ?? 'kg'
+  const [starting, setStarting] = useState(false)
 
   async function start() {
-    if (!next) return
-    await startSession(routine, next)
-    void ensureNotificationPermission()
-    navigate(`/train`)
+    if (!next || starting) return
+    setStarting(true)
+    try {
+      await startSession(routine, next)
+      void ensureNotificationPermission()
+      navigate(`/train`)
+    } catch (err) {
+      console.error('startSession failed', err)
+      toast('Could not start workout — try again', { kind: 'danger' })
+      setStarting(false)
+    }
   }
 
   return (
@@ -80,8 +104,8 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
       </header>
 
       {next ? (
-        <button className="btn primary block start-btn" onClick={start}>
-          Start workout
+        <button className="btn primary block start-btn" onClick={start} disabled={starting}>
+          {starting ? 'Starting…' : 'Start workout'}
         </button>
       ) : (
         <Link to="/routines" className="btn block">

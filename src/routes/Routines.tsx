@@ -131,7 +131,7 @@ export default function Routines() {
 }
 
 function RoutineEditor({
-  routine,
+  routine: initial,
   onClose,
   onClone,
 }: {
@@ -139,6 +139,11 @@ function RoutineEditor({
   onClose: () => void
   onClone: () => void
 }) {
+  // Subscribe to the live routine so edits made inside this modal show up
+  // immediately (otherwise we hold a stale snapshot and "+ Add workout"
+  // would silently appear to do nothing until reopen).
+  const live = useLiveQuery(() => db.routines.get(initial.id), [initial.id])
+  const routine = live ?? initial
   const isBuiltIn = routine.builtIn
 
   async function patch(updates: Partial<Routine>) {

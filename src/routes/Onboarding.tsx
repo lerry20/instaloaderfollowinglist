@@ -1,16 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db, type Goal, type Units } from '../db/schema'
-import { useAllRoutines } from '../db/queries'
+import { useAllRoutines, useSettings } from '../db/queries'
 
 export default function Onboarding() {
   const navigate = useNavigate()
+  const settings = useSettings()
   const [step, setStep] = useState(0)
   const [units, setUnits] = useState<Units>('kg')
   const [goal, setGoal] = useState<Goal>('bulk')
   const [routineId, setRoutineId] = useState<string>('ppl-6day')
   const routines = useAllRoutines() ?? []
   const builtIn = routines.filter((r) => r.builtIn)
+
+  // If user is already onboarded (e.g. opened /welcome by mistake or after
+  // re-install), bounce them to the main app.
+  useEffect(() => {
+    if (settings?.onboarded) navigate('/', { replace: true })
+  }, [settings?.onboarded, navigate])
 
   async function finish() {
     const existing = await db.settings.get(1)
