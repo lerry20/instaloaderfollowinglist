@@ -12,11 +12,9 @@ export default function Layout() {
           <span>BulkLog</span>
         </div>
         <nav className="top-nav" aria-label="Primary">
-          <NavLink to="/" end>Today</NavLink>
-          <NavLink to="/plan">Plan</NavLink>
-          <NavLink to="/history">History</NavLink>
-          <NavLink to="/bodyweight">Weight</NavLink>
-          <NavLink to="/settings">Settings</NavLink>
+          <NavLink to="/" end>Train</NavLink>
+          <NavLink to="/routines">Routines</NavLink>
+          <NavLink to="/progress">Progress</NavLink>
         </nav>
       </header>
       <main className="app-main">
@@ -26,23 +24,15 @@ export default function Layout() {
       <nav className="bottom-nav" aria-label="Primary">
         <NavLink to="/" end>
           <span aria-hidden>🏋️</span>
-          <span>Today</span>
+          <span>Train</span>
         </NavLink>
-        <NavLink to="/plan">
-          <span aria-hidden>📅</span>
-          <span>Plan</span>
+        <NavLink to="/routines">
+          <span aria-hidden>📋</span>
+          <span>Routines</span>
         </NavLink>
-        <NavLink to="/history">
-          <span aria-hidden>📜</span>
-          <span>History</span>
-        </NavLink>
-        <NavLink to="/bodyweight">
-          <span aria-hidden>⚖️</span>
-          <span>Weight</span>
-        </NavLink>
-        <NavLink to="/settings">
-          <span aria-hidden>⚙️</span>
-          <span>More</span>
+        <NavLink to="/progress">
+          <span aria-hidden>📈</span>
+          <span>Progress</span>
         </NavLink>
       </nav>
     </div>

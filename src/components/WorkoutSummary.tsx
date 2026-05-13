@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Units } from '../db/schema'
-import { sessionHasPR } from '../db/queries'
+import { sessionHasPRs } from '../db/queries'
 import { kgToDisplay } from '../lib/units'
 
 interface Props {
@@ -14,12 +14,15 @@ interface Props {
 export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
   const navigate = useNavigate()
   const session = useLiveQuery(() => db.sessions.get(sessionId), [sessionId])
-  const logs = useLiveQuery(() => db.setLogs.where('sessionId').equals(sessionId).toArray(), [sessionId])
+  const logs = useLiveQuery(
+    () => db.setLogs.where('sessionId').equals(sessionId).toArray(),
+    [sessionId],
+  )
   const exercises = useLiveQuery(() => db.exercises.toArray(), [])
   const [prs, setPrs] = useState<string[]>([])
 
   useEffect(() => {
-    sessionHasPR(sessionId).then(setPrs).catch(() => setPrs([]))
+    sessionHasPRs(sessionId).then(setPrs).catch(() => setPrs([]))
   }, [sessionId, logs?.length])
 
   if (!session || !logs || !exercises) return null
@@ -27,7 +30,6 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
   const working = logs.filter((l) => !l.isWarmup)
   const totalVolumeKg = working.reduce((s, l) => s + l.weight * l.reps, 0)
   const setsCount = working.length
-  const planned = session.items ?? []
   const exerciseIds = Array.from(new Set(working.map((l) => l.exerciseId)))
 
   return (
@@ -36,27 +38,25 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
         <header className="modal-head">
           <div>
             <span className="muted small">{session.date}</span>
-            <h3>{session.planDayLabel} — done</h3>
+            <h3>{session.workoutName} — done</h3>
           </div>
-          <button className="link" onClick={onClose} aria-label="Close summary">
-            Close
-          </button>
+          <button className="link" onClick={onClose}>Close</button>
         </header>
 
         <div className="summary-stats">
           <div>
             <span className="muted small">Working sets</span>
-            <strong>{setsCount}</strong>
+            <strong className="tabnum">{setsCount}</strong>
           </div>
           <div>
             <span className="muted small">Volume</span>
-            <strong>
-              {Math.round(kgToDisplay(totalVolumeKg, units))} {units}·reps
+            <strong className="tabnum">
+              {Math.round(kgToDisplay(totalVolumeKg, units)).toLocaleString()} {units}·reps
             </strong>
           </div>
           <div>
             <span className="muted small">PRs</span>
-            <strong>{prs.length}</strong>
+            <strong className="tabnum">{prs.length}</strong>
           </div>
         </div>
 
@@ -74,11 +74,11 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
 
         <div className="summary-list">
           {exerciseIds.length === 0 ? (
-            <p className="muted">No sets logged.</p>
+            <p className="muted">No working sets logged.</p>
           ) : (
             exerciseIds.map((id) => {
               const ex = exercises.find((e) => e.id === id)
-              const plan = planned.find((p) => p.exerciseId === id)
+              const plan = session.items.find((p) => p.exerciseId === id)
               const exLogs = working.filter((l) => l.exerciseId === id)
               const top = exLogs.reduce((m, l) => Math.max(m, l.weight), 0)
               return (
@@ -87,13 +87,12 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
                     <strong>{ex?.name ?? id}</strong>
                     {plan ? (
                       <span className="muted small">
-                        {' '}
-                        · planned {plan.targetSets} × {plan.targetReps}
+                        {' · planned '}{plan.targetSets} × {plan.targetReps}
                       </span>
                     ) : null}
                   </div>
-                  <div className="muted small">
-                    {exLogs.length} sets · top {kgToDisplay(top, units).toFixed(1)} {units}
+                  <div className="muted small tabnum">
+                    {exLogs.length} sets · top {kgToDisplay(top, units).toFixed(units === 'kg' ? 1 : 0)} {units}
                   </div>
                 </div>
               )
@@ -102,8 +101,8 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
         </div>
 
         <div className="modal-foot">
-          <button className="btn primary block" onClick={() => navigate('/history')}>
-            Done — go to History
+          <button className="btn primary block" onClick={() => navigate('/progress')}>
+            Done — go to Progress
           </button>
         </div>
       </div>

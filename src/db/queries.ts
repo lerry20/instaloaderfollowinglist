@@ -1,11 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   db,
-  type DayKey,
-  type Plan,
   type PlanItem,
-  type SetLog,
+  type Routine,
   type Settings,
+  type WorkoutDef,
 } from './schema'
 
 export function todayISO() {
@@ -16,18 +15,20 @@ export function todayISO() {
   return `${yyyy}-${mm}-${dd}`
 }
 
-export function todayDayKey(): DayKey {
-  const idx = new Date().getDay()
-  const map: DayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-  return map[idx]
-}
-
-export function usePlan(planId = 'default'): Plan | undefined {
-  return useLiveQuery(() => db.plans.get(planId), [planId])
-}
-
 export function useSettings(): Settings | undefined {
   return useLiveQuery(() => db.settings.get(1), [])
+}
+
+export function useActiveRoutine(): Routine | undefined {
+  return useLiveQuery(async () => {
+    const s = await db.settings.get(1)
+    if (!s) return undefined
+    return db.routines.get(s.activeRoutineId)
+  }, [])
+}
+
+export function useAllRoutines(): Routine[] | undefined {
+  return useLiveQuery(() => db.routines.orderBy('id').toArray(), [])
 }
 
 export function useExercise(id: string | undefined) {
@@ -36,13 +37,6 @@ export function useExercise(id: string | undefined) {
 
 export function useAllExercises() {
   return useLiveQuery(() => db.exercises.orderBy('name').toArray(), [])
-}
-
-export function useSession(sessionId: number | undefined) {
-  return useLiveQuery(
-    () => (sessionId ? db.sessions.get(sessionId) : undefined),
-    [sessionId],
-  )
 }
 
 export function useSessionSetLogs(sessionId: number | undefined) {
@@ -63,25 +57,49 @@ export function useBodyweightLogs() {
   return useLiveQuery(() => db.bodyweight.orderBy('date').toArray(), [])
 }
 
-export async function getOrCreateTodaySession(
-  dayKey: DayKey,
-  label: string,
-  items: PlanItem[],
-) {
-  const date = todayISO()
-  const existing = await db.sessions.where('date').equals(date).first()
-  if (existing) {
-    // If somehow created without items (v1 data), patch them in
-    if (!existing.items || existing.items.length === 0) {
-      await db.sessions.update(existing.id!, { items })
-    }
-    return existing.id!
+export function useActiveSession() {
+  return useLiveQuery(async () => {
+    const all = await db.sessions.orderBy('startedAt').reverse().limit(10).toArray()
+    return all.find((s) => s.completedAt === null)
+  }, [])
+}
+
+export async function suggestNextWorkout(
+  routine: Routine,
+): Promise<WorkoutDef> {
+  if (routine.workouts.length === 0) {
+    return { id: 'empty', name: 'Empty routine', items: [] }
   }
+  // Look at the most recent completed session in this routine.
+  const recent = await db.sessions
+    .where('routineId')
+    .equals(routine.id)
+    .reverse()
+    .sortBy('startedAt')
+  const lastCompleted = recent.find((s) => s.completedAt !== null)
+  if (!lastCompleted) return routine.workouts[0]
+  const idx = routine.workouts.findIndex((w) => w.id === lastCompleted.workoutId)
+  if (idx < 0) return routine.workouts[0]
+  return routine.workouts[(idx + 1) % routine.workouts.length]
+}
+
+export async function startSession(
+  routine: Routine,
+  workout: WorkoutDef,
+): Promise<number> {
+  // Reuse an in-progress session for the same workout if it exists.
+  const existing = await db.sessions
+    .where({ routineId: routine.id, workoutId: workout.id })
+    .reverse()
+    .sortBy('startedAt')
+  const open = existing.find((s) => s.completedAt === null)
+  if (open) return open.id!
   return await db.sessions.add({
-    date,
-    dayKey,
-    planDayLabel: label,
-    items,
+    date: todayISO(),
+    routineId: routine.id,
+    workoutId: workout.id,
+    workoutName: workout.name,
+    items: workout.items,
     startedAt: Date.now(),
     completedAt: null,
   })
@@ -108,16 +126,18 @@ export async function logSet(
   })
 }
 
-export async function updateSetLog(id: number, patch: Partial<SetLog>) {
-  await db.setLogs.update(id, patch)
-}
-
 export async function deleteSetLog(id: number) {
   await db.setLogs.delete(id)
 }
 
 export async function markSessionComplete(sessionId: number) {
   await db.sessions.update(sessionId, { completedAt: Date.now() })
+}
+
+export async function abandonSession(sessionId: number) {
+  // Drop the session and its logs entirely.
+  await db.setLogs.where('sessionId').equals(sessionId).delete()
+  await db.sessions.delete(sessionId)
 }
 
 export async function swapSessionItem(
@@ -127,55 +147,136 @@ export async function swapSessionItem(
 ) {
   const s = await db.sessions.get(sessionId)
   if (!s) return
-  const items = (s.items ?? []).map((it) => (it.exerciseId === oldExerciseId ? newItem : it))
+  const items = (s.items ?? []).map((it) =>
+    it.exerciseId === oldExerciseId ? newItem : it,
+  )
   await db.sessions.update(sessionId, { items })
 }
 
-export async function lastWorkingTopSet(
+export interface LastSetSummary {
+  weight: number
+  reps: number
+  rpe: number | null
+  loggedAt: number
+}
+
+export async function lastWorkingSetsForExercise(
   exerciseId: string,
   excludeSessionId?: number,
-): Promise<{ sessionId: number; weight: number; reps: number; loggedAt: number } | null> {
+  limitSessions = 1,
+): Promise<{ sessionId: number; sets: LastSetSummary[] } | null> {
   const logs = await db.setLogs
     .where('exerciseId')
     .equals(exerciseId)
     .filter((l) => !l.isWarmup && (excludeSessionId ? l.sessionId !== excludeSessionId : true))
     .toArray()
   if (logs.length === 0) return null
-  const bySession = new Map<number, { weight: number; reps: number; loggedAt: number }>()
+  const bySession = new Map<number, LastSetSummary[]>()
   for (const l of logs) {
-    const cur = bySession.get(l.sessionId)
-    if (!cur || l.weight > cur.weight) {
-      bySession.set(l.sessionId, { weight: l.weight, reps: l.reps, loggedAt: l.loggedAt })
-    }
+    if (!bySession.has(l.sessionId)) bySession.set(l.sessionId, [])
+    bySession.get(l.sessionId)!.push({
+      weight: l.weight,
+      reps: l.reps,
+      rpe: l.rpe,
+      loggedAt: l.loggedAt,
+    })
   }
-  let best: { sessionId: number; weight: number; reps: number; loggedAt: number } | null = null
-  for (const [sessionId, info] of bySession.entries()) {
-    if (!best || info.loggedAt > best.loggedAt) {
-      best = { sessionId, ...info }
-    }
+  const sessionIds = Array.from(bySession.keys())
+  const sessions = await db.sessions.bulkGet(sessionIds)
+  const ordered = sessions
+    .filter((s): s is NonNullable<typeof s> => !!s)
+    .sort((a, b) => b.startedAt - a.startedAt)
+    .slice(0, limitSessions)
+  if (ordered.length === 0) return null
+  const top = ordered[0]
+  return {
+    sessionId: top.id!,
+    sets: (bySession.get(top.id!) ?? []).sort((a, b) => a.loggedAt - b.loggedAt),
   }
-  return best
 }
 
-export async function allTimeTopSet(
+export interface ProgressionHint {
+  kind: 'increase' | 'hold' | 'reduce' | 'firstTime'
+  amountKg?: number
+  reason: string
+}
+
+export async function suggestProgression(
   exerciseId: string,
-): Promise<{ weight: number; sessionId: number } | null> {
+  item: PlanItem,
+  excludeSessionId?: number,
+): Promise<{ suggestedKg: number | null; hint: ProgressionHint }> {
+  // Look at the last 2 sessions of working sets.
   const logs = await db.setLogs
     .where('exerciseId')
     .equals(exerciseId)
-    .filter((l) => !l.isWarmup)
+    .filter((l) => !l.isWarmup && (excludeSessionId ? l.sessionId !== excludeSessionId : true))
     .toArray()
-  if (logs.length === 0) return null
-  let best: { weight: number; sessionId: number } | null = null
-  for (const l of logs) {
-    if (!best || l.weight > best.weight) best = { weight: l.weight, sessionId: l.sessionId }
+  if (logs.length === 0) {
+    return { suggestedKg: null, hint: { kind: 'firstTime', reason: 'First time logging this lift.' } }
   }
-  return best
+  const bySession = new Map<number, typeof logs>()
+  for (const l of logs) {
+    if (!bySession.has(l.sessionId)) bySession.set(l.sessionId, [])
+    bySession.get(l.sessionId)!.push(l)
+  }
+  const sessions = await db.sessions.bulkGet(Array.from(bySession.keys()))
+  const ordered = sessions
+    .filter((s): s is NonNullable<typeof s> => !!s)
+    .sort((a, b) => b.startedAt - a.startedAt)
+  const recent = ordered.slice(0, 2)
+  if (recent.length === 0) {
+    return { suggestedKg: null, hint: { kind: 'firstTime', reason: 'No prior data.' } }
+  }
+  const lastSetsBySession = recent.map((s) =>
+    (bySession.get(s.id!) ?? []).sort((a, b) => a.loggedAt - b.loggedAt),
+  )
+  const lastSession = lastSetsBySession[0]
+  const lastTop = lastSession.reduce((m, l) => Math.max(m, l.weight), 0)
+  const repsHigh = Number(String(item.targetReps).split(/[–\-]/)[1] || String(item.targetReps).split(/[–\-]/)[0]) || null
+  const repsLow = Number(String(item.targetReps).split(/[–\-]/)[0]) || null
+
+  // Hit top of rep range with the top weight in last 2 sessions → increase.
+  if (repsHigh !== null) {
+    const hitTopBoth = lastSetsBySession.every((sets) => {
+      if (sets.length === 0) return false
+      const topSet = sets.find((s) => s.weight === Math.max(...sets.map((x) => x.weight)))
+      return topSet ? topSet.reps >= repsHigh : false
+    })
+    if (hitTopBoth && lastSetsBySession.length === 2) {
+      return {
+        suggestedKg: lastTop + 2.5,
+        hint: {
+          kind: 'increase',
+          amountKg: 2.5,
+          reason: `You hit ${repsHigh}+ reps the last two sessions. Add 2.5 kg.`,
+        },
+      }
+    }
+  }
+
+  // Last session reps below target low → reduce or hold.
+  if (repsLow !== null) {
+    const minRepsLast = Math.min(...lastSession.map((l) => l.reps))
+    if (minRepsLast < repsLow) {
+      return {
+        suggestedKg: Math.max(0, lastTop - 2.5),
+        hint: {
+          kind: 'reduce',
+          amountKg: 2.5,
+          reason: `Reps dropped below target last time. Pull weight back 2.5 kg.`,
+        },
+      }
+    }
+  }
+
+  return {
+    suggestedKg: lastTop,
+    hint: { kind: 'hold', reason: `Match last session’s top set, push for one more rep.` },
+  }
 }
 
-export async function sessionHasPR(sessionId: number): Promise<string[]> {
-  // Returns exerciseIds where the heaviest working set in this session exceeded
-  // the previous all-time working top set for that exercise.
+export async function sessionHasPRs(sessionId: number): Promise<string[]> {
   const logs = await db.setLogs.where('sessionId').equals(sessionId).toArray()
   const byEx = new Map<string, number>()
   for (const l of logs) {
@@ -195,7 +296,7 @@ export async function sessionHasPR(sessionId: number): Promise<string[]> {
   return prs
 }
 
-export async function exerciseSessionHistory(
+export async function exerciseProgression(
   exerciseId: string,
   limit = 12,
 ): Promise<{ label: string; value: number }[]> {
@@ -208,12 +309,12 @@ export async function exerciseSessionHistory(
   for (const l of logs) {
     bySession.set(l.sessionId, Math.max(bySession.get(l.sessionId) ?? 0, l.weight))
   }
-  const sessions = await db.sessions
-    .where('id')
-    .anyOf(Array.from(bySession.keys()))
-    .toArray()
-  sessions.sort((a, b) => (a.date < b.date ? -1 : 1))
-  return sessions.slice(-limit).map((s) => ({
+  const sessions = await db.sessions.bulkGet(Array.from(bySession.keys()))
+  const ordered = sessions
+    .filter((s): s is NonNullable<typeof s> => !!s)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .slice(-limit)
+  return ordered.map((s) => ({
     label: s.date.slice(5),
     value: bySession.get(s.id!)!,
   }))
