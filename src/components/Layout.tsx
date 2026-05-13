@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import RestTimerBar from './RestTimerBar'
-import UpdateBanner from './UpdateBanner'
 import ToastContainer from './ToastContainer'
 import SettingsModal from './SettingsModal'
 
@@ -9,7 +8,6 @@ export default function Layout() {
   const [showSettings, setShowSettings] = useState(false)
   return (
     <div className="app-shell">
-      <UpdateBanner />
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark" aria-hidden />
