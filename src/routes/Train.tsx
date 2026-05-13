@@ -20,6 +20,9 @@ import PlateSheet from '../components/PlateSheet'
 import { kgToDisplay } from '../lib/units'
 import { ensureNotificationPermission } from '../state/restTimer'
 import { toast } from '../state/toasts'
+import { haptics } from '../lib/haptics'
+import { buildProactiveMessage, type ProactiveMessage } from '../lib/streak'
+import Skeleton from '../components/Skeleton'
 
 export default function Train() {
   const settings = useSettings()
@@ -34,7 +37,11 @@ export default function Train() {
   }, [routine, session?.id, session?.completedAt])
 
   if (!settings) {
-    return <div className="page"><p className="muted">Loading…</p></div>
+    return (
+      <div className="page">
+        <Skeleton rows={4} height={22} />
+      </div>
+    )
   }
 
   if (!routine) {
@@ -80,6 +87,17 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const latestBw = bw && bw.length > 0 ? bw[bw.length - 1] : null
   const units = settings?.units ?? 'kg'
   const [starting, setStarting] = useState(false)
+  const [proactive, setProactive] = useState<ProactiveMessage | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    buildProactiveMessage()
+      .then((m) => !cancelled && setProactive(m))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function start() {
     if (!next || starting) return
@@ -97,6 +115,9 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
 
   return (
     <div className="page train-start">
+      {proactive ? (
+        <div className={`proactive proactive-${proactive.kind}`}>{proactive.text}</div>
+      ) : null}
       <header className="hero">
         <span className="muted small">Today's workout</span>
         <h1 className="big-title">{next?.name ?? 'No workout queued'}</h1>
@@ -195,6 +216,7 @@ function ActiveSessionView({
 
   async function finish() {
     await markSessionComplete(session.id!)
+    haptics.finish()
     setConfirmFinish(false)
     setShowSummary(session.id!)
   }

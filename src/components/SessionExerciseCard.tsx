@@ -17,6 +17,7 @@ import {
 } from '../db/queries'
 import { useRestTimer } from '../state/restTimer'
 import { toast } from '../state/toasts'
+import { haptics } from '../lib/haptics'
 import { kgToDisplay } from '../lib/units'
 import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
@@ -128,12 +129,25 @@ export default function SessionExerciseCard({
     return () => window.clearTimeout(t)
   }, [workingLogs.length, totalSetsPlanned, lastLogTime])
 
-  function handleLog(
+  async function handleLog(
     rowIdx: number,
     data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean },
     restSec: number,
   ) {
-    logSet(
+    // Detect a working-set PR BEFORE the new log lands: if this weight beats
+    // the user's prior all-time top working weight for this exercise, it's a PR.
+    let isPR = false
+    if (!data.isWarmup) {
+      const priorWorking = await db.setLogs
+        .where('exerciseId')
+        .equals(item.exerciseId)
+        .filter((l) => !l.isWarmup && l.sessionId !== sessionId)
+        .toArray()
+      const priorTop = priorWorking.reduce((m, l) => Math.max(m, l.weight), 0)
+      if (priorTop > 0 && data.weightKg > priorTop) isPR = true
+    }
+
+    await logSet(
       sessionId,
       item.exerciseId,
       rowIdx,
@@ -141,14 +155,24 @@ export default function SessionExerciseCard({
       data.reps,
       data.rpe,
       data.isWarmup,
-    ).then(() => {
-      if (!data.isWarmup) startTimer(restSec)
-      setPendingWarmup(false)
-      onFocus(data.weightKg)
-      if (data.isWarmup) {
-        toast('Warm-up logged', { kind: 'info', duration: 1800 })
+    )
+    if (data.isWarmup) {
+      haptics.pop()
+      toast('Warm-up logged', { kind: 'info', duration: 1800 })
+    } else {
+      if (isPR) {
+        haptics.pr()
+        toast(
+          `🥇 NEW PR · ${exercise?.name ?? 'Exercise'} · ${fmt(kgToDisplay(data.weightKg, units), units)} ${units}`,
+          { kind: 'success', duration: 4500 },
+        )
+      } else {
+        haptics.tap()
       }
-    })
+      startTimer(restSec)
+    }
+    setPendingWarmup(false)
+    onFocus(data.weightKg)
   }
 
   const sparkValues = (sparklineData ?? []).map((p) => p.value)

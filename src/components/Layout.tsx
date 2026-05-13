@@ -1,19 +1,42 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import RestTimerBar from './RestTimerBar'
 import ToastContainer from './ToastContainer'
 import SettingsModal from './SettingsModal'
 import CoachChat from './CoachChat'
+import { currentStreak } from '../lib/streak'
 
 export default function Layout() {
   const [showSettings, setShowSettings] = useState(false)
   const [showCoach, setShowCoach] = useState(false)
+  const [streak, setStreak] = useState<number>(0)
+
+  useEffect(() => {
+    let cancelled = false
+    function refresh() {
+      currentStreak()
+        .then((n) => !cancelled && setStreak(n))
+        .catch(() => {})
+    }
+    refresh()
+    const id = window.setInterval(refresh, 60_000)
+    return () => {
+      cancelled = true
+      window.clearInterval(id)
+    }
+  }, [])
+
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark" aria-hidden />
           <span>BulkLog</span>
+          {streak >= 2 ? (
+            <span className="streak-badge tabnum" title={`${streak}-day streak`}>
+              🔥 {streak}
+            </span>
+          ) : null}
         </div>
         <div className="header-right">
           <nav className="top-nav" aria-label="Primary">

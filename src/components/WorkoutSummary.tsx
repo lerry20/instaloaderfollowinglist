@@ -35,28 +35,32 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal summary" onClick={(e) => e.stopPropagation()}>
+        {prs.length > 0 ? <ConfettiBanner /> : null}
         <header className="modal-head">
           <div>
             <span className="muted small">{session.date}</span>
-            <h3>{session.workoutName} — done</h3>
+            <h3>
+              {prs.length > 0 ? '🥇 ' : '💪 '}
+              {session.workoutName} — done
+            </h3>
           </div>
           <button className="link" onClick={onClose}>Close</button>
         </header>
 
-        <div className="summary-stats">
+        <div className="summary-stats big">
           <div>
             <span className="muted small">Working sets</span>
-            <strong className="tabnum">{setsCount}</strong>
+            <strong className="tabnum stat-big">{setsCount}</strong>
           </div>
           <div>
-            <span className="muted small">Volume</span>
-            <strong className="tabnum">
-              {Math.round(kgToDisplay(totalVolumeKg, units)).toLocaleString()} {units}·reps
+            <span className="muted small">Volume ({units}·reps)</span>
+            <strong className="tabnum stat-big">
+              {Math.round(kgToDisplay(totalVolumeKg, units)).toLocaleString()}
             </strong>
           </div>
           <div>
             <span className="muted small">PRs</span>
-            <strong className="tabnum">{prs.length}</strong>
+            <strong className={`tabnum stat-big${prs.length > 0 ? ' stat-pr' : ''}`}>{prs.length}</strong>
           </div>
         </div>
 
@@ -106,6 +110,40 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function ConfettiBanner() {
+  // Pure CSS confetti — 24 absolutely-positioned squares that fall + rotate.
+  const pieces = Array.from({ length: 24 })
+  const colors = [
+    'var(--primary)',
+    'var(--good)',
+    'var(--gold)',
+    'var(--accent)',
+    'var(--warning)',
+  ]
+  return (
+    <div className="confetti" aria-hidden>
+      {pieces.map((_, i) => {
+        const left = (i / pieces.length) * 100
+        const delay = (i % 8) * 0.12
+        const dur = 1.6 + ((i * 7) % 9) / 10
+        const bg = colors[i % colors.length]
+        return (
+          <span
+            key={i}
+            className="confetti-piece"
+            style={{
+              left: `${left}%`,
+              animationDelay: `${delay}s`,
+              animationDuration: `${dur}s`,
+              background: bg,
+            }}
+          />
+        )
+      })}
     </div>
   )
 }
