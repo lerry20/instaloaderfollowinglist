@@ -3,9 +3,11 @@ import { NavLink, Outlet } from 'react-router-dom'
 import RestTimerBar from './RestTimerBar'
 import ToastContainer from './ToastContainer'
 import SettingsModal from './SettingsModal'
+import CoachChat from './CoachChat'
 
 export default function Layout() {
   const [showSettings, setShowSettings] = useState(false)
+  const [showCoach, setShowCoach] = useState(false)
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -17,8 +19,18 @@ export default function Layout() {
           <nav className="top-nav" aria-label="Primary">
             <NavLink to="/" end>Train</NavLink>
             <NavLink to="/routines">Routines</NavLink>
+            <NavLink to="/daily">Daily</NavLink>
             <NavLink to="/progress">Progress</NavLink>
           </nav>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Open AI coach"
+            onClick={() => setShowCoach(true)}
+            title="AI coach"
+          >
+            <span aria-hidden style={{ fontSize: '1rem' }}>💬</span>
+          </button>
           <button
             type="button"
             className="icon-btn"
@@ -42,6 +54,10 @@ export default function Layout() {
           <span aria-hidden>📋</span>
           <span>Routines</span>
         </NavLink>
+        <NavLink to="/daily">
+          <span aria-hidden>🍳</span>
+          <span>Daily</span>
+        </NavLink>
         <NavLink to="/progress">
           <span aria-hidden>📈</span>
           <span>Progress</span>
@@ -49,6 +65,7 @@ export default function Layout() {
       </nav>
       <ToastContainer />
       {showSettings ? <SettingsModal onClose={() => setShowSettings(false)} /> : null}
+      <CoachChat open={showCoach} onClose={() => setShowCoach(false)} />
     </div>
   )
 }

@@ -37,6 +37,8 @@ export default function Onboarding() {
       activeRoutineId: routineId,
       skillLevel: existing?.skillLevel ?? 'beginner',
       theme: existing?.theme ?? 'system',
+      periodizationPhase: existing?.periodizationPhase ?? 'volume',
+      periodizationWeek: existing?.periodizationWeek ?? 1,
     })
     navigate('/')
   }
