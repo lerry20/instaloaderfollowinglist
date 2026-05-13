@@ -63,6 +63,44 @@ input[type='number']::-webkit-inner-spin-button {
   letter-spacing: 0.05em;
 }
 
+.error-screen {
+  padding: 1rem;
+}
+.error-card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+.error-card h2 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+.error-pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow: auto;
+  color: var(--danger);
+}
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 .app-header {
   position: sticky;
   top: 0;
