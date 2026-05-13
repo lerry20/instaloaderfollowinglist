@@ -8,6 +8,7 @@ import {
   db,
 } from '../db/schema'
 import { useAllExercises, usePlan } from '../db/queries'
+import ExercisePicker from '../components/ExercisePicker'
 
 export default function Plan() {
   const plan = usePlan()
@@ -190,20 +191,7 @@ function PlanDayEditor({
           )}
         </div>
         <div className="modal-foot">
-          {adding ? (
-            <ExercisePicker
-              onPick={(id) => {
-                setItems((arr) => [
-                  ...arr,
-                  { exerciseId: id, targetSets: 3, targetReps: '8–10', targetRPE: 8 },
-                ])
-                setAdding(false)
-              }}
-              onCancel={() => setAdding(false)}
-            />
-          ) : (
-            <button className="btn ghost" onClick={() => setAdding(true)}>+ Add exercise</button>
-          )}
+          <button className="btn ghost" onClick={() => setAdding(true)}>+ Add exercise</button>
           <button
             className="btn primary"
             onClick={() => onSave(items, label.trim() || DAY_LABEL[day])}
@@ -211,45 +199,21 @@ function PlanDayEditor({
             Save
           </button>
         </div>
-      </div>
-    </div>
-  )
-}
 
-function ExercisePicker({
-  onPick,
-  onCancel,
-}: {
-  onPick: (id: string) => void
-  onCancel: () => void
-}) {
-  const exercises = useAllExercises() ?? []
-  const [q, setQ] = useState('')
-  const filtered = exercises.filter((e) =>
-    e.name.toLowerCase().includes(q.toLowerCase()) || e.primaryMuscle.toLowerCase().includes(q.toLowerCase()),
-  )
-  return (
-    <div className="exercise-picker">
-      <div className="picker-head">
-        <input
-          autoFocus
-          type="search"
-          placeholder="Search exercises…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <button className="link" onClick={onCancel}>Cancel</button>
+        {adding ? (
+          <ExercisePicker
+            title="Add exercise"
+            onClose={() => setAdding(false)}
+            onPick={(id) => {
+              setItems((arr) => [
+                ...arr,
+                { exerciseId: id, targetSets: 3, targetReps: '8–10', targetRPE: 8 },
+              ])
+              setAdding(false)
+            }}
+          />
+        ) : null}
       </div>
-      <ul>
-        {filtered.map((e) => (
-          <li key={e.id}>
-            <button className="picker-row" onClick={() => onPick(e.id)}>
-              <strong>{e.name}</strong>
-              <span className="muted small">{e.primaryMuscle} · {e.equipment}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }

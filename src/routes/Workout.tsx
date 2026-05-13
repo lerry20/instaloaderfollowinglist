@@ -25,6 +25,7 @@ import { kgToDisplay } from '../lib/units'
 import SetRow from '../components/SetRow'
 import PlateCalculator from '../components/PlateCalculator'
 import WorkoutSummary from '../components/WorkoutSummary'
+import ExercisePicker from '../components/ExercisePicker'
 
 export default function Workout() {
   const { day } = useParams<{ day: DayKey }>()
@@ -299,8 +300,8 @@ function WorkoutItemCard({
       </button>
 
       {showSwap ? (
-        <SwapPicker
-          currentName={exerciseName}
+        <ExercisePicker
+          title={`Swap ${exerciseName}`}
           onClose={() => setShowSwap(false)}
           onPick={async (newId) => {
             await swapSessionItem(sessionId, exerciseId, {
@@ -336,47 +337,3 @@ function NotificationsPromptOnce() {
   return null
 }
 
-function SwapPicker({
-  currentName,
-  onClose,
-  onPick,
-}: {
-  currentName: string
-  onClose: () => void
-  onPick: (id: string) => void
-}) {
-  const exercises = useAllExercises() ?? []
-  const [q, setQ] = useState('')
-  const filtered = exercises.filter((e) =>
-    e.name.toLowerCase().includes(q.toLowerCase()) ||
-    e.primaryMuscle.toLowerCase().includes(q.toLowerCase()),
-  )
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
-          <h3>Swap {currentName}</h3>
-          <button className="link" onClick={onClose}>Cancel</button>
-        </header>
-        <input
-          autoFocus
-          type="search"
-          placeholder="Search exercises…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="picker-search"
-        />
-        <ul className="picker-list">
-          {filtered.map((e) => (
-            <li key={e.id}>
-              <button className="picker-row" onClick={() => onPick(e.id)}>
-                <strong>{e.name}</strong>
-                <span className="muted small">{e.primaryMuscle} · {e.equipment}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
