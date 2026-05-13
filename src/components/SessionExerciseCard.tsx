@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import {
@@ -13,8 +13,8 @@ import {
   logSet,
   suggestProgression,
 } from '../db/queries'
-import { kgToDisplay } from '../lib/units'
 import { useRestTimer } from '../state/restTimer'
+import { toast } from '../state/toasts'
 import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
 import ExercisePicker from './ExercisePicker'
@@ -23,13 +23,26 @@ interface Props {
   item: PlanItem
   sessionId: number
   units: Units
+  positionIndex: number
+  totalExercises: number
   onSwap: (newId: string) => void
+  onSkip: () => void
+  onFocus: (suggestedKg: number | null) => void
 }
 
-export default function SessionExerciseCard({ item, sessionId, units, onSwap }: Props) {
+export default function SessionExerciseCard({
+  item,
+  sessionId,
+  units,
+  positionIndex,
+  totalExercises,
+  onSwap,
+  onSkip,
+  onFocus,
+}: Props) {
   const exercise = useLiveQuery(() => db.exercises.get(item.exerciseId), [item.exerciseId])
-  const cardRef = useRef<HTMLElement>(null)
   const [showSwap, setShowSwap] = useState(false)
+  const [pendingWarmup, setPendingWarmup] = useState(false)
 
   const logs =
     useLiveQuery(
@@ -69,16 +82,16 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
       ? workingLogs[workingLogs.length - 1].weight
       : progression?.suggestedKg ?? null
 
+  const lastSessionTopKg = lastSession?.sets[0]?.weight ?? null
+
   const totalSetsPlanned = item.targetSets
   const remaining = Math.max(0, totalSetsPlanned - workingLogs.length)
 
-  // Pre-build rows: already-logged sets + pending sets up to plan target.
   const rows: { idx: number; logged?: SetLog }[] = []
   for (let i = 0; i < Math.max(totalSetsPlanned, workingLogs.length); i++) {
     rows.push({ idx: i, logged: workingLogs[i] })
   }
 
-  // Auto-scroll handled by parent in SessionView on log; here we just commit data.
   function handleLog(
     rowIdx: number,
     data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean },
@@ -92,43 +105,51 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
       data.reps,
       data.rpe,
       data.isWarmup,
-    ).then(() => {
-      startTimer(restSec)
+    ).then((id) => {
+      if (!data.isWarmup) startTimer(restSec)
+      setPendingWarmup(false)
       setTimeout(() => {
-        const next = cardRef.current?.querySelector('.one-tap-row.pending') as HTMLElement | null
-        if (next) {
-          next.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        } else {
-          const nextCard = cardRef.current?.nextElementSibling as HTMLElement | null
-          nextCard?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
+        scrollToNext()
       }, 80)
+      if (data.isWarmup) {
+        toast('Warm-up logged', { kind: 'info', duration: 1800 })
+      }
+      // Side effect: pass focus to parent so plate calc can update.
+      onFocus(data.weightKg)
+      void id
     })
   }
 
-  useEffect(() => {
-    // no-op effect to keep TS happy
-  }, [])
+  function scrollToNext() {
+    const card = document.querySelector(`[data-exercise-card="${item.exerciseId}"]`)
+    const next = card?.querySelector('.set-row-v2.pending') as HTMLElement | null
+    if (next) {
+      next.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    } else {
+      const sibling = card?.nextElementSibling as HTMLElement | null
+      sibling?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   return (
-    <article className="session-card" ref={cardRef}>
+    <article className="session-card" data-exercise-card={item.exerciseId}>
       <header className="session-card-head">
-        <Link to={`/exercise/${item.exerciseId}`} className="session-card-link">
+        <Link
+          to={`/exercise/${item.exerciseId}`}
+          className="session-card-link"
+          onFocus={() => onFocus(suggestedKg)}
+        >
           <ExerciseImage urls={exercise?.imageUrls ?? []} alt={exercise?.name ?? item.exerciseId} />
           <div className="session-card-titles">
+            <span className="position-tag muted small">
+              {positionIndex + 1} / {totalExercises}
+            </span>
             <h2>{exercise?.name ?? item.exerciseId}</h2>
             <span className="muted small">
               {exercise?.equipment ?? '—'}
             </span>
           </div>
         </Link>
-        <button
-          className="link small swap-link"
-          onClick={() => setShowSwap(true)}
-          aria-label="Swap exercise"
-        >
-          Swap
-        </button>
       </header>
 
       <div className="target-line">
@@ -139,31 +160,44 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
         <span className="muted small">@ RPE {item.targetRPE}</span>
       </div>
 
-      <div className="last-session-line">
-        {lastSession ? (
-          <span className="muted small">
-            Last:{' '}
-            <strong className="tabnum">
-              {fmt(kgToDisplay(lastSession.sets[0]?.weight ?? 0, units), units)} {units}
-            </strong>{' '}
-            × {lastSession.sets.map((s) => s.reps).join(', ')}
+      {lastSession ? (
+        <div className="last-session-line muted small">
+          Last:{' '}
+          <strong className="tabnum">
+            {lastSession.sets
+              .map((s) => `${fmt(kgToDisplay(s.weight, units), units)}×${s.reps}`)
+              .join(', ')}
+          </strong>
+        </div>
+      ) : (
+        <div className="last-session-line muted small">No history for this lift yet.</div>
+      )}
+
+      {progression && (progression.hint.kind === 'increase' ||
+        progression.hint.kind === 'reduce' ||
+        progression.hint.kind === 'hold') ? (
+        <div className="hint-line">
+          <span
+            className={`hint-pill ${
+              progression.hint.kind === 'increase'
+                ? 'up'
+                : progression.hint.kind === 'reduce'
+                ? 'down'
+                : 'hold'
+            }`}
+          >
+            {progression.hint.kind === 'increase'
+              ? '↑'
+              : progression.hint.kind === 'reduce'
+              ? '↓'
+              : '→'}{' '}
+            {progression.hint.reason}
           </span>
-        ) : (
-          <span className="muted small">No history yet</span>
-        )}
-        {progression && progression.hint.kind === 'increase' ? (
-          <span className="hint-pill up">↑ {progression.hint.reason}</span>
-        ) : null}
-        {progression && progression.hint.kind === 'reduce' ? (
-          <span className="hint-pill down">↓ {progression.hint.reason}</span>
-        ) : null}
-        {progression && progression.hint.kind === 'hold' ? (
-          <span className="hint-pill hold">→ {progression.hint.reason}</span>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {warmupLogs.length > 0 ? (
-        <div className="set-list warmups">
+        <div className="set-list warmups" aria-label="Warm-up sets">
           {warmupLogs.map((w, i) => (
             <OneTapSetRow
               key={`w-${w.id}`}
@@ -174,11 +208,27 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
               logged={w}
               onLog={() => {}}
               onUnlog={async () => {
-                if (w.id) await deleteSetLog(w.id)
+                if (w.id) {
+                  await deleteSetLog(w.id)
+                  toast('Warm-up removed', { kind: 'info', duration: 1500 })
+                }
               }}
             />
           ))}
         </div>
+      ) : null}
+
+      {pendingWarmup ? (
+        <OneTapSetRow
+          key="pending-warmup"
+          index={warmupLogs.length}
+          units={units}
+          suggestedKg={suggestedKg !== null ? suggestedKg * 0.5 : null}
+          suggestedReps={Math.max(5, Math.round((repsLow ?? 6) / 2))}
+          prefillWarmup
+          onLog={(data) => handleLog(warmupLogs.length, { ...data, isWarmup: true }, 0)}
+          onUnlog={() => setPendingWarmup(false)}
+        />
       ) : null}
 
       <div className="set-list">
@@ -189,19 +239,55 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
             units={units}
             suggestedKg={logged ? logged.weight : suggestedKg}
             suggestedReps={logged ? logged.reps : repsHigh}
+            lastSessionTopKg={lastSessionTopKg}
             logged={logged}
             onLog={(data) =>
               handleLog(idx, data, exercise?.defaultRestSec ?? 90)
             }
             onUnlog={async () => {
-              if (logged?.id) await deleteSetLog(logged.id)
+              if (logged?.id) {
+                await deleteSetLog(logged.id)
+                toast('Set deleted', { kind: 'info', duration: 1500 })
+              }
             }}
           />
         ))}
       </div>
 
+      <div className="card-actions">
+        {!pendingWarmup ? (
+          <button
+            type="button"
+            className="btn small ghost"
+            onClick={() => setPendingWarmup(true)}
+          >
+            + Add warm-up
+          </button>
+        ) : null}
+        <button
+          type="button"
+          className="btn small ghost"
+          onClick={() => setShowSwap(true)}
+        >
+          ⇄ Swap exercise
+        </button>
+        <button
+          type="button"
+          className="btn small ghost"
+          onClick={() => {
+            if (workingLogs.length > 0) {
+              if (!confirm('Skip this exercise? Your logged sets will remain.')) return
+            }
+            onSkip()
+            toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
+          }}
+        >
+          ⤼ Skip exercise
+        </button>
+      </div>
+
       {remaining === 0 && workingLogs.length > 0 ? (
-        <p className="muted small done-line">All sets done · keep pushing 💪</p>
+        <p className="muted small done-line">All sets done · 💪</p>
       ) : null}
 
       {showSwap ? (
@@ -211,6 +297,7 @@ export default function SessionExerciseCard({ item, sessionId, units, onSwap }: 
           onPick={(id) => {
             onSwap(id)
             setShowSwap(false)
+            toast('Exercise swapped', { kind: 'success', duration: 2000 })
           }}
         />
       ) : null}
@@ -222,4 +309,8 @@ function fmt(value: number, units: Units): string {
   if (units === 'lb') return Math.round(value).toString()
   if (Number.isInteger(value)) return String(value)
   return value.toFixed(1)
+}
+
+function kgToDisplay(kg: number, units: Units): number {
+  return units === 'kg' ? kg : kg / 0.45359237
 }

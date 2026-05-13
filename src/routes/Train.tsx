@@ -16,9 +16,10 @@ import {
 } from '../db/queries'
 import SessionExerciseCard from '../components/SessionExerciseCard'
 import WorkoutSummary from '../components/WorkoutSummary'
-import PlateCalculator from '../components/PlateCalculator'
+import PlateSheet from '../components/PlateSheet'
 import { kgToDisplay } from '../lib/units'
 import { ensureNotificationPermission } from '../state/restTimer'
+import { toast } from '../state/toasts'
 
 export default function Train() {
   const settings = useSettings()
@@ -42,12 +43,10 @@ export default function Train() {
         session={session}
         routine={routine}
         units={settings.units}
-        onFinish={async (id) => {
-          await markSessionComplete(id)
-        }}
         onAbandon={async (id) => {
-          if (confirm('Discard this in-progress workout?')) {
+          if (confirm('Discard this in-progress workout? All logged sets will be removed.')) {
             await abandonSession(id)
+            toast('Workout discarded', { kind: 'warn' })
             navigate('/')
           }
         }}
@@ -67,11 +66,9 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
 
   async function start() {
     if (!next) return
-    const id = await startSession(routine, next)
+    await startSession(routine, next)
     void ensureNotificationPermission()
     navigate(`/train`)
-    // Force re-render by referencing id (unused but keeps fn async-aware)
-    void id
   }
 
   return (
@@ -94,7 +91,10 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
 
       {next ? (
         <section className="card">
-          <h3>What you'll do</h3>
+          <header className="section-head">
+            <h3>What you'll do</h3>
+            <span className="muted small">{next.items.length} exercises</span>
+          </header>
           <ul className="hero-items">
             {next.items.map((it) => (
               <li key={it.exerciseId} className="hero-item">
@@ -115,6 +115,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
             {latestBw ? kgToDisplay(latestBw.weightKg, units).toFixed(1) : '—'}
             <span className="unit">{latestBw ? units : ''}</span>
           </span>
+          {!latestBw ? <span className="link small">Log it →</span> : null}
         </Link>
         <Link to="/routines" className="card stat-link">
           <span className="muted small">Routine</span>
@@ -130,28 +131,40 @@ function ActiveSessionView({
   session,
   routine,
   units,
-  onFinish,
   onAbandon,
 }: {
   session: Session
   routine: Routine
   units: 'kg' | 'lb'
-  onFinish: (id: number) => Promise<void>
   onAbandon: (id: number) => Promise<void>
 }) {
   const navigate = useNavigate()
   const setLogs = useSessionSetLogs(session.id) ?? []
   const [showSummary, setShowSummary] = useState<number | null>(null)
   const [showPlates, setShowPlates] = useState(false)
+  const [focusedKg, setFocusedKg] = useState<number | null>(null)
+  const [confirmFinish, setConfirmFinish] = useState(false)
 
   const workingLogs = setLogs.filter((l) => !l.isWarmup)
   const totalPlanned = session.items.reduce((n, it) => n + it.targetSets, 0)
   const progress = totalPlanned > 0 ? Math.min(100, (workingLogs.length / totalPlanned) * 100) : 0
+  const unloggedSets = Math.max(0, totalPlanned - workingLogs.length)
 
   async function swap(oldId: string, newId: string) {
     const item = session.items.find((i) => i.exerciseId === oldId)
     if (!item) return
     await swapSessionItem(session.id!, oldId, { ...item, exerciseId: newId })
+  }
+
+  async function skipExercise(exerciseId: string) {
+    const items = session.items.filter((i) => i.exerciseId !== exerciseId)
+    await db.sessions.update(session.id!, { items })
+  }
+
+  async function finish() {
+    await markSessionComplete(session.id!)
+    setConfirmFinish(false)
+    setShowSummary(session.id!)
   }
 
   return (
@@ -172,36 +185,73 @@ function ActiveSessionView({
         <div className="session-meta">
           <span className="muted small">{workingLogs.length} / {totalPlanned} working sets</span>
           <button
-            className="btn small ghost"
+            className={`btn small ${showPlates ? '' : 'ghost'}`}
             onClick={() => setShowPlates((v) => !v)}
             aria-pressed={showPlates}
           >
-            {showPlates ? 'Hide plates' : 'Plates'}
+            {showPlates ? '✕ Plates' : '⚖ Plates'}
           </button>
         </div>
       </header>
 
-      {showPlates ? <PlateCalculator units={units} /> : null}
-
-      {session.items.map((item) => (
-        <SessionExerciseCard
-          key={item.exerciseId}
-          item={item}
-          sessionId={session.id!}
-          units={units}
-          onSwap={(newId) => swap(item.exerciseId, newId)}
-        />
-      ))}
+      {session.items.length === 0 ? (
+        <section className="card">
+          <p className="muted">All exercises skipped or removed. Finish or discard the workout.</p>
+        </section>
+      ) : (
+        session.items.map((item, idx) => (
+          <SessionExerciseCard
+            key={item.exerciseId}
+            item={item}
+            sessionId={session.id!}
+            units={units}
+            positionIndex={idx}
+            totalExercises={session.items.length}
+            onSwap={(newId) => swap(item.exerciseId, newId)}
+            onSkip={() => skipExercise(item.exerciseId)}
+            onFocus={(kg) => setFocusedKg(kg)}
+          />
+        ))
+      )}
 
       <button
         className="btn primary block finish-btn"
-        onClick={async () => {
-          await onFinish(session.id!)
-          setShowSummary(session.id!)
+        onClick={() => {
+          if (unloggedSets > 0 && workingLogs.length > 0) {
+            setConfirmFinish(true)
+          } else {
+            finish()
+          }
         }}
       >
         Finish workout
       </button>
+
+      {confirmFinish ? (
+        <div className="modal-backdrop" onClick={() => setConfirmFinish(false)}>
+          <div className="modal small-modal" onClick={(e) => e.stopPropagation()}>
+            <header className="modal-head">
+              <h3>Finish early?</h3>
+              <button className="link" onClick={() => setConfirmFinish(false)}>Cancel</button>
+            </header>
+            <p>
+              You have <strong>{unloggedSets}</strong> planned set{unloggedSets === 1 ? '' : 's'} left.
+              You can come back to this session anytime — or finish it now.
+            </p>
+            <div className="modal-foot">
+              <button className="btn primary block" onClick={finish}>Finish anyway</button>
+              <button className="btn ghost block" onClick={() => setConfirmFinish(false)}>Keep going</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <PlateSheet
+        open={showPlates}
+        units={units}
+        focusedKg={focusedKg}
+        onClose={() => setShowPlates(false)}
+      />
 
       {showSummary !== null ? (
         <WorkoutSummary
