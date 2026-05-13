@@ -148,6 +148,26 @@ export const CURATED_EXERCISES: Exercise[] = [
     bulkingTip:
       'A heavy bodyweight chest builder. Once you can do 10 strict reps, add load with a dip belt.',
   },
+  {
+    id: 'decline-press',
+    name: 'Smith / Barbell Decline Press',
+    primaryMuscle: 'chest',
+    secondaryMuscles: ['tricep'],
+    equipment: 'Smith machine or barbell + decline bench',
+    category: 'compound',
+    defaultRestSec: 150,
+    videoQuery: 'decline bench press technique',
+    imageUrls: imgs('Smith_Machine_Decline_Press'),
+    isCurated: true,
+    cues: [
+      'Set the bench to ~15–30° decline. Hook your feet so you don\'t slide.',
+      'Lower the bar to your lower chest, just below the nipples.',
+      'Press back up in a straight line — no arc.',
+      'Keep your elbows tucked at ~45° from your torso, like a regular bench.',
+    ],
+    bulkingTip:
+      'The most direct lower-chest builder you can load heavy. EMG studies (Lauver et al.) show decline pressing biases the lower pec fibers significantly more than flat bench. Pair with chest dips for the strongest lower-chest stimulus.',
+  },
 
   // ───────── SHOULDERS ─────────
   {
@@ -393,6 +413,26 @@ export const CURATED_EXERCISES: Exercise[] = [
       'Lets you handle huge loads with less lower-back stress than barbell rows. Best rowing variation for raw back size.',
   },
   {
+    id: 'chest-supported-row',
+    name: 'Chest-Supported DB Row',
+    primaryMuscle: 'midBack',
+    secondaryMuscles: ['lat', 'bicep', 'rearDelt'],
+    equipment: 'Dumbbells + incline bench',
+    category: 'compound',
+    defaultRestSec: 120,
+    videoQuery: 'chest supported dumbbell row technique',
+    imageUrls: imgs('Dumbbell_Incline_Row'),
+    isCurated: true,
+    cues: [
+      'Set an incline bench to ~30–45°. Lie chest-down on the bench, arms hanging.',
+      'Row the dumbbells up to your hips, driving your elbows back.',
+      'Squeeze your shoulder blades together hard at the top.',
+      'Lower slowly to a full hang each rep.',
+    ],
+    bulkingTip:
+      'Lower back gets ZERO stress here — all the fatigue goes into the actual back muscles. Best back-isolation row for hypertrophy when your lower back is fried from squats and deadlifts.',
+  },
+  {
     id: 'seated-cable-row',
     name: 'Seated Cable Row',
     primaryMuscle: 'midBack',
@@ -492,7 +532,7 @@ export const CURATED_EXERCISES: Exercise[] = [
       'Lower slowly (about 2 seconds) all the way back to a full hang.',
     ],
     bulkingTip:
-      'The best mass builder for the long head of the bicep — the part that creates the peak when you flex.',
+      'The best mass builder for the long head of the bicep — the part that creates the peak when you flex. Stretched-position bicep training (arm behind body, full elbow extension) consistently produces more growth than concentration curls in recent comparisons (Sato et al. 2021, Wolf et al. 2023).',
   },
   {
     id: 'hammer-curl',
@@ -553,6 +593,26 @@ export const CURATED_EXERCISES: Exercise[] = [
     ],
     bulkingTip:
       'Cables give constant tension; dumbbells/bars lose tension at the bottom. Best for that final pump-set after heavier curl work.',
+  },
+  {
+    id: 'bayesian-curl',
+    name: 'Bayesian Cable Curl',
+    primaryMuscle: 'bicep',
+    secondaryMuscles: [],
+    equipment: 'Low cable + D-handle',
+    category: 'isolation',
+    defaultRestSec: 60,
+    videoQuery: 'bayesian cable curl technique',
+    imageUrls: imgs('Overhead_Cable_Curl'),
+    isCurated: true,
+    cues: [
+      'Set the cable to the LOWEST setting. Grab the handle with one hand, palm forward.',
+      'Stand facing AWAY from the machine and step forward so the cable runs behind you.',
+      'Your working arm should be slightly BEHIND your torso — this is the key.',
+      'Curl up without letting your elbow drift forward. The bicep should feel a deep stretch at the bottom.',
+    ],
+    bulkingTip:
+      'The Bayesian curl puts the long head of the bicep into a deep stretch — research (Oliveira 2009, Wolf et al. 2023) shows stretch-position bicep training produces more growth than peak-contraction work. Probably the #1 long-head bicep exercise. 3 × 10–12 each arm.',
   },
 
   // ───────── TRICEPS ─────────
@@ -838,7 +898,7 @@ export const CURATED_EXERCISES: Exercise[] = [
       'Slow control on the way back up.',
     ],
     bulkingTip:
-      'Stretches the hamstrings differently than lying curls — recent research suggests this stretched-position bias may be the more effective for growth.',
+      'Maeo et al. (2021) showed seated leg curl produced ~70% more hamstring growth than lying leg curl over 12 weeks — the longer muscle length at the bottom is the key. If you only do one leg-curl variation, make it this one.',
   },
   {
     id: 'hip-thrust',
@@ -858,7 +918,7 @@ export const CURATED_EXERCISES: Exercise[] = [
       'Lower under control. Keep your chin tucked and ribs down.',
     ],
     bulkingTip:
-      'The single best direct glute exercise. Important for performance AND looks. 3–4 × 8–12 once a week is plenty.',
+      'The single best direct glute exercise — Contreras\' research shows higher glute EMG activation than squats or deadlifts. Important for performance AND looks. 3–4 × 8–12 once a week is plenty.',
   },
   {
     id: 'cable-pull-through',
