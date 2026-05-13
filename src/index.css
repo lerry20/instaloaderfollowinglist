@@ -1472,10 +1472,126 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .edit-tap-btn:hover { border-color: var(--primary); background: var(--bg-elev-2); }
 .edit-tap-btn:active { transform: scale(0.97); }
 
-.set-row-v2.editing { display: flex; flex-direction: column; gap: 0.55rem; }
-.edit-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-.edit-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
-.edit-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.set-row-v2.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem 0.85rem;
+}
+.edit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.big-stepper { display: flex; flex-direction: column; gap: 0.3rem; }
+.big-stepper-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.big-stepper-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.4rem;
+  align-items: center;
+}
+.step-side {
+  display: flex;
+  gap: 0.3rem;
+}
+.step-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms, transform 80ms;
+}
+.step-btn:hover { border-color: var(--primary); background: #243172; }
+.step-btn:active { transform: scale(0.96); }
+.step-btn.small-step {
+  background: var(--bg);
+  font-weight: 600;
+}
+.step-value-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-value-wrap input {
+  width: 100%;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1;
+  border-radius: 12px;
+  border: 2px solid var(--primary-strong);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.65rem 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+.step-value-wrap input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.18);
+}
+
+.rpe-and-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.3rem;
+  border-top: 1px dashed var(--border);
+}
+.rpe-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.rpe-inline input {
+  width: 60px;
+  text-align: center;
+  font-weight: 700;
+  padding: 0.4rem 0.4rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+}
+.rpe-help { font-size: 0.7rem; }
+.edit-foot-buttons { display: inline-flex; gap: 0.4rem; }
+
+.big-tap-button.placeholder {
+  background: var(--bg-elev-2);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-muted);
+  text-align: left;
+}
+.big-tap-button.placeholder .big-tap-action {
+  font-size: 0.95rem;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 1;
+}
+.big-tap-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* Card actions row */
 .card-actions {
