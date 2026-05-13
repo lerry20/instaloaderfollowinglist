@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   DAY_KEYS,
@@ -10,43 +10,46 @@ import {
 } from '../db/schema'
 import {
   getOrCreateTodaySession,
-  lastTopSetForExercise,
+  lastWorkingTopSet,
   logSet,
   markSessionComplete,
+  swapSessionItem,
   useAllExercises,
   usePlan,
+  useSession,
   useSessionSetLogs,
+  useSettings,
 } from '../db/queries'
-import { useRestTimer } from '../state/restTimer'
+import { ensureNotificationPermission, useRestTimer } from '../state/restTimer'
+import { kgToDisplay } from '../lib/units'
 import SetRow from '../components/SetRow'
+import PlateCalculator from '../components/PlateCalculator'
+import WorkoutSummary from '../components/WorkoutSummary'
 
 export default function Workout() {
   const { day } = useParams<{ day: DayKey }>()
-  const dayKey = (day && DAY_KEYS.includes(day) ? day : 'mon') as DayKey
+  const dayKey = (day && DAY_KEYS.includes(day as DayKey) ? (day as DayKey) : 'mon') as DayKey
   const plan = usePlan()
   const planDay = plan?.weekTemplate[dayKey] ?? null
   const exercises = useAllExercises() ?? []
+  const settings = useSettings()
   const navigate = useNavigate()
+  const [showSummary, setShowSummary] = useState<number | null>(null)
+  const [showPlateCalc, setShowPlateCalc] = useState(false)
 
   const sessionId = useLiveQuery(async () => {
     if (!planDay) return null
-    return getOrCreateTodaySession(dayKey, planDay.label)
+    return getOrCreateTodaySession(dayKey, planDay.label, planDay.items)
   }, [dayKey, planDay?.label])
 
+  const session = useSession(sessionId ?? undefined)
   const sessionLogs = useSessionSetLogs(sessionId ?? undefined)
-  const session = useLiveQuery(
-    () => (sessionId ? db.sessions.get(sessionId) : undefined),
-    [sessionId],
-  )
 
-  const settings = useLiveQuery(() => db.settings.get(1), [])
   const units = settings?.units ?? 'kg'
 
-  const items = useMemo(() => planDay?.items ?? [], [planDay])
+  const items: PlanItem[] = useMemo(() => session?.items ?? planDay?.items ?? [], [session?.items, planDay])
 
-  if (!plan) {
-    return <div className="page"><p className="muted">Loading…</p></div>
-  }
+  if (!plan) return <div className="page"><p className="muted">Loading…</p></div>
   if (!planDay) {
     return (
       <div className="page">
@@ -56,7 +59,7 @@ export default function Workout() {
       </div>
     )
   }
-  if (!sessionId || !sessionLogs) {
+  if (!sessionId || !sessionLogs || !session) {
     return <div className="page"><p className="muted">Loading workout…</p></div>
   }
 
@@ -67,112 +70,217 @@ export default function Workout() {
           <span className="muted">{DAY_LABEL[dayKey]}</span>
           <h1>{planDay.label}</h1>
         </div>
-        {session && !session.completedAt ? (
+        <div className="workout-actions">
           <button
-            className="btn primary"
-            onClick={async () => {
-              await markSessionComplete(sessionId)
-              navigate('/history')
-            }}
+            className="btn ghost small"
+            onClick={() => setShowPlateCalc((v) => !v)}
+            aria-pressed={showPlateCalc}
           >
-            Finish workout
+            {showPlateCalc ? 'Hide plates' : 'Plates'}
           </button>
-        ) : (
-          <span className="badge good">Completed</span>
-        )}
+          {session.completedAt ? (
+            <span className="badge good">Completed</span>
+          ) : (
+            <button
+              className="btn primary"
+              onClick={async () => {
+                await markSessionComplete(sessionId)
+                setShowSummary(sessionId)
+              }}
+            >
+              Finish
+            </button>
+          )}
+        </div>
       </header>
+
+      {showPlateCalc ? <PlateCalculator units={units} /> : null}
 
       {items.map((item) => {
         const ex = exercises.find((e) => e.id === item.exerciseId)
         const logsForItem = sessionLogs
           .filter((l) => l.exerciseId === item.exerciseId)
-          .sort((a, b) => a.setIndex - b.setIndex)
+          .sort((a, b) => a.loggedAt - b.loggedAt)
         return (
           <WorkoutItemCard
             key={item.exerciseId}
             item={item}
+            exerciseId={item.exerciseId}
             exerciseName={ex?.name ?? item.exerciseId}
             primaryMuscle={ex?.primaryMuscle}
             equipment={ex?.equipment}
+            exerciseDefaultRestSec={ex?.defaultRestSec ?? settings?.defaultRestSec ?? 90}
             units={units}
             logs={logsForItem}
             sessionId={sessionId}
-            defaultRestSec={settings?.defaultRestSec ?? 90}
+            fallbackRestSec={settings?.defaultRestSec ?? 90}
           />
         )
       })}
+
+      {!session.completedAt && items.length > 0 ? (
+        <button
+          className="btn primary block"
+          onClick={async () => {
+            await markSessionComplete(sessionId)
+            setShowSummary(sessionId)
+          }}
+        >
+          Finish workout
+        </button>
+      ) : null}
+
+      {showSummary !== null ? (
+        <WorkoutSummary
+          sessionId={showSummary}
+          units={units}
+          onClose={() => {
+            setShowSummary(null)
+            navigate('/history')
+          }}
+        />
+      ) : null}
     </div>
   )
 }
 
 function WorkoutItemCard({
   item,
+  exerciseId,
   exerciseName,
   primaryMuscle,
   equipment,
+  exerciseDefaultRestSec,
   units,
   logs,
   sessionId,
-  defaultRestSec,
 }: {
   item: PlanItem
+  exerciseId: string
   exerciseName: string
   primaryMuscle?: string
   equipment?: string
-  units: string
-  logs: { id?: number; weight: number; reps: number; rpe: number | null; setIndex: number }[]
+  exerciseDefaultRestSec: number
+  units: 'kg' | 'lb'
+  logs: { id?: number; weight: number; reps: number; rpe: number | null; isWarmup: boolean; loggedAt: number }[]
   sessionId: number
-  defaultRestSec: number
+  fallbackRestSec: number
 }) {
   const startTimer = useRestTimer((s) => s.start)
-  const lastTop = useLiveQuery(() => lastTopSetForExercise(item.exerciseId), [item.exerciseId])
-  const suggested = lastTop ? lastTop.weight + 2.5 : undefined
+  const lastTop = useLiveQuery(
+    () => lastWorkingTopSet(exerciseId, sessionId),
+    [exerciseId, sessionId],
+  )
+  const cardRef = useRef<HTMLElement>(null)
+  const [showSwap, setShowSwap] = useState(false)
 
+  const workingLogs = logs.filter((l) => !l.isWarmup)
+  const lastWorkingThisSession = workingLogs[workingLogs.length - 1]
+  const suggestedKg = lastWorkingThisSession
+    ? lastWorkingThisSession.weight
+    : lastTop
+    ? lastTop.weight + (units === 'kg' ? 2.5 : 5 * 0.45359237)
+    : undefined
+  const repsLow = Number(String(item.targetReps).split(/[–\-]/)[0]) || undefined
+
+  const totalRows = Math.max(item.targetSets, workingLogs.length)
   const rows: { index: number; logged?: typeof logs[number] }[] = []
-  for (let i = 0; i < Math.max(item.targetSets, logs.length); i++) {
-    rows.push({ index: i, logged: logs.find((l) => l.setIndex === i) })
+  for (let i = 0; i < totalRows; i++) {
+    rows.push({ index: i, logged: workingLogs[i] })
   }
+  const warmupRows = logs
+    .filter((l) => l.isWarmup)
+    .map((l, idx) => ({ logged: l, virtualIndex: idx }))
 
   return (
-    <article className="card workout-card">
+    <article className="card workout-card" ref={cardRef}>
       <header className="workout-card-head">
-        <Link to={`/exercise/${item.exerciseId}`} className="exercise-link">
+        <Link to={`/exercise/${exerciseId}`} className="exercise-link">
           <h3>{exerciseName}</h3>
           <span className="muted small">
             {primaryMuscle}
             {equipment ? ` · ${equipment}` : ''}
           </span>
         </Link>
-        <span className="muted small">
-          Target: {item.targetSets} × {item.targetReps} @ RPE {item.targetRPE}
-        </span>
+        <div className="workout-card-actions">
+          <span className="muted small">
+            {item.targetSets} × {item.targetReps} @ RPE {item.targetRPE}
+          </span>
+          <button
+            className="link"
+            onClick={() => setShowSwap(true)}
+            aria-label={`Swap ${exerciseName}`}
+          >
+            Swap
+          </button>
+        </div>
       </header>
-      {suggested ? (
-        <p className="muted small suggestion">
-          Last top set: {lastTop!.weight}
-          {units} → try {suggested}
-          {units} today.
-        </p>
-      ) : (
-        <p className="muted small suggestion">First time logging — pick a starter weight you can hit clean.</p>
-      )}
+
+      <p className="muted small suggestion">
+        {lastTop ? (
+          <>
+            Last working top:{' '}
+            <strong>
+              {kgToDisplay(lastTop.weight, units).toFixed(units === 'kg' ? 1 : 0)} {units} × {lastTop.reps}
+            </strong>{' '}
+            · try{' '}
+            <strong>
+              {kgToDisplay(suggestedKg!, units).toFixed(units === 'kg' ? 1 : 0)} {units}
+            </strong>{' '}
+            today.
+          </>
+        ) : (
+          <>First time logging — pick a starter weight you can clean.</>
+        )}
+      </p>
+
+      {warmupRows.length > 0 ? (
+        <div className="set-list">
+          {warmupRows.map((w) => (
+            <SetRow
+              key={`w-${w.logged.id}`}
+              index={w.virtualIndex}
+              units={units}
+              logged={w.logged}
+              onUnlog={async () => {
+                if (w.logged.id) await db.setLogs.delete(w.logged.id)
+              }}
+              onLog={() => {}}
+            />
+          ))}
+        </div>
+      ) : null}
+
       <div className="set-list">
         {rows.map(({ index, logged }) => (
           <SetRow
-            key={index}
+            key={`${index}-${logged?.id ?? 'pending'}`}
             index={index}
             units={units}
-            defaultWeight={
-              logged
-                ? logged.weight
-                : suggested ??
-                  (logs[logs.length - 1]?.weight ?? lastTop?.weight ?? undefined)
-            }
-            defaultReps={logged ? logged.reps : Number(String(item.targetReps).split(/[–-]/)[0]) || undefined}
+            defaultWeightKg={logged ? logged.weight : suggestedKg}
+            defaultReps={logged ? logged.reps : repsLow}
             logged={logged}
             onLog={async (data) => {
-              await logSet(sessionId, item.exerciseId, index, data.weight, data.reps, data.rpe)
-              startTimer(defaultRestSec)
+              await logSet(
+                sessionId,
+                exerciseId,
+                index,
+                data.weightKg,
+                data.reps,
+                data.rpe,
+                data.isWarmup,
+              )
+              startTimer(exerciseDefaultRestSec)
+              // Auto-scroll to next pending row or next card
+              setTimeout(() => {
+                const next = cardRef.current?.querySelector('.set-row.pending') as HTMLElement | null
+                if (next) {
+                  next.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                } else {
+                  const nextCard = cardRef.current?.nextElementSibling as HTMLElement | null
+                  if (nextCard) nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }, 60)
             }}
             onUnlog={async () => {
               if (logged?.id) await db.setLogs.delete(logged.id)
@@ -180,6 +288,95 @@ function WorkoutItemCard({
           />
         ))}
       </div>
+
+      <button className="link add-warmup" onClick={() => {
+        // Insert a pending warm-up by toggling the first row's warm-up state is awkward;
+        // simpler: scroll to a fresh pending row at the top.
+        const first = cardRef.current?.querySelector('.set-row.pending') as HTMLElement | null
+        first?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }}>
+        + Need a warm-up set? Toggle "Warm-up" on the first pending set.
+      </button>
+
+      {showSwap ? (
+        <SwapPicker
+          currentName={exerciseName}
+          onClose={() => setShowSwap(false)}
+          onPick={async (newId) => {
+            await swapSessionItem(sessionId, exerciseId, {
+              ...item,
+              exerciseId: newId,
+            })
+            setShowSwap(false)
+          }}
+        />
+      ) : null}
+
+      <NotificationsPromptOnce />
     </article>
+  )
+}
+
+function NotificationsPromptOnce() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!('Notification' in window)) return
+    if (Notification.permission !== 'default') return
+    const timer = window.setTimeout(() => {
+      void ensureNotificationPermission().then((granted) => {
+        if (granted) {
+          void db.settings.get(1).then((s) => {
+            if (s) db.settings.put({ ...s, notificationsEnabled: true })
+          })
+        }
+      })
+    }, 4000)
+    return () => window.clearTimeout(timer)
+  }, [])
+  return null
+}
+
+function SwapPicker({
+  currentName,
+  onClose,
+  onPick,
+}: {
+  currentName: string
+  onClose: () => void
+  onPick: (id: string) => void
+}) {
+  const exercises = useAllExercises() ?? []
+  const [q, setQ] = useState('')
+  const filtered = exercises.filter((e) =>
+    e.name.toLowerCase().includes(q.toLowerCase()) ||
+    e.primaryMuscle.toLowerCase().includes(q.toLowerCase()),
+  )
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <header className="modal-head">
+          <h3>Swap {currentName}</h3>
+          <button className="link" onClick={onClose}>Cancel</button>
+        </header>
+        <input
+          autoFocus
+          type="search"
+          placeholder="Search exercises…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="picker-search"
+        />
+        <ul className="picker-list">
+          {filtered.map((e) => (
+            <li key={e.id}>
+              <button className="picker-row" onClick={() => onPick(e.id)}>
+                <strong>{e.name}</strong>
+                <span className="muted small">{e.primaryMuscle} · {e.equipment}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   )
 }

@@ -13,27 +13,110 @@ interface RestTimerState {
 }
 
 let tickInterval: number | null = null
+let wakeLock: WakeLockSentinel | null = null
+let visibilityHandler: (() => void) | null = null
+
+interface WakeLockSentinel {
+  released: boolean
+  release: () => Promise<void>
+}
+
+async function acquireWakeLock() {
+  try {
+    const nav = navigator as Navigator & { wakeLock?: { request: (t: string) => Promise<WakeLockSentinel> } }
+    if (nav.wakeLock) {
+      wakeLock = await nav.wakeLock.request('screen')
+      visibilityHandler = async () => {
+        if (document.visibilityState === 'visible' && wakeLock?.released && nav.wakeLock) {
+          try {
+            wakeLock = await nav.wakeLock.request('screen')
+          } catch {
+            // ignore
+          }
+        }
+      }
+      document.addEventListener('visibilitychange', visibilityHandler)
+    }
+  } catch {
+    // ignore — feature unsupported or denied
+  }
+}
+
+async function releaseWakeLock() {
+  if (visibilityHandler) {
+    document.removeEventListener('visibilitychange', visibilityHandler)
+    visibilityHandler = null
+  }
+  try {
+    if (wakeLock) {
+      await wakeLock.release()
+      wakeLock = null
+    }
+  } catch {
+    // ignore
+  }
+}
 
 function fireEnd() {
   try {
-    if ('vibrate' in navigator) navigator.vibrate([180, 80, 180])
+    if ('vibrate' in navigator) navigator.vibrate([220, 100, 220, 100, 220])
   } catch {
-    // ignore vibration errors
+    // ignore
   }
   try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.frequency.value = 880
-    gain.gain.setValueAtTime(0.001, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
-    osc.start()
-    osc.stop(ctx.currentTime + 0.6)
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ctx = new Ctx()
+    const playBeep = (start: number, freq: number) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = freq
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + start)
+      gain.gain.exponentialRampToValueAtTime(0.32, ctx.currentTime + start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + 0.45)
+      osc.start(ctx.currentTime + start)
+      osc.stop(ctx.currentTime + start + 0.5)
+    }
+    playBeep(0, 880)
+    playBeep(0.55, 880)
   } catch {
-    // audio context may be blocked until user gesture
+    // ignore — audio likely needs user gesture
+  }
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const reg = (navigator as Navigator & { serviceWorker?: ServiceWorkerContainer }).serviceWorker
+      if (reg && reg.controller) {
+        reg.ready
+          .then((r) =>
+            r.showNotification('Rest complete', {
+              body: 'Get back to the bar.',
+              icon: '/icon.svg',
+              tag: 'rest-timer',
+              silent: false,
+            }),
+          )
+          .catch(() => {
+            new Notification('Rest complete', { body: 'Get back to the bar.' })
+          })
+      } else {
+        new Notification('Rest complete', { body: 'Get back to the bar.' })
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
+export async function ensureNotificationPermission() {
+  try {
+    if (!('Notification' in window)) return false
+    if (Notification.permission === 'granted') return true
+    if (Notification.permission === 'denied') return false
+    const r = await Notification.requestPermission()
+    return r === 'granted'
+  } catch {
+    return false
   }
 }
 
@@ -46,6 +129,7 @@ export const useRestTimer = create<RestTimerState>((set, get) => ({
     const now = Date.now()
     set({ totalSec: seconds, startedAt: now, endsAt: now + seconds * 1000, tick: 0 })
     if (tickInterval) window.clearInterval(tickInterval)
+    void acquireWakeLock()
     let fired = false
     tickInterval = window.setInterval(() => {
       const s = get()
@@ -55,6 +139,7 @@ export const useRestTimer = create<RestTimerState>((set, get) => ({
       if (remaining <= 0 && !fired) {
         fired = true
         fireEnd()
+        void releaseWakeLock()
         if (tickInterval) {
           window.clearInterval(tickInterval)
           tickInterval = null
@@ -67,12 +152,13 @@ export const useRestTimer = create<RestTimerState>((set, get) => ({
       window.clearInterval(tickInterval)
       tickInterval = null
     }
+    void releaseWakeLock()
     set({ totalSec: 0, startedAt: null, endsAt: null, tick: 0 })
   },
   addSec(delta) {
     const s = get()
     if (!s.endsAt) return
-    set({ endsAt: s.endsAt + delta * 1000, totalSec: s.totalSec + delta })
+    set({ endsAt: s.endsAt + delta * 1000, totalSec: Math.max(0, s.totalSec + delta) })
   },
   remainingSec() {
     const s = get()

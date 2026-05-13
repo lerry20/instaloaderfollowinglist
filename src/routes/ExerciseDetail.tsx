@@ -1,48 +1,43 @@
-import { Link, useParams } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '../db/schema'
+import { useNavigate, useParams } from 'react-router-dom'
 import BodyDiagram from '../components/BodyDiagram'
 import PostureFigure from '../components/PostureFigure'
 import ProgressChart from '../components/ProgressChart'
-import { useExercise, useSettings } from '../db/queries'
+import { exerciseSessionHistory, useExercise, useSettings } from '../db/queries'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { kgToDisplay } from '../lib/units'
 
 export default function ExerciseDetail() {
   const { id } = useParams<{ id: string }>()
   const ex = useExercise(id)
   const settings = useSettings()
-  const sessionsByTopSet = useLiveQuery(async () => {
-    if (!id) return []
-    const logs = await db.setLogs.where('exerciseId').equals(id).toArray()
-    const bySession = new Map<number, { weight: number; date?: string }>()
-    for (const l of logs) {
-      const cur = bySession.get(l.sessionId)
-      if (!cur || l.weight > cur.weight) bySession.set(l.sessionId, { weight: l.weight })
-    }
-    const sessions = await db.sessions
-      .where('id')
-      .anyOf(Array.from(bySession.keys()))
-      .toArray()
-    sessions.sort((a, b) => (a.date < b.date ? -1 : 1))
-    return sessions.slice(-12).map((s) => ({
-      label: s.date.slice(5),
-      value: bySession.get(s.id!)!.weight,
-    }))
-  }, [id])
+  const navigate = useNavigate()
+
+  const historyKg = useLiveQuery(
+    () => (id ? exerciseSessionHistory(id, 12) : Promise.resolve([])),
+    [id],
+  )
 
   if (!ex) {
     return (
       <div className="page">
         <p className="muted">Exercise not found.</p>
-        <Link to="/plan" className="link">Back to plan</Link>
+        <button className="link" onClick={() => navigate(-1)}>← Back</button>
       </div>
     )
   }
 
   const units = settings?.units ?? 'kg'
+  const chart = (historyKg ?? []).map((p) => ({
+    label: p.label,
+    value: Number(kgToDisplay(p.value, units).toFixed(units === 'kg' ? 1 : 0)),
+  }))
+  const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtubeQuery || ex.name + ' technique')}`
 
   return (
     <div className="page exercise-detail">
-      <Link to={-1 as unknown as string} className="link back-link">← Back</Link>
+      <button className="link back-link" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
       <header className="exercise-header">
         <h1>{ex.name}</h1>
         <span className="muted small">
@@ -52,6 +47,10 @@ export default function ExerciseDetail() {
           {ex.equipment}
         </span>
       </header>
+
+      <a className="btn primary block demo-btn" href={ytUrl} target="_blank" rel="noopener noreferrer">
+        ▶ Watch technique demo
+      </a>
 
       <section className="card visuals">
         <div className="visual-grid">
@@ -81,8 +80,8 @@ export default function ExerciseDetail() {
       </section>
 
       <section className="card">
-        <h3>Top-set weight progression</h3>
-        <ProgressChart data={sessionsByTopSet ?? []} unit={units} />
+        <h3>Top-set weight ({units})</h3>
+        <ProgressChart data={chart} unit={units} />
       </section>
     </div>
   )

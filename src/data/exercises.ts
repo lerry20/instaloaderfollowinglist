@@ -9,6 +9,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell + bench',
     postureKey: 'benchPress',
     muscleHighlights: ['chest', 'frontDelt', 'tricep'],
+    category: 'compound',
+    defaultRestSec: 180,
+    youtubeQuery: 'barbell bench press technique jeff nippard',
     cues: [
       'Retract and depress shoulder blades into the bench.',
       'Feet planted, slight arch, glutes on bench.',
@@ -26,6 +29,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells + bench (~30°)',
     postureKey: 'benchPress',
     muscleHighlights: ['chest', 'frontDelt'],
+    category: 'compound',
+    defaultRestSec: 150,
+    youtubeQuery: 'incline dumbbell press technique form',
     cues: [
       'Bench at 30°, not steeper — too high turns it into a shoulder press.',
       'Press dumbbells up and slightly together at the top.',
@@ -43,6 +49,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell',
     postureKey: 'overheadPress',
     muscleHighlights: ['frontDelt', 'sideDelt', 'tricep'],
+    category: 'compound',
+    defaultRestSec: 180,
+    youtubeQuery: 'standing overhead press technique alan thrall',
     cues: [
       'Bar on front delts, elbows just in front of the bar.',
       'Brace core, squeeze glutes — no leg drive.',
@@ -60,6 +69,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells',
     postureKey: 'lateralRaise',
     muscleHighlights: ['sideDelt'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'dumbbell lateral raise technique jeff nippard',
     cues: [
       'Slight forward lean, tiny bend in elbows, locked there.',
       'Lead with elbows — pinky a hair higher than thumb at the top.',
@@ -77,6 +89,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Cable + rope/bar',
     postureKey: 'tricepExt',
     muscleHighlights: ['tricep'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'cable tricep pushdown form technique',
     cues: [
       'Elbows pinned to ribs — they do not drift forward.',
       'Full lockout, brief squeeze at the bottom.',
@@ -94,6 +109,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Cable + rope',
     postureKey: 'tricepExt',
     muscleHighlights: ['tricep'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'overhead cable tricep extension technique',
     cues: [
       'Stagger stance, lean forward slightly with rope behind head.',
       'Elbows high and locked in position — only the forearms move.',
@@ -111,6 +129,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell',
     postureKey: 'deadlift',
     muscleHighlights: ['hamstring', 'glute', 'lowerBack', 'trap'],
+    category: 'compound',
+    defaultRestSec: 240,
+    youtubeQuery: 'conventional deadlift technique alan thrall',
     cues: [
       'Bar over mid-foot, shins ~2 cm from bar at start.',
       'Hips high enough that shoulders are slightly ahead of the bar.',
@@ -128,6 +149,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell',
     postureKey: 'row',
     muscleHighlights: ['midBack', 'lat', 'bicep'],
+    category: 'compound',
+    defaultRestSec: 150,
+    youtubeQuery: 'barbell row technique pendlay row',
     cues: [
       'Hinge to ~45°, neutral spine, knees soft.',
       'Pull bar to lower chest / upper abs.',
@@ -145,6 +169,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Pull-up bar',
     postureKey: 'pullup',
     muscleHighlights: ['lat', 'bicep'],
+    category: 'compound',
+    defaultRestSec: 150,
+    youtubeQuery: 'pull up technique form jeff nippard',
     cues: [
       'Full hang at the bottom, shoulders engaged (no shrugging up).',
       'Drive elbows down and back toward your hips.',
@@ -162,6 +189,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Cable + V-handle',
     postureKey: 'row',
     muscleHighlights: ['midBack', 'lat', 'bicep'],
+    category: 'compound',
+    defaultRestSec: 120,
+    youtubeQuery: 'seated cable row technique form',
     cues: [
       'Chest up, slight backward lean, neutral spine.',
       'Pull handle to lower sternum, elbows skim ribs.',
@@ -179,6 +209,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Cable + rope',
     postureKey: 'facePull',
     muscleHighlights: ['rearDelt', 'midBack', 'trap'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'cable face pull technique form jeff cavaliere',
     cues: [
       'Rope set just above eye level.',
       'Pull rope to forehead, hands ending in “double biceps” position.',
@@ -196,6 +229,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell',
     postureKey: 'curl',
     muscleHighlights: ['bicep', 'forearm'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'barbell curl technique form',
     cues: [
       'Elbows pinned to torso — they do not drift forward.',
       'Curl up to ~45° past vertical, squeeze the bicep peak.',
@@ -213,6 +249,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells',
     postureKey: 'curl',
     muscleHighlights: ['bicep', 'forearm'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'dumbbell hammer curl technique',
     cues: [
       'Neutral grip throughout — thumbs up.',
       'Elbows tight to your sides.',
@@ -230,6 +269,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell + rack',
     postureKey: 'squat',
     muscleHighlights: ['quad', 'glute', 'core'],
+    category: 'compound',
+    defaultRestSec: 210,
+    youtubeQuery: 'back squat technique alan thrall',
     cues: [
       'Bar in mid-trap groove, elbows under bar.',
       'Brace core hard, big breath held until you rise.',
@@ -247,6 +289,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell + rack',
     postureKey: 'squat',
     muscleHighlights: ['quad', 'core'],
+    category: 'compound',
+    defaultRestSec: 180,
+    youtubeQuery: 'front squat technique form',
     cues: [
       'Bar high on front delts, elbows up — “make a shelf”.',
       'Stay vertical, sit straight down.',
@@ -264,6 +309,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Barbell',
     postureKey: 'hipHinge',
     muscleHighlights: ['hamstring', 'glute'],
+    category: 'compound',
+    defaultRestSec: 150,
+    youtubeQuery: 'romanian deadlift technique jeff nippard',
     cues: [
       'Soft knees — bend ~15°, then lock them.',
       'Hinge at the hips, pushing them back.',
@@ -281,6 +329,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Leg-press machine',
     postureKey: 'legPress',
     muscleHighlights: ['quad', 'glute'],
+    category: 'compound',
+    defaultRestSec: 150,
+    youtubeQuery: 'leg press technique form jeff nippard',
     cues: [
       'Feet shoulder-width, mid-foot on platform.',
       'Lower until knees come close to ribs — full ROM.',
@@ -298,6 +349,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Leg-curl machine',
     postureKey: 'legPress',
     muscleHighlights: ['hamstring'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'lying leg curl technique',
     cues: [
       'Pad just above your Achilles, knees just off the bench.',
       'Hips pressed into the pad — don’t arch up.',
@@ -315,6 +369,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells',
     postureKey: 'lunge',
     muscleHighlights: ['quad', 'glute'],
+    category: 'compound',
+    defaultRestSec: 120,
+    youtubeQuery: 'dumbbell walking lunge technique',
     cues: [
       'Long step forward — front shin near vertical.',
       'Back knee hovers just above the floor.',
@@ -332,6 +389,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Calf-raise machine or step',
     postureKey: 'calfRaise',
     muscleHighlights: ['calf'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'standing calf raise technique',
     cues: [
       'Ball of foot on the edge, heel free to drop.',
       'Full stretch down, full contraction up onto toes.',
@@ -349,6 +409,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Pull-up bar',
     postureKey: 'pullup',
     muscleHighlights: ['core'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'hanging leg raise technique',
     cues: [
       'Full dead hang, shoulders engaged.',
       'Posteriorly tilt the pelvis first, then raise legs.',
@@ -366,6 +429,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Bodyweight',
     postureKey: 'plank',
     muscleHighlights: ['core'],
+    category: 'isolation',
+    defaultRestSec: 45,
+    youtubeQuery: 'plank technique form',
     cues: [
       'Elbows under shoulders, feet hip-width.',
       'Squeeze glutes, tuck pelvis under (no lumbar sag).',
@@ -383,6 +449,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells',
     postureKey: 'standing',
     muscleHighlights: ['trap', 'forearm'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'dumbbell shrug technique form',
     cues: [
       'Stand tall, arms straight at your sides.',
       'Shrug straight up, like trying to touch ears with shoulders.',
@@ -400,6 +469,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Dumbbells + bench (~45°)',
     postureKey: 'curl',
     muscleHighlights: ['bicep'],
+    category: 'isolation',
+    defaultRestSec: 75,
+    youtubeQuery: 'incline dumbbell curl technique',
     cues: [
       'Bench at 45°, arms hanging straight down — full stretch.',
       'Curl with supination — pinky comes up at the top.',
@@ -417,6 +489,9 @@ export const EXERCISES: Exercise[] = [
     equipment: 'Cables',
     postureKey: 'benchPress',
     muscleHighlights: ['chest'],
+    category: 'isolation',
+    defaultRestSec: 60,
+    youtubeQuery: 'cable chest fly technique',
     cues: [
       'Slight forward lean, soft elbow bend locked in.',
       'Bring hands together in front of your sternum, fists crossing.',
