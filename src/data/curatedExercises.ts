@@ -19,6 +19,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'barbell bench press technique jeff nippard',
     imageUrls: imgs('Barbell_Bench_Press_-_Medium_Grip'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Pinch your shoulder blades together and pull them down toward your back pockets, into the bench.',
       'Feet flat on the floor, butt on the bench, slight gap under your lower back.',
@@ -39,6 +40,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'incline barbell bench press technique',
     imageUrls: imgs('Barbell_Incline_Bench_Press_-_Medium_Grip'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Set the bench to about 30 degrees — steeper turns it into a shoulder press.',
       'Pinch your shoulder blades back and down into the pad, like flat bench.',
@@ -59,6 +61,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'incline dumbbell press form',
     imageUrls: imgs('Incline_Dumbbell_Press'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Set the bench to about 30 degrees. Steeper than that and it stops working your chest.',
       'Press the dumbbells up and slightly toward each other at the top.',
@@ -79,6 +82,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'dumbbell bench press form jeff nippard',
     imageUrls: imgs('Dumbbell_Bench_Press'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Lie back, dumbbells over your shoulders, palms facing your feet.',
       'Lower under control to your sides — elbows ~45° from your torso, deep stretch at the bottom.',
@@ -99,6 +103,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable chest fly technique',
     imageUrls: imgs('Cable_Crossover'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand with a slight forward lean. Bend your elbows just slightly and keep that bend locked the whole set.',
       'Bring your hands together in front of your chest, crossing them slightly at the bottom for an extra squeeze.',
@@ -119,6 +124,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'pec deck machine technique',
     imageUrls: imgs('Butterfly'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Adjust the seat so your elbows sit at chest height with shoulder blades back.',
       'Squeeze your hands together in front of your chest, focus on the chest contraction.',
@@ -139,6 +145,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'chest dip technique form',
     imageUrls: imgs('Dips_-_Chest_Version'),
     isCurated: true,
+    weightFormat: 'bodyweight',
     cues: [
       'Lean your torso forward to put tension on the chest (more upright works the triceps).',
       'Lower until your shoulders are slightly below your elbows for a full stretch.',
@@ -159,6 +166,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'decline bench press technique',
     imageUrls: imgs('Smith_Machine_Decline_Press'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Set the bench to ~15–30° decline. Hook your feet so you don\'t slide.',
       'Lower the bar to your lower chest, just below the nipples.',
@@ -181,6 +189,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'overhead press technique alan thrall',
     imageUrls: imgs('Standing_Military_Press'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Rest the bar on your shoulders, elbows just in front of the bar.',
       'Squeeze your abs and glutes tight so your lower back stays straight — no bouncing with your legs.',
@@ -201,6 +210,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'seated dumbbell shoulder press technique',
     imageUrls: imgs('Seated_Dumbbell_Press'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Set the bench upright (90° or just under). Press your back into it.',
       'Start with the dumbbells at shoulder height, palms facing forward.',
@@ -221,6 +231,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'dumbbell lateral raise technique jeff nippard',
     imageUrls: imgs('Side_Lateral_Raise'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Stand with a small forward lean. Bend your elbows just slightly and keep that bend locked.',
       'Raise the dumbbells out to the sides by lifting your elbows — like pouring water out of two jugs.',
@@ -241,6 +252,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable lateral raise technique',
     imageUrls: imgs('Cable_Seated_Lateral_Raise'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand sideways to the cable. The cable runs across your body and out to the working hand.',
       'Slight bend in the elbow, then raise your arm out to the side until it\'s parallel to the floor.',
@@ -261,6 +273,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'rear delt fly technique',
     imageUrls: imgs('Reverse_Flyes'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Hinge forward at the hips, chest down toward the floor, slight bend in the knees.',
       'Let the dumbbells hang straight down. Slight bend in your elbows, locked there.',
@@ -281,6 +294,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'face pull form jeff cavaliere',
     imageUrls: imgs('Face_Pull'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Set the rope slightly above eye level.',
       'Pull the rope toward your forehead. End with your hands next to your ears in a "double biceps flex".',
@@ -303,6 +317,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'conventional deadlift technique alan thrall',
     imageUrls: imgs('Barbell_Deadlift'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Position the bar over the middle of your feet. Your shins should be about a finger\'s width from it.',
       'Bend down to grab the bar. Hips slightly above your knees, shoulders just over the bar.',
@@ -323,6 +338,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'pull up technique jeff nippard',
     imageUrls: imgs('Pullups'),
     isCurated: true,
+    weightFormat: 'bodyweight',
     cues: [
       'Start fully hanging. Even at the bottom, keep your shoulders pulled down — don\'t let them shrug to your ears.',
       'Pull yourself up by driving your elbows down and back toward your hips.',
@@ -343,6 +359,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'chin up technique form',
     imageUrls: imgs('Chin-Up'),
     isCurated: true,
+    weightFormat: 'bodyweight',
     cues: [
       'Grip the bar with palms facing you (underhand), shoulder-width apart.',
       'Hang fully, shoulders engaged.',
@@ -363,6 +380,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'lat pulldown technique jeff nippard',
     imageUrls: imgs('Close-Grip_Front_Lat_Pulldown'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Sit tall, slight backward lean (~10°). Grip the bar wider than shoulders.',
       'Pull the bar down to your upper chest by driving your elbows down and back.',
@@ -383,6 +401,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'barbell pendlay row technique',
     imageUrls: imgs('Bent_Over_Barbell_Row'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Bend over until your torso is about 45 degrees. Keep your back flat, knees slightly bent.',
       'Pull the bar up to your lower chest or upper belly.',
@@ -403,6 +422,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 't bar row technique',
     imageUrls: imgs('T-Bar_Row_with_Handle'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Straddle the bar, hinge forward, chest up, back flat.',
       'Grip the handle close to your body.',
@@ -423,6 +443,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'chest supported dumbbell row technique',
     imageUrls: imgs('Dumbbell_Incline_Row'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Set an incline bench to ~30–45°. Lie chest-down on the bench, arms hanging.',
       'Row the dumbbells up to your hips, driving your elbows back.',
@@ -443,6 +464,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'seated cable row technique',
     imageUrls: imgs('Seated_Cable_Rows'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Sit tall with your chest lifted and a slight backward lean. Back stays straight, not rounded.',
       'Pull the handle to your lower chest with your elbows sliding along your sides.',
@@ -463,6 +485,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'straight arm pulldown technique',
     imageUrls: imgs('Rope_Straight-Arm_Pulldown'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand back from the cable, hinge slightly forward.',
       'Keep your arms straight (slight bend allowed but locked).',
@@ -483,6 +506,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'dumbbell pullover technique',
     imageUrls: imgs('Bent-Arm_Dumbbell_Pullover'),
     isCurated: true,
+    weightFormat: 'generic',
     cues: [
       'Lie back on a flat bench. Hold one dumbbell over your chest with both hands cupping the top.',
       'With slightly bent elbows locked, lower the dumbbell in an arc behind your head.',
@@ -505,6 +529,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'barbell curl form technique',
     imageUrls: imgs('Barbell_Curl'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Keep your elbows tucked into your sides. They shouldn\'t drift forward as you curl.',
       'Lift the bar up until your forearms are slightly past vertical, then squeeze your biceps hard.',
@@ -525,6 +550,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'incline dumbbell curl technique',
     imageUrls: imgs('Incline_Dumbbell_Curl'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Set the bench to 45 degrees. Let your arms hang straight down behind your body — this stretches the long head of the bicep.',
       'Curl up while rotating your wrist so your pinky finger comes up toward your shoulder at the top.',
@@ -545,6 +571,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'dumbbell hammer curl technique',
     imageUrls: imgs('Hammer_Curls'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Hold the dumbbells with your thumbs pointing up the whole time (like holding a hammer).',
       'Keep your elbows pinned against your ribs.',
@@ -565,6 +592,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'preacher curl technique',
     imageUrls: imgs('Machine_Preacher_Curls'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Rest your upper arms on the pad. Armpits at the top edge.',
       'Lower the bar/dumbbell slowly to a full stretch (arms nearly straight).',
@@ -585,6 +613,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable bicep curl technique',
     imageUrls: imgs('Lying_Cable_Curl'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand close to the cable so the line is straight up at the bottom.',
       'Elbows pinned to your sides — only the forearms move.',
@@ -605,6 +634,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'bayesian cable curl technique',
     imageUrls: imgs('Overhead_Cable_Curl'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Set the cable to the LOWEST setting. Grab the handle with one hand, palm forward.',
       'Stand facing AWAY from the machine and step forward so the cable runs behind you.',
@@ -627,6 +657,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'close grip bench press technique',
     imageUrls: imgs('Smith_Machine_Close-Grip_Bench_Press'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Set up like a regular bench, but your hands shoulder-width apart, not wider.',
       'Lower the bar to your lower chest. Keep your elbows tucked tight to your sides.',
@@ -647,6 +678,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable tricep pushdown form',
     imageUrls: imgs('Triceps_Pushdown'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Keep your elbows pressed against your sides — only your forearms should move.',
       'Push the bar all the way down and squeeze your triceps hard for a beat.',
@@ -667,6 +699,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'overhead cable tricep extension technique',
     imageUrls: imgs('Tricep_Dumbbell_Kickback'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand with one foot slightly forward, lean forward a bit. The rope starts behind your head.',
       'Keep your elbows pointing forward and high — they stay still. Only your forearms move.',
@@ -687,6 +720,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'ez bar skullcrusher technique',
     imageUrls: imgs('EZ-Bar_Skullcrusher'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Lie on a flat bench, hold the EZ-bar over your chest with arms vertical.',
       'Keep your elbows pointing straight up — don\'t let them drift back as you lower.',
@@ -709,6 +743,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'back squat technique alan thrall',
     imageUrls: imgs('Barbell_Squat'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Rest the bar across the meaty part of your upper back (not on your neck). Pull your elbows down so they point toward the floor.',
       'Take a big belly breath. Brace your stomach as if bracing for a punch. Hold that breath the whole way down and back up.',
@@ -729,6 +764,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'front squat technique',
     imageUrls: imgs('Clean_from_Blocks'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Rest the bar across the front of your shoulders. Push your elbows up so they\'re as high as possible — this creates a shelf for the bar.',
       'Squat straight down — keep your torso upright, almost vertical.',
@@ -749,6 +785,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'leg press technique jeff nippard',
     imageUrls: imgs('Leg_Press'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Place your feet on the platform shoulder-width apart, with your mid-foot in the middle.',
       'Lower the platform until your knees are nearly touching your ribs. Going deep is what builds muscle.',
@@ -769,6 +806,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'hack squat technique',
     imageUrls: imgs('Hack_Squat'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Feet shoulder-width on the platform, lower on the platform = more quads.',
       'Lower yourself until your thighs are below parallel. Knees track over your toes.',
@@ -789,6 +827,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'leg extension technique',
     imageUrls: imgs('Leg_Extensions'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Adjust the pad so it sits just above your ankle, knees aligned with the machine\'s pivot.',
       'Sit upright, hold the handles for stability.',
@@ -809,6 +848,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'walking lunge technique',
     imageUrls: imgs('Dumbbell_Lunges'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Take a long step forward. At the bottom, your front shin should be roughly vertical.',
       'Your back knee should hover just above the floor — don\'t slam it down.',
@@ -829,6 +869,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'bulgarian split squat technique',
     imageUrls: imgs('Split_Squats'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Get into a long stride — back foot a few feet behind you. Optionally elevate the back foot on a bench (Bulgarian split squat).',
       'Lower straight down by bending the front knee. Back knee drops toward the floor.',
@@ -851,6 +892,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'romanian deadlift technique jeff nippard',
     imageUrls: imgs('Romanian_Deadlift'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Slightly bend your knees (about 15°) and keep them locked in that bend the whole set.',
       'Push your hips backward while keeping your back flat. Your torso lowers as your hips travel back.',
@@ -871,6 +913,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'lying leg curl technique',
     imageUrls: imgs('Lying_Leg_Curls'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Set the pad just above the back of your ankles. Your knees should sit just past the edge of the bench.',
       'Keep your hips pressed into the pad — don\'t let your butt lift up to help.',
@@ -891,6 +934,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'seated leg curl technique',
     imageUrls: imgs('Seated_Leg_Curl'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Set the pad above your ankles, sit upright, lap pad locked over your thighs.',
       'Curl your heels under you toward the seat.',
@@ -911,6 +955,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'barbell hip thrust technique bret contreras',
     imageUrls: imgs('Barbell_Hip_Thrust'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Sit with your upper back resting against a bench. Bar over your hips on a pad.',
       'Drive through your heels and squeeze your glutes to lift your hips up to a flat torso line.',
@@ -931,6 +976,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable pull through technique',
     imageUrls: imgs('Pull_Through'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Face away from a low pulley with the rope between your legs.',
       'Hinge at the hips, push them back. Slight bend in the knees.',
@@ -951,6 +997,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'good morning exercise technique',
     imageUrls: imgs('Good_Morning'),
     isCurated: true,
+    weightFormat: 'totalBar',
     cues: [
       'Set the bar across your upper back like a squat.',
       'Slight bend in the knees, keep them there.',
@@ -973,6 +1020,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'standing calf raise technique',
     imageUrls: imgs('Standing_Calf_Raises'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Stand with the balls of your feet on the edge of a block or platform, heels hanging off.',
       'Drop your heels as low as they go for a deep stretch.',
@@ -993,6 +1041,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'seated calf raise technique',
     imageUrls: imgs('Seated_Calf_Raise'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Sit with the pad across your thighs, balls of feet on the platform.',
       'Drop your heels for a full stretch.',
@@ -1015,6 +1064,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'hanging leg raise technique',
     imageUrls: imgs('Hanging_Leg_Raise'),
     isCurated: true,
+    weightFormat: 'bodyweight',
     cues: [
       'Hang from the bar with arms straight, but keep your shoulders pulled down (no shrugging up).',
       'Before raising your legs, tilt your pelvis up by tucking your hips under — like pointing your belt buckle at your face.',
@@ -1035,6 +1085,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'cable crunch technique',
     imageUrls: imgs('Cable_Crunch'),
     isCurated: true,
+    weightFormat: 'stack',
     cues: [
       'Kneel facing away from a high pulley with the rope behind your head.',
       'Crunch by curling your ribs down toward your hips — round your back deliberately.',
@@ -1055,6 +1106,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'plank form',
     imageUrls: imgs('Plank'),
     isCurated: true,
+    weightFormat: 'bodyweight',
     cues: [
       'Forearms on the ground, elbows directly below your shoulders. Feet about hip-width apart.',
       'Squeeze your glutes and tilt your hips forward so your lower back doesn\'t sag.',
@@ -1077,6 +1129,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'dumbbell shrug technique',
     imageUrls: imgs('Dumbbell_Shrug'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Stand straight with dumbbells hanging at your sides, arms locked.',
       'Lift your shoulders straight up — try to touch your ears with them.',
@@ -1097,6 +1150,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'reverse curl forearm technique',
     imageUrls: imgs('Standing_Dumbbell_Reverse_Curl'),
     isCurated: true,
+    weightFormat: 'perDumbbell',
     cues: [
       'Hold the bar or dumbbells with palms facing down (overhand).',
       'Elbows pinned to your sides, just like a regular curl.',
@@ -1117,6 +1171,7 @@ export const CURATED_EXERCISES: Exercise[] = [
     videoQuery: 'wrist curl forearm',
     imageUrls: imgs('Palms-Down_Wrist_Curl_Over_A_Bench'),
     isCurated: true,
+    weightFormat: 'generic',
     cues: [
       'Sit on a bench. Rest your forearms on your thighs, hands hanging off the edge.',
       'Palms up = flexor curl; palms down = extensor curl.',

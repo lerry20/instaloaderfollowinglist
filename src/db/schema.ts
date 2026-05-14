@@ -39,6 +39,21 @@ export const MUSCLE_LABEL: Record<MuscleKey, string> = {
 
 export type ExerciseCategory = 'compound' | 'isolation'
 
+export type WeightFormat =
+  | 'totalBar' // total bar weight including the bar (most barbell lifts)
+  | 'perDumbbell' // dumbbell convention — weight in each hand
+  | 'stack' // cable / selectorized machine stack number
+  | 'bodyweight' // bodyweight + added weight (0 = strict)
+  | 'generic' // unspecified — just the load you're moving
+
+export const WEIGHT_FORMAT_LABEL: Record<WeightFormat, string> = {
+  totalBar: 'Total bar weight (including the bar)',
+  perDumbbell: 'Per dumbbell — weight in each hand',
+  stack: 'Stack weight (the number on the machine)',
+  bodyweight: 'Added weight only (0 = strict bodyweight)',
+  generic: 'Total load you\'re moving',
+}
+
 export interface Exercise {
   id: string
   name: string
@@ -52,6 +67,7 @@ export interface Exercise {
   category: ExerciseCategory
   defaultRestSec: number
   isCurated: boolean
+  weightFormat?: WeightFormat
 }
 
 export interface PlanItem {
