@@ -2391,3 +2391,138 @@ html[data-theme='light'] .progress-strip-fill {
   padding: 0.4rem 0.6rem;
   margin: -0.2rem 0 0.2rem;
 }
+
+/* === Session card head: thumb is now a button === */
+.exercise-thumb-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: transform 100ms ease;
+}
+.exercise-thumb-btn:hover { transform: scale(1.04); }
+.exercise-thumb-btn:active { transform: scale(0.96); }
+.exercise-thumb-btn:disabled { cursor: default; }
+.exercise-thumb-btn .exercise-image,
+.exercise-thumb-btn .exercise-image-fallback {
+  width: 64px;
+  height: 64px;
+}
+.session-card-link-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-decoration: none;
+  color: var(--text);
+  flex: 1;
+}
+.session-card-link-text:hover h2 { color: var(--primary); }
+
+/* === "Repeat last set" button === */
+.repeat-last-btn {
+  align-self: flex-start;
+  background: color-mix(in srgb, var(--good) 14%, var(--bg-elev-2));
+  border-color: color-mix(in srgb, var(--good) 35%, var(--border-strong));
+  color: var(--good);
+  font-weight: 600;
+}
+.repeat-last-btn:hover {
+  background: color-mix(in srgb, var(--good) 22%, var(--bg-elev-2));
+  border-color: var(--good);
+}
+
+/* === "More" overflow menu === */
+.more-wrap {
+  position: relative;
+  display: inline-block;
+}
+.more-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 0.3rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.more-menu button {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.more-menu button:hover { background: var(--bg-elev-2); }
+
+/* === AMRAP / RPE inline explainer === */
+.explain-pill {
+  cursor: help;
+  border-bottom: 1px dotted color-mix(in srgb, var(--text-muted) 50%, transparent);
+}
+
+/* === Image zoom modal === */
+.image-zoom-backdrop {
+  z-index: 65;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.image-zoom-container {
+  position: relative;
+  max-width: 720px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+.image-zoom-image,
+.image-zoom-container .exercise-image,
+.image-zoom-container .exercise-image-fallback {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--bg);
+}
+.image-zoom-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 1;
+}
+.image-zoom-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  color: var(--text);
+}
+
+/* === Rest-bar-active padding === */
+.app-shell.rest-active { padding-bottom: calc(76px + 56px + env(safe-area-inset-bottom, 0)); }
+@media (min-width: 600px) {
+  .app-shell.rest-active { padding-bottom: 56px; }
+}

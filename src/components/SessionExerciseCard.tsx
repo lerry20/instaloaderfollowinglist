@@ -53,6 +53,9 @@ export default function SessionExerciseCard({
   const [showSwap, setShowSwap] = useState(false)
   const [pendingWarmup, setPendingWarmup] = useState(false)
   const [showAllCues, setShowAllCues] = useState(false)
+  const [showImageZoom, setShowImageZoom] = useState(false)
+  const [showMore, setShowMore] = useState(false)
+  const [repeating, setRepeating] = useState(false)
 
   const logs =
     useLiveQuery(
@@ -177,25 +180,61 @@ export default function SessionExerciseCard({
   }
 
   const sparkValues = (sparklineData ?? []).map((p) => p.value)
+  const repsContainsAmrap = /amrap/i.test(item.targetReps)
+
+  async function repeatLastSet() {
+    if (repeating) return
+    const lastWorking = workingLogs[workingLogs.length - 1]
+    if (!lastWorking) return
+    setRepeating(true)
+    try {
+      const pendingCount = Math.max(0, totalSetsPlanned - workingLogs.length)
+      // Walk through each pending working slot and log identical numbers.
+      let nextIdx = workingLogs.length
+      for (let i = 0; i < pendingCount; i++) {
+        await logSet(
+          sessionId,
+          item.exerciseId,
+          nextIdx,
+          lastWorking.weight,
+          lastWorking.reps,
+          lastWorking.rpe,
+          false,
+        )
+        nextIdx += 1
+      }
+      haptics.double()
+      startTimer(exercise?.defaultRestSec ?? 90)
+      toast(`Logged ${pendingCount} more at ${lastWorking.weight} × ${lastWorking.reps}`, { kind: 'success' })
+    } finally {
+      setRepeating(false)
+    }
+  }
 
   return (
     <article className="session-card v2" data-exercise-card={item.exerciseId}>
       <header className="session-card-head">
-        <Link
-          to={`/exercise/${item.exerciseId}`}
-          className="session-card-link"
-          onFocus={() => onFocus(suggestedKg)}
+        <button
+          type="button"
+          className="exercise-thumb-btn"
+          onClick={() => setShowImageZoom(true)}
+          aria-label={`View ${exercise?.name ?? 'exercise'} demo image`}
+          disabled={!exercise?.imageUrls || exercise.imageUrls.length === 0}
         >
           <ExerciseImage urls={exercise?.imageUrls ?? []} alt={exercise?.name ?? item.exerciseId} />
-          <div className="session-card-titles">
-            <span className="position-tag muted small">
-              Exercise {positionIndex + 1} of {totalExercises}
-            </span>
-            <h2>{exercise?.name ?? item.exerciseId}</h2>
-            <span className="muted small">
-              {exercise?.equipment ?? '—'}
-            </span>
-          </div>
+        </button>
+        <Link
+          to={`/exercise/${item.exerciseId}`}
+          className="session-card-link-text"
+          onFocus={() => onFocus(suggestedKg)}
+        >
+          <span className="position-tag muted small">
+            Exercise {positionIndex + 1} of {totalExercises}
+          </span>
+          <h2>{exercise?.name ?? item.exerciseId}</h2>
+          <span className="muted small">
+            {exercise?.equipment ?? '—'}
+          </span>
         </Link>
         {sparkValues.length >= 2 ? (
           <div className="sparkline-cell" title="Last 5 top-set weights">
@@ -208,9 +247,24 @@ export default function SessionExerciseCard({
       <div className="target-line">
         <span className="muted small">Target</span>
         <strong className="tabnum">
-          {item.targetSets} × {item.targetReps}
+          {item.targetSets} ×{' '}
+          {repsContainsAmrap ? (
+            <span
+              className="explain-pill"
+              title="AMRAP = as many reps as possible. Do as many clean reps as you can on this set."
+            >
+              {item.targetReps}
+            </span>
+          ) : (
+            item.targetReps
+          )}
         </strong>
-        <span className="muted small">@ RPE {item.targetRPE}</span>
+        <span
+          className="muted small explain-pill"
+          title={rpeExplainer(item.targetRPE)}
+        >
+          @ RPE {item.targetRPE}
+        </span>
       </div>
 
       {exercise?.weightFormat && exercise.weightFormat !== 'generic' ? (
@@ -313,6 +367,17 @@ export default function SessionExerciseCard({
         ))}
       </div>
 
+      {workingLogs.length > 0 && remaining > 0 ? (
+        <button
+          type="button"
+          className="btn small repeat-last-btn"
+          disabled={repeating}
+          onClick={repeatLastSet}
+        >
+          ↺ Repeat last set × {remaining} more
+        </button>
+      ) : null}
+
       <div className="card-actions">
         {!pendingWarmup ? (
           <button
@@ -323,26 +388,45 @@ export default function SessionExerciseCard({
             + Add warm-up
           </button>
         ) : null}
-        <button
-          type="button"
-          className="btn small ghost"
-          onClick={() => setShowSwap(true)}
-        >
-          ⇄ Swap exercise
-        </button>
-        <button
-          type="button"
-          className="btn small ghost"
-          onClick={() => {
-            if (workingLogs.length > 0) {
-              if (!confirm('Skip this exercise? Your logged sets will remain.')) return
-            }
-            onSkip()
-            toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
-          }}
-        >
-          ⤼ Skip exercise
-        </button>
+        <div className="more-wrap">
+          <button
+            type="button"
+            className="btn small ghost"
+            onClick={() => setShowMore((v) => !v)}
+            aria-expanded={showMore}
+            aria-haspopup="menu"
+          >
+            ⋯ More
+          </button>
+          {showMore ? (
+            <div className="more-menu" role="menu">
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setShowMore(false)
+                  setShowSwap(true)
+                }}
+              >
+                ⇄ Swap exercise
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setShowMore(false)
+                  if (workingLogs.length > 0) {
+                    if (!confirm('Skip this exercise? Your logged sets will remain.')) return
+                  }
+                  onSkip()
+                  toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
+                }}
+              >
+                ⤼ Skip exercise
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Beginner-only: collapsible cues inline */}
@@ -380,6 +464,25 @@ export default function SessionExerciseCard({
           }}
         />
       ) : null}
+
+      {showImageZoom && exercise?.imageUrls && exercise.imageUrls.length > 0 ? (
+        <div className="modal-backdrop image-zoom-backdrop" onClick={() => setShowImageZoom(false)}>
+          <div className="image-zoom-container" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="image-zoom-close"
+              onClick={() => setShowImageZoom(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <ExerciseImage urls={exercise.imageUrls} alt={exercise.name} className="image-zoom-image" />
+            <div className="image-zoom-caption">
+              <strong>{exercise.name}</strong>
+              <span className="muted small">{exercise.equipment}</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </article>
   )
 }
@@ -388,4 +491,12 @@ function fmt(value: number, units: Units): string {
   if (units === 'lb') return Math.round(value).toString()
   if (Number.isInteger(value)) return String(value)
   return value.toFixed(1)
+}
+
+function rpeExplainer(rpe: number): string {
+  if (rpe >= 10) return 'RPE 10 = total failure. No reps left in the tank.'
+  if (rpe >= 9) return 'RPE 9 = 1 rep short of failure. Save for finishers.'
+  if (rpe >= 8) return 'RPE 8 = 2 reps short of failure. The hypertrophy sweet spot.'
+  if (rpe >= 7) return 'RPE 7 = 3 reps short of failure. Warm-ups or speed work.'
+  return 'RPE 6 or lower = 4+ reps in reserve. Light work.'
 }
