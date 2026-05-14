@@ -96,6 +96,10 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
                 return <li key={id}>{ex?.name ?? id}</li>
               })}
             </ul>
+            <p className="muted small" style={{ marginTop: '0.4rem' }}>
+              A PR fires when the heaviest working set you logged today beats your
+              all-time top working set for that exercise — same weight-logging convention as before.
+            </p>
           </div>
         ) : null}
 

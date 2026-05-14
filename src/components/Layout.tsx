@@ -5,11 +5,13 @@ import ToastContainer from './ToastContainer'
 import SettingsModal from './SettingsModal'
 import CoachChat from './CoachChat'
 import { currentStreak } from '../lib/streak'
+import { useRestTimer } from '../state/restTimer'
 
 export default function Layout() {
   const [showSettings, setShowSettings] = useState(false)
   const [showCoach, setShowCoach] = useState(false)
   const [streak, setStreak] = useState<number>(0)
+  const restActive = useRestTimer((s) => s.totalSec > 0)
 
   useEffect(() => {
     let cancelled = false
@@ -27,7 +29,7 @@ export default function Layout() {
   }, [])
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${restActive ? ' rest-active' : ''}`}>
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark" aria-hidden />
