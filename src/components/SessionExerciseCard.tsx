@@ -6,6 +6,7 @@ import {
   type PlanItem,
   type SetLog,
   type Units,
+  WEIGHT_FORMAT_LABEL,
 } from '../db/schema'
 import {
   deleteSetLog,
@@ -211,6 +212,12 @@ export default function SessionExerciseCard({
         </strong>
         <span className="muted small">@ RPE {item.targetRPE}</span>
       </div>
+
+      {exercise?.weightFormat && exercise.weightFormat !== 'generic' ? (
+        <p className="weight-format-hint muted small">
+          ⓘ {WEIGHT_FORMAT_LABEL[exercise.weightFormat]}
+        </p>
+      ) : null}
 
       {lastSession ? (
         <div className="last-session-line muted small">
