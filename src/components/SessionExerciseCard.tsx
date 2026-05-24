@@ -3,7 +3,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import {
   db,
-  MUSCLE_LABEL,
   type PlanItem,
   type SetLog,
   type Units,
@@ -11,7 +10,6 @@ import {
 } from '../db/schema'
 import {
   deleteSetLog,
-  exerciseProgression,
   lastWorkingSetsForExercise,
   logSet,
   suggestProgression,
@@ -25,7 +23,6 @@ import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
 import ActiveSetCard from './ActiveSetCard'
 import ExercisePicker from './ExercisePicker'
-import MiniSparkline from './MiniSparkline'
 
 interface Props {
   item: PlanItem
@@ -103,12 +100,6 @@ export default function SessionExerciseCard({
   const lastSession = useLiveQuery(
     () => lastWorkingSetsForExercise(item.exerciseId, sessionId, 1),
     [item.exerciseId, sessionId],
-  )
-
-  // Mini sparkline of last 5 top-set weights
-  const sparklineData = useLiveQuery(
-    () => exerciseProgression(item.exerciseId, 5),
-    [item.exerciseId],
   )
 
   const startTimer = useRestTimer((s) => s.start)
@@ -205,7 +196,6 @@ export default function SessionExerciseCard({
     onFocus(data.weightKg)
   }
 
-  const sparkValues = (sparklineData ?? []).map((p) => p.value)
   const repsContainsAmrap = /amrap/i.test(item.targetReps)
 
   async function repeatLastSet() {
@@ -237,9 +227,12 @@ export default function SessionExerciseCard({
     }
   }
 
+  const hintKind = progression?.hint.kind
+  const hintActive = hintKind === 'increase' || hintKind === 'reduce' || hintKind === 'hold'
+
   return (
-    <article className="session-card v2" data-exercise-card={item.exerciseId}>
-      <header className="session-card-head">
+    <article className="session-card v3" data-exercise-card={item.exerciseId}>
+      <header className="card-v3-head">
         <button
           type="button"
           className="exercise-thumb-btn"
@@ -251,114 +244,118 @@ export default function SessionExerciseCard({
         </button>
         <Link
           to={`/exercise/${item.exerciseId}`}
-          className="session-card-link-text"
+          className="card-v3-title"
           onFocus={() => onFocus(suggestedKg)}
         >
-          <span className="position-tag muted small">
-            Exercise {positionIndex + 1} of {totalExercises}
-          </span>
           <h2>{exercise?.name ?? item.exerciseId}</h2>
-          <span className="muted small">
-            {exercise?.equipment ?? '—'}
+          <span className="card-v3-subtitle">
+            Exercise {positionIndex + 1} of {totalExercises}
+            {exercise?.equipment ? ` · ${exercise.equipment}` : ''}
           </span>
-          {exercise ? (
-            <div className="muscle-chips-row">
-              <span className="muscle-chip primary-chip">
-                {MUSCLE_LABEL[exercise.primaryMuscle]}
-              </span>
-              {exercise.secondaryMuscles.slice(0, 3).map((m) => (
-                <span key={m} className="muscle-chip">
-                  {MUSCLE_LABEL[m]}
-                </span>
-              ))}
+        </Link>
+        <div className="more-wrap">
+          <button
+            type="button"
+            className="card-v3-more"
+            onClick={() => setShowMore((v) => !v)}
+            aria-expanded={showMore}
+            aria-haspopup="menu"
+            aria-label="Exercise actions"
+          >
+            ⋯
+          </button>
+          {showMore ? (
+            <div className="more-menu" role="menu">
+              {!pendingWarmup ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => { setShowMore(false); setPendingWarmup(true) }}
+                >
+                  + Add warm-up set
+                </button>
+              ) : null}
+              <button
+                type="button"
+                role="menuitem"
+                disabled={!suggestions || suggestions.length === 0}
+                onClick={() => { setShowMore(false); setShowQuickSwap(true) }}
+              >
+                ⇄ Swap exercise
+              </button>
+              {exercise ? (
+                <a
+                  role="menuitem"
+                  href={demoSearchUrl(exercise.videoQuery, exercise.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setShowMore(false)}
+                >
+                  ▶ Watch demo on YouTube
+                </a>
+              ) : null}
+              <button
+                type="button"
+                role="menuitem"
+                className="danger"
+                onClick={() => {
+                  setShowMore(false)
+                  if (workingLogs.length > 0 && !confirm('Skip this exercise? Your logged sets will remain.')) return
+                  onSkip()
+                  toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
+                }}
+              >
+                ⤼ Skip exercise
+              </button>
             </div>
           ) : null}
-        </Link>
-        {exercise ? (
-          <a
-            className="demo-quick-link"
-            href={demoSearchUrl(exercise.videoQuery, exercise.name)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            aria-label={`Watch demo of ${exercise.name}`}
-            title="Watch a YouTube demo of this exercise"
-          >
-            ▶ Demo
-          </a>
-        ) : null}
-        {sparkValues.length >= 2 ? (
-          <div className="sparkline-cell" title="Last 5 top-set weights">
-            <MiniSparkline values={sparkValues} />
-            <span className="muted small">progression</span>
-          </div>
-        ) : null}
+        </div>
       </header>
 
-      <div className="target-line">
-        <span className="muted small">Target</span>
-        <strong className="tabnum">
-          {item.targetSets} ×{' '}
-          {repsContainsAmrap ? (
-            <span
-              className="explain-pill"
-              title="AMRAP = as many reps as possible. Do as many clean reps as you can on this set."
-            >
-              {item.targetReps}
-            </span>
-          ) : (
-            item.targetReps
-          )}
-        </strong>
-        <span
-          className="muted small explain-pill"
-          title={rpeExplainer(item.targetRPE)}
-        >
-          @ RPE {item.targetRPE}
-        </span>
-      </div>
-
-      {exercise?.weightFormat && exercise.weightFormat !== 'generic' ? (
-        <p className="weight-format-hint muted small">
-          ⓘ {WEIGHT_FORMAT_LABEL[exercise.weightFormat]}
-        </p>
-      ) : null}
-
-      {lastSession ? (
-        <div className="last-session-line muted small">
-          Last:{' '}
+      <div className="card-v3-info">
+        <div className="card-v3-info-row">
+          <span className="card-v3-info-label">Target</span>
           <strong className="tabnum">
-            {lastSession.sets
-              .map((s) => `${fmt(kgToDisplay(s.weight, units), units)}×${s.reps}`)
-              .join(', ')}
+            {item.targetSets} ×{' '}
+            {repsContainsAmrap ? (
+              <span className="explain-pill" title="AMRAP = as many reps as possible.">
+                {item.targetReps}
+              </span>
+            ) : (
+              item.targetReps
+            )}
           </strong>
-        </div>
-      ) : (
-        <div className="last-session-line muted small">No history for this lift yet.</div>
-      )}
-
-      {progression && (progression.hint.kind === 'increase' ||
-        progression.hint.kind === 'reduce' ||
-        progression.hint.kind === 'hold') ? (
-        <div className="hint-line">
-          <span
-            className={`hint-pill ${
-              progression.hint.kind === 'increase'
-                ? 'up'
-                : progression.hint.kind === 'reduce'
-                ? 'down'
-                : 'hold'
-            }`}
-          >
-            {progression.hint.kind === 'increase'
-              ? '↑'
-              : progression.hint.kind === 'reduce'
-              ? '↓'
-              : '→'}{' '}
-            {progression.hint.reason}
+          <span className="card-v3-info-meta tabnum" title={rpeExplainer(item.targetRPE)}>
+            @ RPE {item.targetRPE}
           </span>
+          {hintActive ? (
+            <span
+              className={`hint-pill ${
+                hintKind === 'increase' ? 'up' : hintKind === 'reduce' ? 'down' : 'hold'
+              }`}
+              title={progression?.hint.reason}
+            >
+              {hintKind === 'increase' ? '↑' : hintKind === 'reduce' ? '↓' : '→'}{' '}
+              {progression?.hint.reason}
+            </span>
+          ) : null}
         </div>
-      ) : null}
+        {lastSession ? (
+          <div className="card-v3-info-row">
+            <span className="card-v3-info-label">Last</span>
+            <strong className="tabnum">
+              {lastSession.sets
+                .map((s) => `${fmt(kgToDisplay(s.weight, units), units)}×${s.reps}`)
+                .join(' · ')}
+            </strong>
+          </div>
+        ) : null}
+        {exercise?.weightFormat && exercise.weightFormat !== 'generic' ? (
+          <span className="card-v3-info-format">
+            ⓘ {WEIGHT_FORMAT_LABEL[exercise.weightFormat]}
+          </span>
+        ) : null}
+      </div>
 
       {warmupLogs.length > 0 ? (
         <div className="set-list warmups" aria-label="Warm-up sets">
@@ -445,7 +442,7 @@ export default function SessionExerciseCard({
       {workingLogs.length > 0 && remaining > 0 ? (
         <button
           type="button"
-          className="btn small repeat-last-btn"
+          className="repeat-last-strip"
           disabled={repeating}
           onClick={repeatLastSet}
         >
@@ -453,122 +450,68 @@ export default function SessionExerciseCard({
         </button>
       ) : null}
 
-      <div className="card-actions">
-        {!pendingWarmup ? (
-          <button
-            type="button"
-            className="btn small ghost"
-            onClick={() => setPendingWarmup(true)}
-          >
-            + Add warm-up
-          </button>
-        ) : null}
-        <div className="more-wrap">
-          <button
-            type="button"
-            className="btn small ghost"
-            onClick={() => setShowQuickSwap((v) => !v)}
-            aria-expanded={showQuickSwap}
-            aria-haspopup="menu"
-            disabled={!suggestions || suggestions.length === 0}
-          >
-            ⇄ Quick swap
-          </button>
-          {showQuickSwap && suggestions && suggestions.length > 0 ? (
-            <div className="more-menu quick-swap-menu" role="menu">
-              <div className="quick-swap-header muted small">
-                Other {exercise?.primaryMuscle ? MUSCLE_LABEL[exercise.primaryMuscle].toLowerCase() : 'similar'} moves
-              </div>
-              {suggestions.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  role="menuitem"
-                  className="quick-swap-item"
-                  onClick={() => {
-                    setShowQuickSwap(false)
-                    onSwap(s.id)
-                    toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
-                  }}
-                >
-                  <strong>{s.name}</strong>
-                  <span className="muted small">
-                    {s.equipment}
-                    {s.isCurated ? ' · ★ Core' : ''}
-                  </span>
-                </button>
-              ))}
-              <button
-                type="button"
-                role="menuitem"
-                className="quick-swap-browse"
-                onClick={() => {
-                  setShowQuickSwap(false)
-                  setShowSwap(true)
-                }}
-              >
-                Browse all options →
-              </button>
-            </div>
-          ) : null}
-        </div>
-        <div className="more-wrap">
-          <button
-            type="button"
-            className="btn small ghost"
-            onClick={() => setShowMore((v) => !v)}
-            aria-expanded={showMore}
-            aria-haspopup="menu"
-          >
-            ⋯ More
-          </button>
-          {showMore ? (
-            <div className="more-menu" role="menu">
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setShowMore(false)
-                  if (workingLogs.length > 0) {
-                    if (!confirm('Skip this exercise? Your logged sets will remain.')) return
-                  }
-                  onSkip()
-                  toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
-                }}
-              >
-                ⤼ Skip exercise
-              </button>
-            </div>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Always show the first cue inline. Expand for the rest. Beginner mode
-         also surfaces the bulking tip; advanced users tap through to detail. */}
+      {/* Cues collapsed at the bottom — out of the way until needed. */}
       {exercise?.cues && exercise.cues.length > 0 ? (
-        <div className="inline-cues-v2">
-          <p className="inline-cue-primary">💡 {exercise.cues[0]}</p>
-          {exercise.cues.length > 1 ? (
-            <details
-              open={showAllCues}
-              onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
-            >
-              <summary>+ {exercise.cues.length - 1} more cue{exercise.cues.length - 1 === 1 ? '' : 's'}</summary>
-              <ol className="inline-cue-list">
-                {exercise.cues.slice(1).map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ol>
-            </details>
-          ) : null}
+        <details
+          className="card-v3-cues"
+          open={showAllCues}
+          onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>
+            {showAllCues
+              ? 'Hide form cues'
+              : `Form cues · ${exercise.cues.length}${
+                  skillLevel === 'beginner' && exercise.isCurated && exercise.bulkingTip ? ' + tip' : ''
+                }`}
+          </summary>
+          <ol className="card-v3-cue-list">
+            {exercise.cues.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ol>
           {skillLevel === 'beginner' && exercise.isCurated && exercise.bulkingTip ? (
-            <p className="inline-bulking-tip muted small">{exercise.bulkingTip}</p>
+            <p className="card-v3-cue-tip">💡 {exercise.bulkingTip}</p>
           ) : null}
+        </details>
+      ) : null}
+
+      {/* Hidden suggestions used by the SuggestionPanel from the menu.
+         Kept here so we don't re-query on toggle. */}
+      {showQuickSwap && suggestions && suggestions.length > 0 ? (
+        <div className="card-v3-suggest" role="menu">
+          <div className="card-v3-suggest-head">
+            <span className="card-v3-info-label">Swap to</span>
+            <button type="button" className="link" onClick={() => setShowQuickSwap(false)}>Close</button>
+          </div>
+          {suggestions.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="menuitem"
+              className="card-v3-suggest-item"
+              onClick={() => {
+                setShowQuickSwap(false)
+                onSwap(s.id)
+                toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
+              }}
+            >
+              <strong>{s.name}</strong>
+              <span>{s.equipment}{s.isCurated ? ' · ★ Core' : ''}</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            role="menuitem"
+            className="card-v3-suggest-browse"
+            onClick={() => { setShowQuickSwap(false); setShowSwap(true) }}
+          >
+            Browse all exercises →
+          </button>
         </div>
       ) : null}
 
       {remaining === 0 && workingLogs.length > 0 ? (
-        <p className="muted small done-line">All sets done · 💪 advancing to next…</p>
+        <p className="muted small done-line">All sets done · advancing to next…</p>
       ) : null}
 
       {showSwap ? (
