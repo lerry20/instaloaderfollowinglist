@@ -6,6 +6,7 @@ import { kgToDisplay } from '../lib/units'
 import { estimateOneRepMax } from '../lib/strength'
 import ProgressChart from '../components/ProgressChart'
 import ExerciseImage from '../components/ExerciseImage'
+import ExerciseDemo from '../components/ExerciseDemo'
 
 export default function ExerciseDetail() {
   const { id } = useParams<{ id: string }>()
@@ -44,9 +45,6 @@ export default function ExerciseDetail() {
     value: Number(kgToDisplay(p.value, units).toFixed(units === 'kg' ? 1 : 0)),
   }))
   const query = ex.videoQuery || `${ex.name} technique form`
-  // sp=EgIQAQ filters YouTube search results to "videos only".
-  const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=EgIQAQ%253D%253D`
-  const ytEmbedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}&rel=0`
 
   return (
     <div className="page exercise-detail">
@@ -69,34 +67,12 @@ export default function ExerciseDetail() {
         <ExerciseImage urls={ex.imageUrls ?? []} alt={ex.name} />
       </div>
 
-      <section className="card video-card">
-        <header className="section-head">
-          <h3>Video demo</h3>
-          <a
-            className="link small"
-            href={ytSearchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Open on YouTube →
-          </a>
-        </header>
-        <div className="video-frame">
-          <iframe
-            src={ytEmbedUrl}
-            title={`Demo videos for ${ex.name}`}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
-        </div>
-        <p className="muted small">
-          First few search results for{' '}
-          <em>{query}</em>
-          . If the player doesn't load, tap "Open on YouTube" above.
-        </p>
-      </section>
+      <ExerciseDemo
+        exerciseId={ex.id}
+        exerciseName={ex.name}
+        fallbackImage={ex.imageUrls?.[0] ?? null}
+        searchQuery={query}
+      />
 
       <section className="card">
         <h3>{ex.isCurated ? 'Technique cues' : 'Instructions'}</h3>
