@@ -1290,13 +1290,13 @@ textarea { resize: vertical; font-family: inherit; }
   background: color-mix(in srgb, var(--fg) 18%, transparent);
   transition: width 250ms linear;
 }
-.rest-bar.done .rest-bar-progress { background: rgba(92, 210, 155, 0.3); }
+.rest-bar.done .rest-bar-progress { background: color-mix(in srgb, var(--tone-good) 30%, transparent); }
 .rest-bar.done {
   animation: rest-pulse 1.2s ease-in-out infinite;
 }
 @keyframes rest-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 0 rgba(92, 210, 155, 0); }
-  50% { box-shadow: inset 0 0 24px 0 rgba(92, 210, 155, 0.18); }
+  0%, 100% { box-shadow: inset 0 0 0 0 transparent; }
+  50% { box-shadow: inset 0 0 24px 0 color-mix(in srgb, var(--tone-good) 18%, transparent); }
 }
 .rest-bar-content {
   position: relative;
@@ -1426,8 +1426,8 @@ textarea { resize: vertical; font-family: inherit; }
   flex-wrap: wrap;
 }
 .pr-card {
-  background: rgba(255, 200, 87, 0.08);
-  border-color: rgba(255, 200, 87, 0.35);
+  background: color-mix(in srgb, var(--tone-warn) 8%, transparent);
+  border-color: color-mix(in srgb, var(--tone-warn) 35%, transparent);
 }
 .pr-card ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
 
@@ -1574,25 +1574,28 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .set-row-v2.logged:hover { border-color: var(--primary); }
 .set-row-v2.warmup {
-  background: rgba(255, 209, 102, 0.05);
-  border-color: rgba(255, 209, 102, 0.25);
+  background: color-mix(in srgb, var(--tone-warn) 5%, var(--s-1));
+  border-color: color-mix(in srgb, var(--tone-warn) 25%, var(--line));
 }
 .set-pill {
-  padding: 0.2rem 0.5rem;
-  border-radius: 7px;
-  background: var(--bg-elev-2);
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  padding: 2px var(--space-2);
+  border-radius: var(--r-1);
+  background: var(--s-3);
+  color: var(--fg-dim);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
   align-self: center;
 }
 .set-pill.done {
-  background: rgba(92, 210, 155, 0.18);
-  color: var(--good);
+  background: color-mix(in srgb, var(--tone-good) 18%, transparent);
+  color: var(--tone-good);
 }
-.set-row-v2.warmup .set-pill { background: rgba(255, 209, 102, 0.18); color: var(--gold); }
+.set-row-v2.warmup .set-pill {
+  background: color-mix(in srgb, var(--tone-warn) 18%, transparent);
+  color: var(--tone-warn);
+}
 
 .set-row-main {
   flex: 1;
@@ -1631,8 +1634,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   border: 1px solid var(--border);
   color: var(--text-muted);
 }
-.delta-pill.up { background: rgba(92, 210, 155, 0.16); border-color: rgba(92, 210, 155, 0.4); color: var(--good); }
-.delta-pill.down { background: rgba(255, 122, 122, 0.16); border-color: rgba(255, 122, 122, 0.4); color: var(--danger); }
+.delta-pill.up { background: color-mix(in srgb, var(--tone-good) 14%, transparent); border-color: color-mix(in srgb, var(--tone-good) 32%, transparent); color: var(--tone-good); }
+.delta-pill.down { background: color-mix(in srgb, var(--tone-danger) 14%, transparent); border-color: color-mix(in srgb, var(--tone-danger) 32%, transparent); color: var(--tone-danger); }
 .delta-pill.same { background: var(--s-2); border-color: var(--line); color: var(--fg); }
 
 .big-tap-button {
@@ -1674,7 +1677,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   line-height: 1;
 }
 .big-tap-numbers strong { font-weight: 800; }
-.big-tap-numbers .muted { color: rgba(10, 15, 37, 0.7); }
+.big-tap-numbers .muted { color: color-mix(in srgb, var(--primary-ink) 70%, transparent); }
 .big-tap-numbers .unit-suffix { font-size: 0.85rem; }
 
 .edit-tap-btn {
@@ -1996,9 +1999,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   gap: 0.4rem;
 }
 .pr-ticker-list li {
-  background: rgba(255, 200, 87, 0.1);
-  border: 1px solid rgba(255, 200, 87, 0.35);
-  border-radius: 999px;
+  background: color-mix(in srgb, var(--tone-warn) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tone-warn) 32%, transparent);
+  border-radius: var(--r-pill);
   padding: 0.35rem 0.7rem;
   display: inline-flex;
   align-items: center;
@@ -2023,12 +2026,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 /* Rest bar paused state */
 .rest-bar.paused { opacity: 0.7; }
-.rest-bar.paused .rest-bar-progress { background: rgba(255, 209, 102, 0.2); }
+.rest-bar.paused .rest-bar-progress { background: color-mix(in srgb, var(--tone-warn) 22%, transparent); }
 
 /* Nested modal */
 .modal-backdrop.nested {
   z-index: 70;
-  background: rgba(5, 8, 20, 0.6);
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .about-line { margin-top: 0.4rem; }
@@ -2141,94 +2144,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .session-header.compact { gap: 0.45rem; }
 
 /* === Theme-aware tweaks === */
-html[data-theme='light'] .brand-mark {
-  background: var(--fg);
-  box-shadow: 0 0 0 2px var(--s-0) inset;
-}
-html[data-theme='light'] .btn.danger {
-  background: var(--tone-danger);
-  color: #ffffff;
-}
-html[data-theme='light'] .delta-pill.up {
-  background: rgba(44, 159, 96, 0.14);
-  border-color: rgba(44, 159, 96, 0.35);
-}
-html[data-theme='light'] .delta-pill.down {
-  background: rgba(212, 74, 74, 0.14);
-  border-color: rgba(212, 74, 74, 0.35);
-}
-html[data-theme='light'] .hint-pill.up {
-  background: rgba(44, 159, 96, 0.14);
-  border-color: rgba(44, 159, 96, 0.35);
-}
-html[data-theme='light'] .hint-pill.down {
-  background: rgba(212, 74, 74, 0.14);
-  border-color: rgba(212, 74, 74, 0.35);
-}
-html[data-theme='light'] .hint-pill.hold {
-  background: rgba(192, 138, 29, 0.12);
-  border-color: rgba(192, 138, 29, 0.3);
-  color: var(--gold);
-}
-html[data-theme='light'] .pr-pill {
-  background: rgba(192, 138, 29, 0.16);
-  border-color: rgba(192, 138, 29, 0.4);
-  color: var(--gold);
-}
-html[data-theme='light'] .pr-ticker-list li {
-  background: rgba(192, 138, 29, 0.1);
-  border-color: rgba(192, 138, 29, 0.35);
-}
-html[data-theme='light'] .pr-card {
-  background: rgba(192, 138, 29, 0.08);
-  border-color: rgba(192, 138, 29, 0.35);
-}
-html[data-theme='light'] .ext-pill {
-  background: rgba(140, 80, 220, 0.12);
-  color: #6b3fd1;
-  border-color: rgba(140, 80, 220, 0.32);
-}
-html[data-theme='light'] .curated-pill {
-  background: rgba(192, 138, 29, 0.16);
-  color: var(--gold);
-  border-color: rgba(192, 138, 29, 0.4);
-}
+/* Most light-mode overrides are obsolete now that tints are built on
+ * color-mix(--tone-*, transparent) — the tone variable is already theme-
+ * aware. Only the truly theme-specific tweaks remain below. */
 html[data-theme='light'] .modal-backdrop {
-  background: rgba(31, 41, 80, 0.35);
+  background: rgba(0, 0, 0, 0.3);
 }
 html[data-theme='light'] .modal-backdrop.nested {
-  background: rgba(31, 41, 80, 0.25);
-}
-html[data-theme='light'] .toast {
-  box-shadow: 0 6px 24px rgba(31, 41, 80, 0.18);
-}
-html[data-theme='light'] .plate-sheet {
-  box-shadow: 0 -8px 32px rgba(31, 41, 80, 0.14);
-}
-html[data-theme='light'] .big-tap-button {
-  color: #ffffff;
-}
-html[data-theme='light'] .big-tap-button:disabled {
-  background: var(--bg-elev-2);
-  color: var(--text-muted);
-}
-html[data-theme='light'] .one-tap-row.logged .set-pill {
-  background: rgba(44, 159, 96, 0.16);
-  color: var(--good);
-}
-html[data-theme='light'] .set-row-v2.warmup {
-  background: rgba(192, 138, 29, 0.08);
-  border-color: rgba(192, 138, 29, 0.3);
-}
-html[data-theme='light'] .set-row-v2.warmup .set-pill {
-  background: rgba(192, 138, 29, 0.16);
-  color: var(--gold);
-}
-html[data-theme='light'] .rest-bar.done .rest-bar-progress {
-  background: rgba(44, 159, 96, 0.22);
-}
-html[data-theme='light'] .progress-strip-fill {
-  background: var(--fg);
+  background: rgba(0, 0, 0, 0.18);
 }
 
 /* === Volume bars (MEV/MAV/MRV) === */
@@ -3198,7 +3121,7 @@ html[data-theme='light'] .progress-strip-fill {
 .debug-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 8, 20, 0.7);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 100;
   display: flex;
   align-items: center;
