@@ -2787,3 +2787,15 @@ html[data-theme='light'] .progress-strip-fill {
   background: var(--bg);
 }
 .danger-text { color: var(--danger); }
+
+/* === Upcoming sets placeholder (after the active set row) === */
+.upcoming-sets {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding: 0.45rem 0.65rem;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: transparent;
+  font-style: italic;
+}

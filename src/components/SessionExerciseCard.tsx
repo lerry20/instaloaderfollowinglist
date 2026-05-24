@@ -395,26 +395,49 @@ export default function SessionExerciseCard({
       ) : null}
 
       <div className="set-list">
-        {rows.map(({ idx, logged }) => (
+        {/* Logged working sets — compact, tap to edit. */}
+        {workingLogs.map((logged, idx) => (
           <OneTapSetRow
-            key={`${idx}-${logged?.id ?? 'p'}`}
+            key={`done-${idx}-${logged.id}`}
             index={idx}
             units={units}
-            suggestedKg={logged ? logged.weight : suggestedKg}
-            suggestedReps={logged ? logged.reps : repsHigh}
+            suggestedKg={logged.weight}
+            suggestedReps={logged.reps}
             lastSessionTopKg={lastSessionTopKg}
             logged={logged}
-            onLog={(data) =>
-              handleLog(idx, data, exercise?.defaultRestSec ?? 90)
-            }
+            onLog={() => {}}
             onUnlog={async () => {
-              if (logged?.id) {
+              if (logged.id) {
                 await deleteSetLog(logged.id)
                 toast('Set deleted', { kind: 'info', duration: 1500 })
               }
             }}
           />
         ))}
+
+        {/* Active set — only the next pending set gets the big LOG button. */}
+        {remaining > 0 ? (
+          <OneTapSetRow
+            key={`active-${workingLogs.length}`}
+            index={workingLogs.length}
+            units={units}
+            suggestedKg={suggestedKg}
+            suggestedReps={repsHigh}
+            lastSessionTopKg={lastSessionTopKg}
+            onLog={(data) =>
+              handleLog(workingLogs.length, data, exercise?.defaultRestSec ?? 90)
+            }
+          />
+        ) : null}
+
+        {/* Tiny placeholder for sets still to come — keeps user oriented
+           without 3 more huge buttons stacking up. */}
+        {remaining > 1 ? (
+          <div className="upcoming-sets">
+            + {remaining - 1} more set{remaining - 1 === 1 ? '' : 's'} to go
+            {suggestedKg ? ` · target ${kgToDisplay(suggestedKg, units).toFixed(units === 'kg' ? 1 : 0)} ${units} × ${repsHigh ?? '?'}` : ''}
+          </div>
+        ) : null}
       </div>
 
       {workingLogs.length > 0 && remaining > 0 ? (
