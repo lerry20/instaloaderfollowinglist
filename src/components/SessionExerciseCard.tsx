@@ -198,6 +198,20 @@ export default function SessionExerciseCard({
     onFocus(data.weightKg)
   }
 
+  async function updateSet(
+    loggedId: number,
+    data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean },
+  ) {
+    await db.setLogs.update(loggedId, {
+      weight: data.weightKg,
+      reps: data.reps,
+      rpe: data.rpe,
+      isWarmup: data.isWarmup,
+    })
+    haptics.tap()
+    toast('Set updated', { kind: 'success', duration: 1500 })
+  }
+
   const repsContainsAmrap = /amrap/i.test(item.targetReps)
 
   async function repeatLastSet() {
@@ -415,7 +429,7 @@ export default function SessionExerciseCard({
               suggestedKg={w.weight}
               suggestedReps={w.reps}
               logged={w}
-              onLog={() => {}}
+              onLog={(data) => w.id ? updateSet(w.id, data) : undefined}
               onUnlog={async () => {
                 if (w.id) {
                   await deleteSetLog(w.id)
@@ -452,7 +466,7 @@ export default function SessionExerciseCard({
             suggestedReps={logged.reps}
             lastSessionTopKg={lastSessionTopKg}
             logged={logged}
-            onLog={() => {}}
+            onLog={(data) => logged.id ? updateSet(logged.id, data) : undefined}
             onUnlog={async () => {
               if (logged.id) {
                 await deleteSetLog(logged.id)
