@@ -2670,3 +2670,48 @@ html[data-theme='light'] .progress-strip-fill {
 }
 .vol-details[open] > summary::before { content: '▾ '; }
 .vol-details[open] > summary { margin-bottom: 0.55rem; }
+
+/* === Quick demo link on session card === */
+.demo-quick-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  text-decoration: none;
+  transition: background 150ms, transform 80ms;
+}
+.demo-quick-link:hover {
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+}
+.demo-quick-link:active { transform: scale(0.96); }
+
+/* === Embedded YouTube demo on exercise detail === */
+.video-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

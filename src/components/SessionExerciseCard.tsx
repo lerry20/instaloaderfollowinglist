@@ -273,6 +273,19 @@ export default function SessionExerciseCard({
             </div>
           ) : null}
         </Link>
+        {exercise ? (
+          <a
+            className="demo-quick-link"
+            href={demoSearchUrl(exercise.videoQuery, exercise.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Watch demo of ${exercise.name}`}
+            title="Watch a YouTube demo of this exercise"
+          >
+            ▶ Demo
+          </a>
+        ) : null}
         {sparkValues.length >= 2 ? (
           <div className="sparkline-cell" title="Last 5 top-set weights">
             <MiniSparkline values={sparkValues} />
@@ -572,6 +585,12 @@ function fmt(value: number, units: Units): string {
   if (units === 'lb') return Math.round(value).toString()
   if (Number.isInteger(value)) return String(value)
   return value.toFixed(1)
+}
+
+function demoSearchUrl(query: string | undefined, fallback: string): string {
+  const q = query || `${fallback} technique form`
+  // sp=EgIQAQ filters YouTube search to videos only.
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}&sp=EgIQAQ%253D%253D`
 }
 
 function rpeExplainer(rpe: number): string {
