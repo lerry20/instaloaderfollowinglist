@@ -9,7 +9,10 @@ export const DEFAULT_SETTINGS: Settings = {
   goalNotes:
     'Bulk: gain ~0.25 kg / week. Push every working set hard, stop one rep short of failure, and add 2.5 kg whenever you hit the top of the rep range two sessions in a row.',
   goal: 'bulk',
-  onboarded: false,
+  // Onboarding was removed — new users land straight on Train with these
+  // defaults. `onboarded` is kept on the type for forward-compat with
+  // older DBs but is effectively always true now.
+  onboarded: true,
   notificationsEnabled: false,
   activeRoutineId: DEFAULT_ACTIVE_ROUTINE_ID,
   skillLevel: 'beginner',

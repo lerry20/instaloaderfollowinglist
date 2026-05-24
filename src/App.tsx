@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ErrorBoundary from './components/ErrorBoundary'
 import DebugPanel from './components/DebugPanel'
@@ -8,9 +8,7 @@ import Routines from './routes/Routines'
 import Progress from './routes/Progress'
 import Daily from './routes/Daily'
 import ExerciseDetail from './routes/ExerciseDetail'
-import Onboarding from './routes/Onboarding'
 import { seedIfEmpty } from './db/seed'
-import { useSettings } from './db/queries'
 import { useThemeSync } from './state/theme'
 
 export default function App() {
@@ -37,10 +35,8 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <ThemeManager />
-        <OnboardingGate />
         <DebugPanel />
         <Routes>
-          <Route path="/welcome" element={<Onboarding />} />
           <Route element={<Layout />}>
             <Route path="/" element={<Train />} />
             <Route path="/train" element={<Train />} />
@@ -58,18 +54,5 @@ export default function App() {
 
 function ThemeManager() {
   useThemeSync()
-  return null
-}
-
-function OnboardingGate() {
-  const settings = useSettings()
-  const location = useLocation()
-  const navigate = useNavigate()
-  useEffect(() => {
-    if (!settings) return
-    if (settings.onboarded === false && location.pathname !== '/welcome') {
-      navigate('/welcome', { replace: true })
-    }
-  }, [settings, location.pathname, navigate])
   return null
 }
