@@ -113,10 +113,12 @@ export default function SessionExerciseCard({
     Number(String(item.targetReps).split(/[–\-]/)[1] || String(item.targetReps).split(/[–\-]/)[0]) ||
     repsLow
 
+  const lastWorking = workingLogs[workingLogs.length - 1]
   const suggestedKg =
-    workingLogs.length > 0
-      ? workingLogs[workingLogs.length - 1].weight
-      : progression?.suggestedKg ?? null
+    lastWorking?.weight ?? progression?.suggestedKg ?? null
+  // After the first set, default the next set's reps to what you just did.
+  // Otherwise aim for the top of the target range.
+  const suggestedReps = lastWorking?.reps ?? repsHigh
 
   const lastSessionTopKg = lastSession?.sets[0]?.weight ?? null
 
@@ -469,7 +471,7 @@ export default function SessionExerciseCard({
             totalSets={totalSetsPlanned}
             units={units}
             suggestedKg={suggestedKg}
-            suggestedReps={repsHigh}
+            suggestedReps={suggestedReps}
             onLog={(data) =>
               handleLog(workingLogs.length, data, exercise?.defaultRestSec ?? 90)
             }

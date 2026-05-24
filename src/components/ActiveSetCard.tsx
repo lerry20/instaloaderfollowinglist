@@ -34,8 +34,11 @@ export default function ActiveSetCard({
   onCancelWarmup,
 }: Props) {
   const inc = weightIncrement(units)
-  const initialWeight = suggestedKg !== null ? roundTo(kgToDisplay(suggestedKg, units), inc) : 0
-  const [weight, setWeight] = useState<number>(initialWeight)
+  // Round to a fine 0.25 grid so float artifacts get cleaned up but an
+  // exact prior log like 8 kg stays 8 kg (not snapped to the 2.5-kg
+  // stepper grid → 7.5).
+  const seedWeight = (kg: number) => roundTo(kgToDisplay(kg, units), 0.25)
+  const [weight, setWeight] = useState<number>(suggestedKg !== null ? seedWeight(suggestedKg) : 0)
   const [reps, setReps] = useState<number>(suggestedReps ?? 0)
   const [rpe, setRpe] = useState<number | ''>('')
   const [warmup, setWarmup] = useState<boolean>(defaultWarmup)
@@ -44,9 +47,7 @@ export default function ActiveSetCard({
   // Re-seed when the suggestion changes (e.g. after logging set 1, set 2's
   // suggestion is set-1's actual values).
   useEffect(() => {
-    if (suggestedKg !== null) {
-      setWeight(roundTo(kgToDisplay(suggestedKg, units), inc))
-    }
+    if (suggestedKg !== null) setWeight(seedWeight(suggestedKg))
     if (suggestedReps !== null) setReps(suggestedReps)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestedKg, suggestedReps, units])
