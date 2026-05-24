@@ -506,7 +506,7 @@ export default function SessionExerciseCard({
           <div className="upcoming-sets">
             {t('session.more_sets_to_go', {
               n: remaining - 1,
-              unit: remaining - 1 === 1 ? t('unit.workout') : t('unit.sets'),
+              unit: remaining - 1 === 1 ? t('unit.set') : t('unit.sets'),
             })}
             {suggestedKg ? ` · ${kgToDisplay(suggestedKg, units).toFixed(units === 'kg' ? 1 : 0)} ${units} × ${repsHigh ?? '?'}` : ''}
           </div>

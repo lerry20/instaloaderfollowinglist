@@ -32,6 +32,7 @@ export const en: Dict = {
   // Units
   'unit.kg': 'kg',
   'unit.lb': 'lb',
+  'unit.set': 'set',
   'unit.sets': 'sets',
   'unit.reps': 'reps',
   'unit.rpe': 'RPE',

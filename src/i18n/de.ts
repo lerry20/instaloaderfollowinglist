@@ -32,6 +32,7 @@ export const de: Dict = {
   // Units
   'unit.kg': 'kg',
   'unit.lb': 'lb',
+  'unit.set': 'Satz',
   'unit.sets': 'Sätze',
   'unit.reps': 'Wdh.',
   'unit.rpe': 'RPE',
@@ -104,7 +105,7 @@ export const de: Dict = {
   'settings.skill_beginner': 'Anfänger',
   'settings.skill_advanced': 'Fortgeschritten',
   'settings.goal': 'Ziel',
-  'settings.goal_bulk': 'Aufbauen',
+  'settings.goal_bulk': 'Aufbau',
   'settings.goal_cut': 'Definition',
   'settings.goal_recomp': 'Recomp',
   'settings.default_rest': 'Standard-Pause',

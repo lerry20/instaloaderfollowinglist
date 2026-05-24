@@ -33,7 +33,7 @@ export type DictKey =
   | 'common.loading' | 'common.starting'
   | 'common.yes' | 'common.no' | 'common.confirm'
   // Common units / labels
-  | 'unit.kg' | 'unit.lb' | 'unit.sets' | 'unit.reps' | 'unit.rpe'
+  | 'unit.kg' | 'unit.lb' | 'unit.set' | 'unit.sets' | 'unit.reps' | 'unit.rpe'
   | 'unit.weight' | 'unit.bodyweight' | 'unit.warmup' | 'unit.workout'
   // Train start screen
   | 'train.todays_workout' | 'train.no_workout_queued' | 'train.start_workout'
