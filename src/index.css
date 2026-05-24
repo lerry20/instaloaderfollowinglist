@@ -1,11 +1,54 @@
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
-  font-feature-settings: 'tnum' 1, 'cv11' 1;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-feature-settings: 'tnum' 1, 'cv11' 1, 'ss03' 1;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: rgba(122, 162, 255, 0.18);
   touch-action: manipulation;
+
+  /* === Phase 1 design tokens (Emil Kowalski-inspired). Additive — old tokens
+        above still resolve; new components opt in via --fg / --s-0 / --r-3
+        / --t-1 / etc. */
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale */
+  --fs-display: 2.25rem;    /* 36px */
+  --fs-h1: 1.4rem;          /* 22.4px */
+  --fs-h2: 1.0625rem;       /* 17px  */
+  --fs-body: 0.9375rem;     /* 15px  */
+  --fs-small: 0.8125rem;    /* 13px  */
+  --fs-caption: 0.6875rem;  /* 11px  */
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-body: 1.5;
+
+  /* Spacing — strict 4-px grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-9: 64px;
+
+  /* Radii */
+  --r-1: 6px;
+  --r-2: 10px;
+  --r-3: 14px;
+  --r-4: 20px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --t-1: 120ms;
+  --t-2: 200ms;
+  --t-3: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.5, 1.6, 0.4, 1);
 }
 
 html[data-theme='dark'] {
@@ -26,6 +69,33 @@ html[data-theme='dark'] {
   --gold: #ffc857;
   --danger: #ff7a7a;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+
+  /* Phase 1 monochromatic surfaces (Emil Kowalski / Geist palette). */
+  --s-0: #0a0a0a;          /* canvas */
+  --s-1: #111111;          /* card */
+  --s-2: #161616;          /* elevated card */
+  --s-3: #1c1c1c;          /* drawer / modal */
+  --s-hover: rgba(255, 255, 255, 0.04);
+
+  --fg: #ededed;
+  --fg-muted: #a1a1a1;
+  --fg-dim: #707070;
+  --fg-inverse: #0a0a0a;
+
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.10);
+  --line-strong: rgba(255, 255, 255, 0.18);
+
+  --accent-1: #ffffff;        /* monochrome accent — pure white on dark */
+  --accent-1-ink: #0a0a0a;
+  --accent-2: #2f81f7;        /* used sparingly: links, focus rings */
+  --tone-good: #3fb968;
+  --tone-warn: #d9a13a;
+  --tone-danger: #ef5b5b;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+  --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-drawer: 0 -24px 48px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
 html[data-theme='light'] {
@@ -46,6 +116,33 @@ html[data-theme='light'] {
   --gold: #c08a1d;
   --danger: #d44a4a;
   --shadow: 0 6px 24px rgba(31, 41, 80, 0.12);
+
+  /* Phase 1 monochromatic surfaces — light mode. */
+  --s-0: #ffffff;
+  --s-1: #fafafa;
+  --s-2: #f4f4f4;
+  --s-3: #ededed;
+  --s-hover: rgba(0, 0, 0, 0.03);
+
+  --fg: #0a0a0a;
+  --fg-muted: #555555;
+  --fg-dim: #888888;
+  --fg-inverse: #ffffff;
+
+  --line-soft: rgba(0, 0, 0, 0.05);
+  --line: rgba(0, 0, 0, 0.09);
+  --line-strong: rgba(0, 0, 0, 0.16);
+
+  --accent-1: #0a0a0a;       /* monochrome accent — near-black on light */
+  --accent-1-ink: #ffffff;
+  --accent-2: #0061d5;
+  --tone-good: #1a7d3f;
+  --tone-warn: #a26b00;
+  --tone-danger: #c63a3a;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 6px 18px rgba(31, 41, 80, 0.10);
+  --shadow-drawer: 0 -20px 48px rgba(31, 41, 80, 0.16);
 }
 
 html {
