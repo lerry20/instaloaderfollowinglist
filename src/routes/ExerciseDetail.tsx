@@ -7,10 +7,12 @@ import { estimateOneRepMax } from '../lib/strength'
 import ProgressChart from '../components/ProgressChart'
 import ExerciseImage from '../components/ExerciseImage'
 import ExerciseDemo from '../components/ExerciseDemo'
+import { useLocalizedExercise } from '../lib/exercise'
 
 export default function ExerciseDetail() {
   const { id } = useParams<{ id: string }>()
   const ex = useExercise(id)
+  const localized = useLocalizedExercise(ex ?? undefined)
   const settings = useSettings()
   const navigate = useNavigate()
   const history = useLiveQuery(
@@ -44,32 +46,36 @@ export default function ExerciseDetail() {
     label: p.label,
     value: Number(kgToDisplay(p.value, units).toFixed(units === 'kg' ? 1 : 0)),
   }))
-  const query = ex.videoQuery || `${ex.name} technique form`
+  const name = localized?.name ?? ex.name
+  const equipment = localized?.equipment ?? ex.equipment
+  const cues = localized?.cues ?? ex.cues
+  const bulkingTip = localized?.bulkingTip ?? ex.bulkingTip
+  const query = ex.videoQuery || `${name} technique form`
 
   return (
     <div className="page exercise-detail">
       <button className="link back-link" onClick={() => navigate(-1)}>← Back</button>
 
       <header className="exercise-header">
-        <h1 className="big-title">{ex.name}</h1>
+        <h1 className="big-title">{name}</h1>
         <span className="muted small">
           {MUSCLE_LABEL[ex.primaryMuscle]}
           {ex.secondaryMuscles.length > 0
             ? ` · ${ex.secondaryMuscles.map((m) => MUSCLE_LABEL[m]).join(', ')}`
             : ''}
           {' · '}
-          {ex.equipment}
+          {equipment}
         </span>
         {!ex.isCurated ? <span className="ext-pill standalone">Extended catalog</span> : null}
       </header>
 
       <div className="exercise-image-large">
-        <ExerciseImage urls={ex.imageUrls ?? []} alt={ex.name} />
+        <ExerciseImage urls={ex.imageUrls ?? []} alt={name} />
       </div>
 
       <ExerciseDemo
         exerciseId={ex.id}
-        exerciseName={ex.name}
+        exerciseName={name}
         fallbackImage={ex.imageUrls?.[0] ?? null}
         searchQuery={query}
       />
@@ -77,16 +83,16 @@ export default function ExerciseDetail() {
       <section className="card">
         <h3>{ex.isCurated ? 'Technique cues' : 'Instructions'}</h3>
         <ol className="cue-list">
-          {ex.cues.map((c, i) => (
+          {cues.map((c, i) => (
             <li key={i}>{c}</li>
           ))}
         </ol>
       </section>
 
-      {ex.isCurated && ex.bulkingTip ? (
+      {ex.isCurated && bulkingTip ? (
         <section className="card bulk-tip">
           <h3>Bulking tip</h3>
-          <p>{ex.bulkingTip}</p>
+          <p>{bulkingTip}</p>
         </section>
       ) : null}
 

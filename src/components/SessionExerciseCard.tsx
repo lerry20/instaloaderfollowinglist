@@ -24,6 +24,7 @@ import OneTapSetRow from './OneTapSetRow'
 import ActiveSetCard from './ActiveSetCard'
 import ExercisePicker from './ExercisePicker'
 import { useT } from '../i18n'
+import { useLocalizedExercise } from '../lib/exercise'
 
 interface Props {
   item: PlanItem
@@ -51,6 +52,7 @@ export default function SessionExerciseCard({
   const t = useT()
   const settings = useSettings()
   const exercise = useLiveQuery(() => db.exercises.get(item.exerciseId), [item.exerciseId])
+  const exLocalized = useLocalizedExercise(exercise)
   const [showSwap, setShowSwap] = useState(false)
   const [pendingWarmup, setPendingWarmup] = useState(false)
   const [showAllCues, setShowAllCues] = useState(false)
@@ -189,7 +191,7 @@ export default function SessionExerciseCard({
         haptics.pr()
         toast(
           t('toast.new_pr', {
-            name: exercise?.name ?? 'Exercise',
+            name: exLocalized?.name ?? 'Exercise',
             weight: fmt(kgToDisplay(data.weightKg, units), units),
             unit: units,
           }),
@@ -262,20 +264,20 @@ export default function SessionExerciseCard({
           type="button"
           className="exercise-thumb-btn"
           onClick={() => setShowImageZoom(true)}
-          aria-label={`View ${exercise?.name ?? 'exercise'} demo image`}
+          aria-label={`View ${exLocalized?.name ?? 'exercise'} demo image`}
           disabled={!exercise?.imageUrls || exercise.imageUrls.length === 0}
         >
-          <ExerciseImage urls={exercise?.imageUrls ?? []} alt={exercise?.name ?? item.exerciseId} />
+          <ExerciseImage urls={exercise?.imageUrls ?? []} alt={exLocalized?.name ?? item.exerciseId} />
         </button>
         <Link
           to={`/exercise/${item.exerciseId}`}
           className="card-v3-title"
           onFocus={() => onFocus(suggestedKg)}
         >
-          <h2>{exercise?.name ?? item.exerciseId}</h2>
+          <h2>{exLocalized?.name ?? item.exerciseId}</h2>
           <span className="card-v3-subtitle">
             {t('session.exercise_of', { n: positionIndex + 1, total: totalExercises })}
-            {exercise?.equipment ? ` · ${exercise.equipment}` : ''}
+            {exLocalized?.equipment ? ` · ${exLocalized.equipment}` : ''}
           </span>
         </Link>
         <div className="card-v3-head-actions">
@@ -339,7 +341,7 @@ export default function SessionExerciseCard({
                     setShowMore(false)
                     if (workingLogs.length > 0 && !confirm(t('session.skip_confirm'))) return
                     onSkip()
-                    toast(t('session.exercise_skipped', { name: exercise?.name ?? 'Exercise' }), { kind: 'info', duration: 2000 })
+                    toast(t('session.exercise_skipped', { name: exLocalized?.name ?? 'Exercise' }), { kind: 'info', duration: 2000 })
                   }}
                 >
                   {t('session.skip_exercise')}
@@ -525,22 +527,22 @@ export default function SessionExerciseCard({
       ) : null}
 
       {/* Cues collapsed at the bottom — out of the way until needed. */}
-      {exercise?.cues && exercise.cues.length > 0 ? (
+      {exLocalized?.cues && exLocalized.cues.length > 0 ? (
         <details
           className="card-v3-cues"
           open={showAllCues}
           onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
         >
           <summary>
-            {showAllCues ? t('session.hide_cues') : t('session.form_cues', { n: exercise.cues.length })}
+            {showAllCues ? t('session.hide_cues') : t('session.form_cues', { n: exLocalized.cues.length })}
           </summary>
           <ol className="card-v3-cue-list">
-            {exercise.cues.map((c, i) => (
+            {exLocalized.cues.map((c, i) => (
               <li key={i}>{c}</li>
             ))}
           </ol>
-          {skillLevel === 'beginner' && exercise.isCurated && exercise.bulkingTip ? (
-            <p className="card-v3-cue-tip">💡 {exercise.bulkingTip}</p>
+          {skillLevel === 'beginner' && exercise?.isCurated && exLocalized.bulkingTip ? (
+            <p className="card-v3-cue-tip">💡 {exLocalized.bulkingTip}</p>
           ) : null}
         </details>
       ) : null}
@@ -551,7 +553,7 @@ export default function SessionExerciseCard({
 
       {showSwap ? (
         <ExercisePicker
-          title={`Swap ${exercise?.name ?? 'exercise'}`}
+          title={`${t('session.swap_exercise')}: ${exLocalized?.name ?? 'exercise'}`}
           onClose={() => setShowSwap(false)}
           initialMuscle={exercise?.primaryMuscle}
           onPick={(id) => {
@@ -572,10 +574,10 @@ export default function SessionExerciseCard({
             >
               ✕
             </button>
-            <ExerciseImage urls={exercise.imageUrls} alt={exercise.name} className="image-zoom-image" />
+            <ExerciseImage urls={exercise.imageUrls} alt={exLocalized?.name ?? exercise.name} className="image-zoom-image" />
             <div className="image-zoom-caption">
-              <strong>{exercise.name}</strong>
-              <span className="muted small">{exercise.equipment}</span>
+              <strong>{exLocalized?.name ?? exercise.name}</strong>
+              <span className="muted small">{exLocalized?.equipment ?? exercise.equipment}</span>
             </div>
           </div>
         </div>

@@ -54,6 +54,13 @@ export const WEIGHT_FORMAT_LABEL: Record<WeightFormat, string> = {
   generic: 'Total load you\'re moving',
 }
 
+export interface ExerciseI18n {
+  name?: string
+  equipment?: string
+  cues?: string[]
+  bulkingTip?: string
+}
+
 export interface Exercise {
   id: string
   name: string
@@ -68,6 +75,9 @@ export interface Exercise {
   defaultRestSec: number
   isCurated: boolean
   weightFormat?: WeightFormat
+  /** Optional per-locale overrides. Falls back to the English fields above
+   * whenever a locale or specific field is missing. Keyed by Locale code. */
+  i18n?: Record<string, ExerciseI18n>
 }
 
 export interface PlanItem {

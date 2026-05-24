@@ -1,4 +1,5 @@
 import type { Exercise } from '../db/schema'
+import { EXERCISES_IT } from './curatedExercises.it'
 
 const CDN = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises'
 
@@ -6,7 +7,7 @@ function imgs(slug: string): string[] {
   return [`${CDN}/${slug}/0.jpg`, `${CDN}/${slug}/1.jpg`]
 }
 
-export const CURATED_EXERCISES: Exercise[] = [
+const RAW: Exercise[] = [
   // ───────── CHEST ─────────
   {
     id: 'bench-press',
@@ -1182,3 +1183,11 @@ export const CURATED_EXERCISES: Exercise[] = [
       'Grip and forearm size translates directly to better deadlifts, pull-ups, and rows. 2 sets of 15–20 reps a couple times a week.',
   },
 ]
+
+/** Each exercise gets every available locale's overrides merged in under
+ * `i18n`. Adding a new language is a single import + one more line below. */
+export const CURATED_EXERCISES: Exercise[] = RAW.map((ex) => {
+  const i18n: Record<string, NonNullable<Exercise['i18n']>[string]> = {}
+  if (EXERCISES_IT[ex.id]) i18n.it = EXERCISES_IT[ex.id]
+  return Object.keys(i18n).length > 0 ? { ...ex, i18n } : ex
+})

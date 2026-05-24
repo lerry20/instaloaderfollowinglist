@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { db, MUSCLE_LABEL, type Exercise, type MuscleKey } from '../db/schema'
 import { useAllExercises } from '../db/queries'
 import { loadFullCatalog } from '../lib/extendedCatalog'
+import { useLocalizedExercise } from '../lib/exercise'
 
 interface Props {
   title: string
@@ -215,7 +216,7 @@ export default function ExercisePicker({
               {recentExercises.map((e) => (
                 <li key={e.id}>
                   <button className="chip" onClick={() => pick(e)}>
-                    {e.name}
+                    <ExerciseLocalizedName ex={e} />
                   </button>
                 </li>
               ))}
@@ -231,7 +232,7 @@ export default function ExercisePicker({
               <li key={e.id}>
                 <button className="picker-row" onClick={() => pick(e)}>
                   <span className="picker-row-head">
-                    <strong>{e.name}</strong>
+                    <strong><ExerciseLocalizedName ex={e} /></strong>
                     {e.isCurated ? (
                       <span
                         className="curated-pill"
@@ -249,7 +250,7 @@ export default function ExercisePicker({
                   </span>
                   <span className="muted small">
                     {MUSCLE_LABEL[e.primaryMuscle]}
-                    {e.equipment && e.equipment !== '—' ? ` · ${e.equipment}` : ''}
+                    <ExerciseLocalizedEquipment ex={e} />
                   </span>
                 </button>
               </li>
@@ -283,4 +284,15 @@ export default function ExercisePicker({
       </div>
     </div>
   )
+}
+
+function ExerciseLocalizedName({ ex }: { ex: Exercise }) {
+  const local = useLocalizedExercise(ex)
+  return <>{local?.name ?? ex.name}</>
+}
+
+function ExerciseLocalizedEquipment({ ex }: { ex: Exercise }) {
+  const local = useLocalizedExercise(ex)
+  const eq = local?.equipment ?? ex.equipment
+  return <>{eq && eq !== '—' ? ` · ${eq}` : ''}</>
 }

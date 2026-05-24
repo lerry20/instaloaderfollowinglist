@@ -24,6 +24,7 @@ import { haptics } from '../lib/haptics'
 import { buildProactiveMessage, type ProactiveMessage } from '../lib/streak'
 import Skeleton from '../components/Skeleton'
 import { useT } from '../i18n'
+import { useLocalizedExercise } from '../lib/exercise'
 
 export default function Train() {
   const t = useT()
@@ -320,5 +321,6 @@ function ActiveSessionView({
 
 function ExerciseName({ id }: { id: string }) {
   const ex = useLiveQuery(() => db.exercises.get(id), [id])
-  return <>{ex?.name ?? id}</>
+  const local = useLocalizedExercise(ex)
+  return <>{local?.name ?? ex?.name ?? id}</>
 }
