@@ -1,5 +1,9 @@
 import { en } from './en'
 import { it } from './it'
+import { es } from './es'
+import { fr } from './fr'
+import { de } from './de'
+import { pt } from './pt'
 import { useLocaleStore } from './store'
 import type { Dict, DictKey, Locale } from './types'
 
@@ -7,11 +11,10 @@ export type { Dict, DictKey, Locale } from './types'
 export { LOCALES, LOCALE_LABEL, LOCALE_FLAG } from './types'
 export { useLocaleStore } from './store'
 
-// Only English and Italian have full dictionaries today. Other supported
-// locales fall back to English until their dictionaries are filled in.
-const dicts: Partial<Record<Locale, Partial<Dict>>> = {
-  en,
-  it,
+// All six locales have full dictionaries. Any missing key in a locale
+// falls back to English at runtime via lookup().
+const dicts: Record<Locale, Partial<Dict>> = {
+  en, it, es, fr, de, pt,
 }
 
 function lookup(locale: Locale, key: DictKey): string {
