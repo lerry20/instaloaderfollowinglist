@@ -50,8 +50,37 @@ export default class ErrorBoundary extends Component<
     }
   }
 
+  async copyReport() {
+    const { error, info } = this.state
+    const payload = [
+      `BulkLog crash report`,
+      `ts: ${new Date().toISOString()}`,
+      `url: ${window.location.href}`,
+      `ua: ${navigator.userAgent}`,
+      ``,
+      `error: ${error?.message ?? String(error)}`,
+      ``,
+      `stack:`,
+      error?.stack ?? '(no stack)',
+      ``,
+      `component stack:`,
+      info?.componentStack ?? '(no component stack)',
+    ].join('\n')
+    try {
+      await navigator.clipboard.writeText(payload)
+      // eslint-disable-next-line no-alert
+      alert('Crash report copied to clipboard.')
+    } catch {
+      console.log('[crash-report]', payload)
+      // eslint-disable-next-line no-alert
+      alert('Copy failed — report logged to devtools console.')
+    }
+  }
+
   render() {
     if (!this.state.error) return this.props.children
+
+    const componentStack = this.state.info?.componentStack?.trim() || ''
 
     return (
       <div className="boot-screen error-screen">
@@ -63,6 +92,12 @@ export default class ErrorBoundary extends Component<
             "Abandon active sessions" first.
           </p>
           <pre className="error-pre">{String(this.state.error.message ?? this.state.error)}</pre>
+          {componentStack ? (
+            <details>
+              <summary className="muted small">Component stack</summary>
+              <pre className="error-pre">{componentStack}</pre>
+            </details>
+          ) : null}
           <div className="error-actions">
             <button
               className="btn primary"
@@ -77,6 +112,13 @@ export default class ErrorBoundary extends Component<
               onClick={() => window.location.reload()}
             >
               Just reload
+            </button>
+            <button
+              className="btn"
+              disabled={this.state.busy}
+              onClick={() => this.copyReport()}
+            >
+              Copy crash report
             </button>
             <button
               className="btn danger"

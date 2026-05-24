@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import ErrorBoundary from './components/ErrorBoundary'
+import DebugPanel from './components/DebugPanel'
 import Train from './routes/Train'
 import Routines from './routes/Routines'
 import Progress from './routes/Progress'
@@ -37,6 +38,7 @@ export default function App() {
       <BrowserRouter>
         <ThemeManager />
         <OnboardingGate />
+        <DebugPanel />
         <Routes>
           <Route path="/welcome" element={<Onboarding />} />
           <Route element={<Layout />}>

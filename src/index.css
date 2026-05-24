@@ -2975,3 +2975,66 @@ html[data-theme='light'] .active-set-card {
   .active-value-input { font-size: 1.6rem; }
   .active-stepper { min-width: 38px; padding: 0 0.2rem; }
 }
+
+/* Debug overlay (⌘D / Ctrl+D) */
+.debug-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 20, 0.7);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.debug-panel {
+  width: 100%;
+  max-width: 440px;
+  max-height: 80dvh;
+  overflow-y: auto;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+.debug-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.debug-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.debug-table td {
+  padding: 0.2rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.debug-table td:last-child {
+  text-align: right;
+  font-weight: 700;
+}
+.debug-pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow: auto;
+  margin: 0;
+}
+.debug-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.debug-actions .btn { flex: 1 0 auto; min-width: 0; }
