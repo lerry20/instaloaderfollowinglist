@@ -1043,32 +1043,33 @@ textarea { resize: vertical; font-family: inherit; }
 }
 
 /* Workout editor */
-.workout-edits { display: flex; flex-direction: column; gap: 0.65rem; }
+.workout-edits { display: flex; flex-direction: column; gap: var(--space-3); }
 .workout-edit {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.7rem 0.8rem;
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: var(--space-3);
 }
 .workout-edit-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 .workout-edit-head input {
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.5rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--bg-elev);
-  color: var(--text);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-2);
+  border: 1px solid var(--line);
+  background: var(--s-0);
+  color: var(--fg);
   flex: 1;
   min-width: 0;
+  letter-spacing: -0.005em;
 }
 .workout-items {
   list-style: none;
@@ -1076,41 +1077,50 @@ textarea { resize: vertical; font-family: inherit; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: var(--space-2);
 }
 .workout-item {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.55rem 0.65rem;
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: var(--space-3) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--space-2);
 }
 .workout-item-name {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-2);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  letter-spacing: -0.005em;
 }
 .workout-item-fields {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.4rem;
+  gap: var(--space-2);
 }
 .workout-item-fields label {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  gap: 2px;
+  font-size: var(--fs-caption);
+  color: var(--fg-dim);
+  font-weight: 500;
+  letter-spacing: -0.003em;
 }
 .workout-item-fields input {
-  padding: 0.45rem 0.55rem;
-  border-radius: 7px;
-  border: 1px solid var(--border-strong);
-  background: var(--bg);
-  color: var(--text);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--r-1);
+  border: 1px solid var(--line);
+  background: var(--s-0);
+  color: var(--fg);
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  font-weight: 500;
 }
 .workout-item-fields input:disabled { opacity: 0.7; }
 
@@ -3272,3 +3282,19 @@ html[data-theme='light'] .modal-backdrop.nested {
   gap: 0.35rem;
 }
 .debug-actions .btn { flex: 1 0 auto; min-width: 0; }
+
+/* === Reduced motion: respect the user's OS preference. Keep the layout,
+       drop the kinetics. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .rest-bar.done { animation: none; }
+  .skeleton-bar { animation: none; background: var(--s-2); }
+  .page-dot.active { width: 24px; } /* skip the width-animate */
+}
