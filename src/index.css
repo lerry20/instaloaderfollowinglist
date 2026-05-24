@@ -494,18 +494,18 @@ p { margin: 0; }
 .hero-item .tabnum { color: var(--fg-dim); font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
 
 /* Session */
-.session-page { gap: 0.7rem; }
-.session-header { display: flex; flex-direction: column; gap: 0.5rem; }
+.session-page { gap: var(--space-3); }
+.session-header { display: flex; flex-direction: column; gap: var(--space-2); }
 .session-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 .progress-strip {
-  height: 5px;
-  background: var(--bg-elev);
-  border-radius: 999px;
+  height: 4px;
+  background: var(--s-2);
+  border-radius: var(--r-pill);
   overflow: hidden;
 }
 .progress-strip-fill {
@@ -517,7 +517,10 @@ p { margin: 0; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
+  font-size: var(--fs-small);
+  letter-spacing: -0.005em;
+  flex-wrap: wrap;
 }
 
 .session-card {
@@ -3610,4 +3613,94 @@ html[data-theme='light'] .modal-backdrop.nested {
   .rest-bar.done { animation: none; }
   .skeleton-bar { animation: none; background: var(--s-2); }
   .page-dot.active { width: 24px; } /* skip the width-animate */
+}
+
+/* ====================================================================
+   Mobile-friendly overrides — prevent iOS input zoom, hit ≥44 px tap
+   targets, breathing room on narrow phones.
+   ==================================================================== */
+
+/* Apply ALWAYS (not just at the breakpoint): iOS zooms whenever an input
+   focuses with font-size < 16 px, regardless of viewport. Using bare
+   element selectors so any class-based override (e.g. .active-value-input
+   at 2rem) keeps higher specificity. */
+input,
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+@media (max-width: 600px) {
+  /* Touch targets: bump every interactive ≥ 44 px on mobile. */
+  .icon-btn { width: 44px; height: 44px; }
+  .card-v3-more, .card-v3-swap { width: 44px; height: 44px; font-size: 1.2rem; }
+  .image-zoom-close { width: 44px; height: 44px; top: -12px; right: -12px; }
+  .btn.small { min-height: 44px; padding: var(--space-2) var(--space-4); font-size: var(--fs-small); }
+  .toast-x { min-width: 36px; min-height: 36px; padding: var(--space-1) var(--space-2); }
+  .toast-undo { min-height: 36px; padding: var(--space-2) var(--space-3); }
+  .stepper-btn { min-width: 44px; min-height: 44px; }
+  .active-stepper { min-height: 44px; }
+  .step-btn { min-width: 44px; min-height: 44px; }
+  .more-menu button,
+  .more-menu a[role='menuitem'] {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-body);
+  }
+
+  /* Picker rows + similar tap-list rows */
+  .picker-row { min-height: 56px; padding: var(--space-3) var(--space-4); }
+  .card-v3-suggest-item { min-height: 56px; padding: var(--space-3); }
+  .quick-swap-item { min-height: 56px; }
+
+  /* Section collapsibles: pad the whole summary so the entire row is a
+     tap target, not just the small text. */
+  .advanced-details summary,
+  .glossary-card > summary,
+  .picker-filter-details summary,
+  .card-v3-cues > summary,
+  .inline-cues > summary,
+  .inline-cues-v2 > details > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Modal / drawer breathing room */
+  .modal { padding: var(--space-5) var(--space-4) calc(env(safe-area-inset-bottom, 0) + var(--space-5)); }
+
+  /* Card padding stays at --space-4 but headings tighten so the title
+     doesn't truncate as aggressively on small phones. */
+  .session-card.v3 { padding: var(--space-3); gap: var(--space-3); }
+  .card-v3-title h2 { font-size: var(--fs-body); }
+
+  /* Bottom nav: ensure each label area is a comfortable tap target. */
+  .bottom-nav a { min-height: 56px; }
+
+  /* App header reduces a touch on small screens but keeps icon buttons
+     at 44 px so the gap stays consistent. */
+  .app-header { padding-left: var(--space-3); padding-right: var(--space-3); gap: var(--space-2); }
+  .header-right { gap: var(--space-1); }
+
+  /* Stop horizontal scroll: any inadvertent overflow becomes a soft scroll
+     within the main column, not body-level pan. */
+  html, body { overflow-x: hidden; }
+
+  /* Coach chat textarea grows comfortably on mobile keyboards. */
+  .coach-input-row textarea { min-height: 56px; }
+
+  /* Rest-bar action buttons (−15 / +15 / Pause / End rest) need to be
+     tappable, currently at fs-small with --space-1 vertical padding. */
+  .rest-bar-actions button {
+    min-height: 40px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* Very narrow phones (<360 px) — tighten horizontal padding further so
+   nothing clips. */
+@media (max-width: 359px) {
+  .app-main { padding-left: var(--space-2); padding-right: var(--space-2); }
+  .session-card.v3 { padding: var(--space-2); }
+  .modal { padding-left: var(--space-3); padding-right: var(--space-3); }
 }
