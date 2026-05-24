@@ -5,12 +5,16 @@ import { useSettings } from '../db/queries'
 import { ensureNotificationPermission } from '../state/restTimer'
 import { toast } from '../state/toasts'
 import { detectDeloadSignal, nextPhase, PHASE_DESCRIPTION, PHASE_LABEL } from '../lib/programming'
+import { useT, useLocaleStore, LOCALES, LOCALE_LABEL, LOCALE_FLAG, type Locale } from '../i18n'
 
 interface Props {
   onClose: () => void
 }
 
 export default function SettingsModal({ onClose }: Props) {
+  const tr = useT()
+  const locale = useLocaleStore((s) => s.locale)
+  const setLocale = useLocaleStore((s) => s.setLocale)
   const settings = useSettings()
   const [confirmReset, setConfirmReset] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -112,41 +116,56 @@ export default function SettingsModal({ onClose }: Props) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
-          <h3>Settings</h3>
-          <button className="link" onClick={onClose}>Close</button>
+          <h3>{tr('settings.title')}</h3>
+          <button className="link" onClick={onClose}>{tr('common.close')}</button>
         </header>
 
-        <Row label="Theme">
-          <div className="seg">
-            {(['system', 'light', 'dark'] as const).map((t) => (
-              <button key={t} className={settings.theme === t ? 'active' : ''} onClick={() => update('theme', t)}>
-                {t === 'system' ? 'Auto' : t[0].toUpperCase() + t.slice(1)}
+        <Row label={tr('settings.language')}>
+          <div className="seg" style={{ flexWrap: 'wrap' }}>
+            {LOCALES.map((l: Locale) => (
+              <button
+                key={l}
+                className={locale === l ? 'active' : ''}
+                onClick={() => setLocale(l)}
+                aria-pressed={locale === l}
+              >
+                {LOCALE_FLAG[l]} {LOCALE_LABEL[l]}
               </button>
             ))}
           </div>
         </Row>
 
-        <Row label="Detail level">
+        <Row label={tr('settings.theme')}>
           <div className="seg">
-            <button className={settings.skillLevel === 'beginner' ? 'active' : ''} onClick={() => update('skillLevel', 'beginner')}>Beginner</button>
-            <button className={settings.skillLevel === 'advanced' ? 'active' : ''} onClick={() => update('skillLevel', 'advanced')}>Advanced</button>
+            {(['system', 'light', 'dark'] as const).map((th) => (
+              <button key={th} className={settings.theme === th ? 'active' : ''} onClick={() => update('theme', th)}>
+                {th === 'system' ? tr('settings.theme_system') : th === 'light' ? tr('settings.theme_light') : tr('settings.theme_dark')}
+              </button>
+            ))}
           </div>
         </Row>
 
-        <Row label="Goal">
+        <Row label={tr('settings.skill_level')}>
+          <div className="seg">
+            <button className={settings.skillLevel === 'beginner' ? 'active' : ''} onClick={() => update('skillLevel', 'beginner')}>{tr('settings.skill_beginner')}</button>
+            <button className={settings.skillLevel === 'advanced' ? 'active' : ''} onClick={() => update('skillLevel', 'advanced')}>{tr('settings.skill_advanced')}</button>
+          </div>
+        </Row>
+
+        <Row label={tr('settings.goal')}>
           <div className="seg">
             {(['bulk', 'cut', 'recomp'] as const).map((g) => (
               <button key={g} className={settings.goal === g ? 'active' : ''} onClick={() => update('goal', g)}>
-                {g[0].toUpperCase() + g.slice(1)}
+                {g === 'bulk' ? tr('settings.goal_bulk') : g === 'cut' ? tr('settings.goal_cut') : tr('settings.goal_recomp')}
               </button>
             ))}
           </div>
         </Row>
 
-        <Row label="Units">
+        <Row label={tr('settings.units')}>
           <div className="seg">
-            <button className={settings.units === 'kg' ? 'active' : ''} onClick={() => update('units', 'kg')}>kg</button>
-            <button className={settings.units === 'lb' ? 'active' : ''} onClick={() => update('units', 'lb')}>lb</button>
+            <button className={settings.units === 'kg' ? 'active' : ''} onClick={() => update('units', 'kg')}>{tr('unit.kg')}</button>
+            <button className={settings.units === 'lb' ? 'active' : ''} onClick={() => update('units', 'lb')}>{tr('unit.lb')}</button>
           </div>
         </Row>
 

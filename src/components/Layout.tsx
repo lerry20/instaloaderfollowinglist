@@ -6,8 +6,10 @@ import SettingsModal from './SettingsModal'
 import CoachChat from './CoachChat'
 import { currentStreak } from '../lib/streak'
 import { useRestTimer } from '../state/restTimer'
+import { useT } from '../i18n'
 
 export default function Layout() {
+  const t = useT()
   const [showSettings, setShowSettings] = useState(false)
   const [showCoach, setShowCoach] = useState(false)
   const [streak, setStreak] = useState<number>(0)
@@ -42,10 +44,10 @@ export default function Layout() {
         </div>
         <div className="header-right">
           <nav className="top-nav" aria-label="Primary">
-            <NavLink to="/" end>Train</NavLink>
-            <NavLink to="/routines">Routines</NavLink>
-            <NavLink to="/daily">Daily</NavLink>
-            <NavLink to="/progress">Progress</NavLink>
+            <NavLink to="/" end>{t('nav.train')}</NavLink>
+            <NavLink to="/routines">{t('nav.routines')}</NavLink>
+            <NavLink to="/daily">{t('nav.daily')}</NavLink>
+            <NavLink to="/progress">{t('nav.progress')}</NavLink>
           </nav>
           <button
             type="button"
@@ -73,19 +75,19 @@ export default function Layout() {
       <nav className="bottom-nav" aria-label="Primary">
         <NavLink to="/" end>
           <span aria-hidden>🏋️</span>
-          <span>Train</span>
+          <span>{t('nav.train')}</span>
         </NavLink>
         <NavLink to="/routines">
           <span aria-hidden>📋</span>
-          <span>Routines</span>
+          <span>{t('nav.routines')}</span>
         </NavLink>
         <NavLink to="/daily">
           <span aria-hidden>🍳</span>
-          <span>Daily</span>
+          <span>{t('nav.daily')}</span>
         </NavLink>
         <NavLink to="/progress">
           <span aria-hidden>📈</span>
-          <span>Progress</span>
+          <span>{t('nav.progress')}</span>
         </NavLink>
       </nav>
       <ToastContainer />

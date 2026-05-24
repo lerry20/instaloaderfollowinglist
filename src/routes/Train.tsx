@@ -23,8 +23,10 @@ import { toast } from '../state/toasts'
 import { haptics } from '../lib/haptics'
 import { buildProactiveMessage, type ProactiveMessage } from '../lib/streak'
 import Skeleton from '../components/Skeleton'
+import { useT } from '../i18n'
 
 export default function Train() {
+  const t = useT()
   const settings = useSettings()
   const routine = useActiveRoutine()
   const session = useActiveSession()
@@ -50,11 +52,11 @@ export default function Train() {
     return (
       <div className="page">
         <header className="hero">
-          <span className="muted small">No routine selected</span>
-          <h1 className="big-title">Pick a routine to start training</h1>
+          <span className="muted small">{t('train.no_routine_selected')}</span>
+          <h1 className="big-title">{t('train.pick_routine_title')}</h1>
         </header>
         <Link to="/routines" className="btn primary block">
-          Browse routines
+          {t('train.browse_routines')}
         </Link>
       </div>
     )
@@ -67,9 +69,9 @@ export default function Train() {
         routine={routine}
         units={settings.units}
         onAbandon={async (id) => {
-          if (confirm('Discard this in-progress workout? All logged sets will be removed.')) {
+          if (confirm(t('session.discard_confirm'))) {
             await abandonSession(id)
-            toast('Workout discarded', { kind: 'warn' })
+            toast(t('toast.workout_discarded'), { kind: 'warn' })
             navigate('/')
           }
         }}
@@ -81,6 +83,7 @@ export default function Train() {
 }
 
 function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | null }) {
+  const t = useT()
   const navigate = useNavigate()
   const settings = useSettings()
   const bw = useBodyweightLogs()
@@ -108,7 +111,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
       navigate(`/train`)
     } catch (err) {
       console.error('startSession failed', err)
-      toast('Could not start workout — try again', { kind: 'danger' })
+      toast(t('toast.could_not_start'), { kind: 'danger' })
       setStarting(false)
     }
   }
@@ -119,26 +122,26 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         <div className={`proactive proactive-${proactive.kind}`}>{proactive.text}</div>
       ) : null}
       <header className="hero">
-        <span className="muted small">Today's workout</span>
-        <h1 className="big-title">{next?.name ?? 'No workout queued'}</h1>
+        <span className="muted small">{t('train.todays_workout')}</span>
+        <h1 className="big-title">{next?.name ?? t('train.no_workout_queued')}</h1>
         <span className="muted small">{routine.name}</span>
       </header>
 
       {next ? (
         <button className="btn primary block start-btn" onClick={start} disabled={starting}>
-          {starting ? 'Starting…' : 'Start workout'}
+          {starting ? t('common.starting') : t('train.start_workout')}
         </button>
       ) : (
         <Link to="/routines" className="btn block">
-          Pick a routine
+          {t('train.browse_routines')}
         </Link>
       )}
 
       {next ? (
         <section className="card">
           <header className="section-head">
-            <h3>What you'll do</h3>
-            <span className="muted small">{next.items.length} exercises</span>
+            <h3>{t('train.what_youll_do')}</h3>
+            <span className="muted small">{t('train.n_exercises', { n: next.items.length })}</span>
           </header>
           <ul className="hero-items">
             {next.items.map((it) => (
@@ -155,17 +158,17 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
 
       <section className="grid-2">
         <Link to="/progress" className="card stat-link">
-          <span className="muted small">Bodyweight</span>
+          <span className="muted small">{t('train.bodyweight')}</span>
           <span className="stat-value tabnum">
             {latestBw ? kgToDisplay(latestBw.weightKg, units).toFixed(1) : '—'}
             <span className="unit">{latestBw ? units : ''}</span>
           </span>
-          {!latestBw ? <span className="link small">Log it →</span> : null}
+          {!latestBw ? <span className="link small">{t('train.log_it')}</span> : null}
         </Link>
         <Link to="/routines" className="card stat-link">
-          <span className="muted small">Routine</span>
+          <span className="muted small">{t('train.routine')}</span>
           <span className="stat-value-small">{routine.name}</span>
-          <span className="muted small">Change →</span>
+          <span className="muted small">{t('train.change')}</span>
         </Link>
       </section>
     </div>
@@ -183,6 +186,7 @@ function ActiveSessionView({
   units: 'kg' | 'lb'
   onAbandon: (id: number) => Promise<void>
 }) {
+  const t = useT()
   const navigate = useNavigate()
   const setLogs = useSessionSetLogs(session.id) ?? []
   const [showSummary, setShowSummary] = useState<number | null>(null)
@@ -230,20 +234,20 @@ function ActiveSessionView({
             <h1 className="big-title">{session.workoutName}</h1>
           </div>
           <button className="link danger small" onClick={() => onAbandon(session.id!)}>
-            Discard
+            {t('session.discard')}
           </button>
         </div>
         <div className="progress-strip">
           <div className="progress-strip-fill" style={{ width: `${progress}%` }} />
         </div>
         <div className="session-meta">
-          <span className="muted small">{workingLogs.length} / {totalPlanned} working sets</span>
+          <span className="muted small">{t('session.working_sets', { done: workingLogs.length, total: totalPlanned })}</span>
           <button
             className={`btn small ${showPlates ? '' : 'ghost'}`}
             onClick={() => setShowPlates((v) => !v)}
             aria-pressed={showPlates}
           >
-            {showPlates ? '✕ Plates' : '⚖ Plates'}
+            {showPlates ? `✕ ${t('session.plates')}` : `⚖ ${t('session.plates')}`}
           </button>
         </div>
       </header>
@@ -274,23 +278,20 @@ function ActiveSessionView({
           }
         }}
       >
-        Finish workout
+        {t('session.finish_workout')}
       </button>
 
       {confirmFinish ? (
         <div className="modal-backdrop" onClick={() => setConfirmFinish(false)}>
           <div className="modal small-modal" onClick={(e) => e.stopPropagation()}>
             <header className="modal-head">
-              <h3>Finish early?</h3>
-              <button className="link" onClick={() => setConfirmFinish(false)}>Cancel</button>
+              <h3>{t('session.finish_early')}</h3>
+              <button className="link" onClick={() => setConfirmFinish(false)}>{t('common.cancel')}</button>
             </header>
-            <p>
-              You have <strong>{unloggedSets}</strong> planned set{unloggedSets === 1 ? '' : 's'} left.
-              You can come back to this session anytime — or finish it now.
-            </p>
+            <p>{t('session.sets_left', { n: unloggedSets, plural: unloggedSets === 1 ? '' : 's' })}</p>
             <div className="modal-foot">
-              <button className="btn primary block" onClick={finish}>Finish anyway</button>
-              <button className="btn ghost block" onClick={() => setConfirmFinish(false)}>Keep going</button>
+              <button className="btn primary block" onClick={finish}>{t('session.finish_anyway')}</button>
+              <button className="btn ghost block" onClick={() => setConfirmFinish(false)}>{t('session.keep_going')}</button>
             </div>
           </div>
         </div>

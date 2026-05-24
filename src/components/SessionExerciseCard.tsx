@@ -23,6 +23,7 @@ import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
 import ActiveSetCard from './ActiveSetCard'
 import ExercisePicker from './ExercisePicker'
+import { useT } from '../i18n'
 
 interface Props {
   item: PlanItem
@@ -47,6 +48,7 @@ export default function SessionExerciseCard({
   onFocus,
   onAdvance,
 }: Props) {
+  const t = useT()
   const settings = useSettings()
   const exercise = useLiveQuery(() => db.exercises.get(item.exerciseId), [item.exerciseId])
   const [showSwap, setShowSwap] = useState(false)
@@ -181,12 +183,16 @@ export default function SessionExerciseCard({
     )
     if (data.isWarmup) {
       haptics.pop()
-      toast('Warm-up logged', { kind: 'info', duration: 1800 })
+      toast(t('session.warmup_logged'), { kind: 'info', duration: 1800 })
     } else {
       if (isPR) {
         haptics.pr()
         toast(
-          `🥇 NEW PR · ${exercise?.name ?? 'Exercise'} · ${fmt(kgToDisplay(data.weightKg, units), units)} ${units}`,
+          t('toast.new_pr', {
+            name: exercise?.name ?? 'Exercise',
+            weight: fmt(kgToDisplay(data.weightKg, units), units),
+            unit: units,
+          }),
           { kind: 'success', duration: 4500 },
         )
       } else {
@@ -209,7 +215,7 @@ export default function SessionExerciseCard({
       isWarmup: data.isWarmup,
     })
     haptics.tap()
-    toast('Set updated', { kind: 'success', duration: 1500 })
+    toast(t('session.set_updated'), { kind: 'success', duration: 1500 })
   }
 
   const repsContainsAmrap = /amrap/i.test(item.targetReps)
@@ -237,7 +243,10 @@ export default function SessionExerciseCard({
       }
       haptics.double()
       startTimer(exercise?.defaultRestSec ?? 90)
-      toast(`Logged ${pendingCount} more at ${lastWorking.weight} × ${lastWorking.reps}`, { kind: 'success' })
+      toast(
+        `${pendingCount} × ${lastWorking.weight} × ${lastWorking.reps}`,
+        { kind: 'success' },
+      )
     } finally {
       setRepeating(false)
     }
@@ -265,7 +274,7 @@ export default function SessionExerciseCard({
         >
           <h2>{exercise?.name ?? item.exerciseId}</h2>
           <span className="card-v3-subtitle">
-            Exercise {positionIndex + 1} of {totalExercises}
+            {t('session.exercise_of', { n: positionIndex + 1, total: totalExercises })}
             {exercise?.equipment ? ` · ${exercise.equipment}` : ''}
           </span>
         </Link>
@@ -276,8 +285,8 @@ export default function SessionExerciseCard({
             onClick={() => setShowQuickSwap((v) => !v)}
             disabled={!suggestions || suggestions.length === 0}
             aria-expanded={showQuickSwap}
-            aria-label="Swap exercise for a similar one"
-            title="Swap for a similar exercise"
+            aria-label={t('session.swap_exercise')}
+            title={t('session.swap_exercise')}
           >
             ⇄
           </button>
@@ -300,7 +309,7 @@ export default function SessionExerciseCard({
                     role="menuitem"
                     onClick={() => { setShowMore(false); setPendingWarmup(true) }}
                   >
-                    + Add warm-up set
+                    {t('session.add_warmup')}
                   </button>
                 ) : null}
                 <button
@@ -309,7 +318,7 @@ export default function SessionExerciseCard({
                   disabled={!suggestions || suggestions.length === 0}
                   onClick={() => { setShowMore(false); setShowQuickSwap(true) }}
                 >
-                  ⇄ Swap exercise
+                  {t('session.swap_exercise')}
                 </button>
                 {exercise ? (
                 <a
@@ -319,7 +328,7 @@ export default function SessionExerciseCard({
                   rel="noopener noreferrer"
                   onClick={() => setShowMore(false)}
                 >
-                  ▶ Watch demo on YouTube
+                  {t('session.watch_demo')}
                 </a>
               ) : null}
                 <button
@@ -328,12 +337,12 @@ export default function SessionExerciseCard({
                   className="danger"
                   onClick={() => {
                     setShowMore(false)
-                    if (workingLogs.length > 0 && !confirm('Skip this exercise? Your logged sets will remain.')) return
+                    if (workingLogs.length > 0 && !confirm(t('session.skip_confirm'))) return
                     onSkip()
-                    toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
+                    toast(t('session.exercise_skipped', { name: exercise?.name ?? 'Exercise' }), { kind: 'info', duration: 2000 })
                   }}
                 >
-                  ⤼ Skip exercise
+                  {t('session.skip_exercise')}
                 </button>
               </div>
             ) : null}
@@ -344,8 +353,8 @@ export default function SessionExerciseCard({
       {showQuickSwap && suggestions && suggestions.length > 0 ? (
         <div className="card-v3-suggest" role="menu">
           <div className="card-v3-suggest-head">
-            <span className="card-v3-info-label">Swap to</span>
-            <button type="button" className="link" onClick={() => setShowQuickSwap(false)}>Close</button>
+            <span className="card-v3-info-label">{t('session.swap_to')}</span>
+            <button type="button" className="link" onClick={() => setShowQuickSwap(false)}>{t('common.close')}</button>
           </div>
           {suggestions.map((s) => (
             <button
@@ -356,7 +365,7 @@ export default function SessionExerciseCard({
               onClick={() => {
                 setShowQuickSwap(false)
                 onSwap(s.id)
-                toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
+                toast(t('session.exercise_swapped', { name: s.name }), { kind: 'success', duration: 2000 })
               }}
             >
               <strong>{s.name}</strong>
@@ -369,14 +378,14 @@ export default function SessionExerciseCard({
             className="card-v3-suggest-browse"
             onClick={() => { setShowQuickSwap(false); setShowSwap(true) }}
           >
-            Browse all exercises →
+            {t('session.browse_all_exercises')}
           </button>
         </div>
       ) : null}
 
       <div className="card-v3-info">
         <div className="card-v3-info-row">
-          <span className="card-v3-info-label">Target</span>
+          <span className="card-v3-info-label">{t('session.target')}</span>
           <strong className="tabnum">
             {item.targetSets} ×{' '}
             {repsContainsAmrap ? (
@@ -404,7 +413,7 @@ export default function SessionExerciseCard({
         </div>
         {lastSession ? (
           <div className="card-v3-info-row">
-            <span className="card-v3-info-label">Last</span>
+            <span className="card-v3-info-label">{t('session.last')}</span>
             <strong className="tabnum">
               {lastSession.sets
                 .map((s) => `${fmt(kgToDisplay(s.weight, units), units)}×${s.reps}`)
@@ -433,7 +442,7 @@ export default function SessionExerciseCard({
               onUnlog={async () => {
                 if (w.id) {
                   await deleteSetLog(w.id)
-                  toast('Warm-up removed', { kind: 'info', duration: 1500 })
+                  toast(t('session.warmup_removed'), { kind: 'info', duration: 1500 })
                 }
               }}
             />
@@ -470,7 +479,7 @@ export default function SessionExerciseCard({
             onUnlog={async () => {
               if (logged.id) {
                 await deleteSetLog(logged.id)
-                toast('Set deleted', { kind: 'info', duration: 1500 })
+                toast(t('session.set_deleted'), { kind: 'info', duration: 1500 })
               }
             }}
           />
@@ -495,8 +504,11 @@ export default function SessionExerciseCard({
         {/* Upcoming sets collapse into one tiny placeholder line. */}
         {remaining > 1 ? (
           <div className="upcoming-sets">
-            + {remaining - 1} more set{remaining - 1 === 1 ? '' : 's'} to go
-            {suggestedKg ? ` · target ${kgToDisplay(suggestedKg, units).toFixed(units === 'kg' ? 1 : 0)} ${units} × ${repsHigh ?? '?'}` : ''}
+            {t('session.more_sets_to_go', {
+              n: remaining - 1,
+              unit: remaining - 1 === 1 ? t('unit.workout') : t('unit.sets'),
+            })}
+            {suggestedKg ? ` · ${kgToDisplay(suggestedKg, units).toFixed(units === 'kg' ? 1 : 0)} ${units} × ${repsHigh ?? '?'}` : ''}
           </div>
         ) : null}
       </div>
@@ -508,7 +520,7 @@ export default function SessionExerciseCard({
           disabled={repeating}
           onClick={repeatLastSet}
         >
-          ↺ Repeat last set × {remaining} more
+          {t('session.repeat_last', { n: remaining })}
         </button>
       ) : null}
 
@@ -520,11 +532,7 @@ export default function SessionExerciseCard({
           onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
         >
           <summary>
-            {showAllCues
-              ? 'Hide form cues'
-              : `Form cues · ${exercise.cues.length}${
-                  skillLevel === 'beginner' && exercise.isCurated && exercise.bulkingTip ? ' + tip' : ''
-                }`}
+            {showAllCues ? t('session.hide_cues') : t('session.form_cues', { n: exercise.cues.length })}
           </summary>
           <ol className="card-v3-cue-list">
             {exercise.cues.map((c, i) => (
@@ -538,7 +546,7 @@ export default function SessionExerciseCard({
       ) : null}
 
       {remaining === 0 && workingLogs.length > 0 ? (
-        <p className="muted small done-line">All sets done · advancing to next…</p>
+        <p className="muted small done-line">{t('session.all_sets_done')}</p>
       ) : null}
 
       {showSwap ? (
