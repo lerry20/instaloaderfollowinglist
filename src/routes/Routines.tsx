@@ -9,14 +9,16 @@ import {
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
 import ExercisePicker from '../components/ExercisePicker'
 import { toast } from '../state/toasts'
+import { useT } from '../i18n'
 
 export default function Routines() {
+  const t = useT()
   const routines = useAllRoutines()
   const active = useActiveRoutine()
   const settings = useSettings()
   const [editing, setEditing] = useState<Routine | null>(null)
 
-  if (!routines || !settings) return <div className="page"><p className="muted">Loading…</p></div>
+  if (!routines || !settings) return <div className="page"><p className="muted">{t('common.loading')}</p></div>
 
   async function activate(id: string) {
     if (!settings) return
@@ -51,8 +53,7 @@ export default function Routines() {
 
   return (
     <div className="page">
-      <h1 className="big-title">Routines</h1>
-      <p className="muted small">Pick a routine to activate it. Tap any routine to view or edit.</p>
+      <h1 className="big-title">{t('nav.routines')}</h1>
 
       <details className="glossary-card">
         <summary>What do <strong>RPE</strong>, <strong>RIR</strong>, and <strong>AMRAP</strong> mean?</summary>
@@ -78,7 +79,7 @@ export default function Routines() {
                   {r.builtIn ? ' · built-in' : ' · custom'}
                 </span>
               </div>
-              {active?.id === r.id ? <span className="badge good">Active</span> : null}
+              {active?.id === r.id ? <span className="badge good">●</span> : null}
             </div>
             <p className="muted small">{r.description}</p>
             <ul className="routine-workouts">
@@ -89,20 +90,20 @@ export default function Routines() {
             <div className="row">
               {active?.id !== r.id ? (
                 <button className="btn primary small" onClick={() => activate(r.id)}>
-                  Activate
+                  {t('common.activate')}
                 </button>
               ) : null}
               <button className="btn small" onClick={() => setEditing(r)}>
-                {r.builtIn ? 'Preview' : 'Edit'}
+                {r.builtIn ? t('common.preview') : t('common.edit')}
               </button>
               {r.builtIn ? (
                 <button className="btn small ghost" onClick={() => clone(r)}>
-                  Clone
+                  {t('common.clone')}
                 </button>
               ) : null}
               {!r.builtIn ? (
                 <button className="btn small danger" onClick={() => deleteRoutine(r)}>
-                  Delete
+                  {t('common.delete')}
                 </button>
               ) : null}
             </div>

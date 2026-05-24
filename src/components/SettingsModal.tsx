@@ -169,7 +169,7 @@ export default function SettingsModal({ onClose }: Props) {
           </div>
         </Row>
 
-        <Row label="Default rest">
+        <Row label={tr('settings.default_rest')}>
           <div className="seg">
             {[60, 90, 120, 180, 240].map((s) => (
               <button key={s} className={settings.defaultRestSec === s ? 'active' : ''} onClick={() => update('defaultRestSec', s)}>{s}s</button>
@@ -300,13 +300,13 @@ export default function SettingsModal({ onClose }: Props) {
         </section>
 
         <details className="advanced-details">
-          <summary>Advanced</summary>
+          <summary>{tr('settings.advanced')}</summary>
           <label className="field" style={{ marginTop: '0.6rem' }}>
             <span>Goal notes</span>
             <textarea rows={3} value={settings.goalNotes} onChange={(e) => update('goalNotes', e.target.value)} />
           </label>
           <div className="settings-row" style={{ marginTop: '0.6rem' }}>
-            <span>Reset all data</span>
+            <span>{tr('settings.reset_data')}</span>
             {confirmReset ? (
               <span className="row">
                 <button
@@ -314,15 +314,15 @@ export default function SettingsModal({ onClose }: Props) {
                   onClick={async () => {
                     await resetDatabase()
                     setConfirmReset(false)
-                    toast('Database reset', { kind: 'warn' })
+                    toast(tr('settings.reset_data'), { kind: 'warn' })
                   }}
                 >
-                  Confirm
+                  {tr('common.confirm')}
                 </button>
-                <button className="btn small ghost" onClick={() => setConfirmReset(false)}>Cancel</button>
+                <button className="btn small ghost" onClick={() => setConfirmReset(false)}>{tr('common.cancel')}</button>
               </span>
             ) : (
-              <button className="btn small ghost" onClick={() => setConfirmReset(true)}>Reset</button>
+              <button className="btn small ghost" onClick={() => setConfirmReset(true)}>{tr('common.confirm')}</button>
             )}
           </div>
         </details>

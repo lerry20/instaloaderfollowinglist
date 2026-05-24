@@ -2,8 +2,19 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db, type Goal, type Units } from '../db/schema'
 import { useAllRoutines, useSettings } from '../db/queries'
+import {
+  useT,
+  useLocaleStore,
+  LOCALES,
+  LOCALE_LABEL,
+  LOCALE_FLAG,
+  type Locale,
+} from '../i18n'
 
 export default function Onboarding() {
+  const t = useT()
+  const locale = useLocaleStore((s) => s.locale)
+  const setLocale = useLocaleStore((s) => s.setLocale)
   const navigate = useNavigate()
   const settings = useSettings()
   const [step, setStep] = useState(0)
@@ -51,46 +62,58 @@ export default function Onboarding() {
         <span className="brand">
           <span className="brand-mark" aria-hidden /> BulkLog
         </span>
-        <span className="muted small">Step {step + 1} of {totalSteps}</span>
+        <span className="muted small">{step + 1} / {totalSteps}</span>
       </header>
 
       {step === 0 ? (
         <section className="card">
-          <h2>Let's set up your training</h2>
-          <p className="muted small">Two quick choices. You can change everything in Settings.</p>
+          <h2>{t('onboarding.welcome_title')}</h2>
+          <p className="muted small">{t('onboarding.welcome_sub')}</p>
 
-          <h4 style={{ marginTop: '0.8rem' }}>Goal</h4>
+          <h4 style={{ marginTop: '1rem' }}>{t('onboarding.choose_language')}</h4>
+          <div className="onboard-grid">
+            {LOCALES.map((l: Locale) => (
+              <button
+                key={l}
+                className={`onboard-tile${locale === l ? ' active' : ''}`}
+                onClick={() => setLocale(l)}
+                aria-pressed={locale === l}
+              >
+                <strong>{LOCALE_FLAG[l]} {LOCALE_LABEL[l]}</strong>
+              </button>
+            ))}
+          </div>
+
+          <h4 style={{ marginTop: '1.2rem' }}>{t('onboarding.choose_goal')}</h4>
           <div className="onboard-grid">
             {(
               [
-                { id: 'bulk', title: 'Bulk', sub: 'Gain muscle & weight' },
-                { id: 'cut', title: 'Cut', sub: 'Lean out, keep strength' },
-                { id: 'recomp', title: 'Recomp', sub: 'Build muscle, hold weight' },
-              ] as { id: Goal; title: string; sub: string }[]
+                { id: 'bulk', titleKey: 'settings.goal_bulk', subKey: 'onboarding.goal_bulk_sub' as const },
+                { id: 'cut', titleKey: 'settings.goal_cut', subKey: 'onboarding.goal_cut_sub' as const },
+                { id: 'recomp', titleKey: 'settings.goal_recomp', subKey: 'onboarding.goal_recomp_sub' as const },
+              ] as { id: Goal; titleKey: 'settings.goal_bulk' | 'settings.goal_cut' | 'settings.goal_recomp'; subKey: string }[]
             ).map((g) => (
               <button
                 key={g.id}
                 className={`onboard-tile${goal === g.id ? ' active' : ''}`}
                 onClick={() => setGoal(g.id)}
               >
-                <strong>{g.title}</strong>
-                <span className="muted small">{g.sub}</span>
+                <strong>{t(g.titleKey)}</strong>
               </button>
             ))}
           </div>
 
-          <h4 style={{ marginTop: '1rem' }}>Units</h4>
+          <h4 style={{ marginTop: '1.2rem' }}>{t('settings.units')}</h4>
           <div className="seg big">
-            <button className={units === 'kg' ? 'active' : ''} onClick={() => setUnits('kg')}>kg</button>
-            <button className={units === 'lb' ? 'active' : ''} onClick={() => setUnits('lb')}>lb</button>
+            <button className={units === 'kg' ? 'active' : ''} onClick={() => setUnits('kg')}>{t('unit.kg')}</button>
+            <button className={units === 'lb' ? 'active' : ''} onClick={() => setUnits('lb')}>{t('unit.lb')}</button>
           </div>
         </section>
       ) : null}
 
       {step === 1 ? (
         <section className="card">
-          <h2>Pick a routine</h2>
-          <p className="muted small">Use a proven preset — you can always swap or customize later.</p>
+          <h2>{t('onboarding.choose_routine')}</h2>
           <div className="routine-onboard-list">
             {builtIn.map((r) => (
               <button
@@ -100,7 +123,7 @@ export default function Onboarding() {
               >
                 <strong>{r.name}</strong>
                 <span className="muted small">{r.description}</span>
-                <span className="muted small">{r.workouts.length} workouts in cycle</span>
+                <span className="muted small">{t('train.n_exercises', { n: r.workouts.length })}</span>
               </button>
             ))}
           </div>
@@ -109,12 +132,12 @@ export default function Onboarding() {
 
       <div className="onboard-actions">
         {step > 0 ? (
-          <button className="btn ghost" onClick={() => setStep((s) => s - 1)}>Back</button>
+          <button className="btn ghost" onClick={() => setStep((s) => s - 1)}>{t('common.back')}</button>
         ) : <span />}
         {step < totalSteps - 1 ? (
-          <button className="btn primary" onClick={() => setStep((s) => s + 1)}>Continue</button>
+          <button className="btn primary" onClick={() => setStep((s) => s + 1)}>{t('onboarding.next')}</button>
         ) : (
-          <button className="btn primary" onClick={finish}>Start training</button>
+          <button className="btn primary" onClick={finish}>{t('onboarding.get_started')}</button>
         )}
       </div>
     </div>

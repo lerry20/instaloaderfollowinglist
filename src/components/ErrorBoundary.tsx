@@ -85,7 +85,7 @@ export default class ErrorBoundary extends Component<
     return (
       <div className="boot-screen error-screen">
         <div className="error-card">
-          <h2>Something crashed</h2>
+          <h2>Something crashed / Errore inatteso</h2>
           <p className="muted small">
             BulkLog hit an unexpected error and stopped rendering. The most
             common cause is a session that got into a bad state — try
