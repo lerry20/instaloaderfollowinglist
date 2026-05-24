@@ -23,6 +23,7 @@ import { haptics } from '../lib/haptics'
 import { kgToDisplay } from '../lib/units'
 import ExerciseImage from './ExerciseImage'
 import OneTapSetRow from './OneTapSetRow'
+import ActiveSetCard from './ActiveSetCard'
 import ExercisePicker from './ExercisePicker'
 import MiniSparkline from './MiniSparkline'
 
@@ -382,15 +383,16 @@ export default function SessionExerciseCard({
       ) : null}
 
       {pendingWarmup ? (
-        <OneTapSetRow
+        <ActiveSetCard
           key="pending-warmup"
-          index={warmupLogs.length}
+          setNumber={warmupLogs.length + 1}
+          totalSets={warmupLogs.length + 1}
           units={units}
           suggestedKg={suggestedKg !== null ? suggestedKg * 0.5 : null}
           suggestedReps={Math.max(5, Math.round((repsLow ?? 6) / 2))}
-          prefillWarmup
+          defaultWarmup
           onLog={(data) => handleLog(warmupLogs.length, { ...data, isWarmup: true }, 0)}
-          onUnlog={() => setPendingWarmup(false)}
+          onCancelWarmup={() => setPendingWarmup(false)}
         />
       ) : null}
 
@@ -415,23 +417,23 @@ export default function SessionExerciseCard({
           />
         ))}
 
-        {/* Active set — only the next pending set gets the big LOG button. */}
+        {/* Active set — values + steppers + giant LOG button, all visible
+           at once. Adjust weight without first tapping "Edit". */}
         {remaining > 0 ? (
-          <OneTapSetRow
+          <ActiveSetCard
             key={`active-${workingLogs.length}`}
-            index={workingLogs.length}
+            setNumber={workingLogs.length + 1}
+            totalSets={totalSetsPlanned}
             units={units}
             suggestedKg={suggestedKg}
             suggestedReps={repsHigh}
-            lastSessionTopKg={lastSessionTopKg}
             onLog={(data) =>
               handleLog(workingLogs.length, data, exercise?.defaultRestSec ?? 90)
             }
           />
         ) : null}
 
-        {/* Tiny placeholder for sets still to come — keeps user oriented
-           without 3 more huge buttons stacking up. */}
+        {/* Upcoming sets collapse into one tiny placeholder line. */}
         {remaining > 1 ? (
           <div className="upcoming-sets">
             + {remaining - 1} more set{remaining - 1 === 1 ? '' : 's'} to go
