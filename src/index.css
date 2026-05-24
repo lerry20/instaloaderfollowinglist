@@ -2992,42 +2992,40 @@ html[data-theme='light'] .progress-strip-fill {
 
 /* === Active set card (the next pending set) === */
 .active-set-card {
-  background: var(--bg);
-  border: 1px solid var(--border-strong);
-  border-radius: 14px;
-  padding: 0.85rem 0.9rem 1rem;
+  background: var(--s-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-3);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
-html[data-theme='light'] .active-set-card {
-  box-shadow: 0 4px 14px rgba(31, 41, 80, 0.07);
+  gap: var(--space-3);
+  box-shadow: var(--shadow-2);
 }
 .active-set-card.warmup {
-  background: color-mix(in srgb, var(--gold) 7%, var(--bg));
-  border-color: color-mix(in srgb, var(--gold) 50%, var(--border-strong));
+  background: color-mix(in srgb, var(--tone-warn) 7%, var(--s-2));
+  border-color: color-mix(in srgb, var(--tone-warn) 35%, var(--line-strong));
 }
 .active-set-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 .active-set-pill {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 14%, transparent);
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: var(--s-3);
+  padding: 3px var(--space-2);
+  border-radius: var(--r-1);
+  border: 1px solid var(--line);
 }
 .active-set-card.warmup .active-set-pill {
-  color: var(--gold);
-  background: color-mix(in srgb, var(--gold) 16%, transparent);
-  border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  color: var(--tone-warn);
+  background: color-mix(in srgb, var(--tone-warn) 14%, transparent);
+  border-color: color-mix(in srgb, var(--tone-warn) 35%, transparent);
 }
 .active-values {
   display: grid;
@@ -3042,80 +3040,85 @@ html[data-theme='light'] .active-set-card {
   min-width: 0;
 }
 .active-value-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
-  font-weight: 700;
+  color: var(--fg-dim);
+  font-weight: 600;
 }
 .active-value-input {
   font-variant-numeric: tabular-nums;
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
   width: 100%;
-  padding: 0.45rem 0.4rem;
-  border-radius: 11px;
-  border: 2px solid var(--primary-strong);
-  background: var(--bg-elev);
-  color: var(--text);
-  line-height: 1.1;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--r-2);
+  border: 1px solid var(--line-strong);
+  background: var(--s-0);
+  color: var(--fg);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  transition: border-color var(--t-1) var(--ease-out),
+              box-shadow var(--t-1) var(--ease-out);
 }
 .active-value-input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  border-color: var(--fg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fg) 16%, transparent);
 }
 .active-stepper-row {
   display: flex;
-  gap: 0.3rem;
+  gap: var(--space-1);
   justify-content: center;
 }
 .active-stepper {
   flex: 1;
   min-width: 44px;
   min-height: 40px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  border-radius: 9px;
-  border: 1px solid var(--border-strong);
-  background: var(--bg-elev-2);
-  color: var(--text);
+  font-weight: 500;
+  font-size: var(--fs-small);
+  border-radius: var(--r-1);
+  border: 1px solid var(--line);
+  background: var(--s-1);
+  color: var(--fg);
   cursor: pointer;
-  transition: background 120ms, transform 80ms;
+  transition: background var(--t-1) var(--ease-out),
+              border-color var(--t-1) var(--ease-out),
+              transform 80ms ease;
 }
-.active-stepper:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--bg-elev-2)); }
+.active-stepper:hover { border-color: var(--line-strong); background: var(--s-hover); }
 .active-stepper:active { transform: scale(0.95); }
 .active-times {
   align-self: center;
-  font-size: 1.6rem;
-  color: var(--text-muted);
-  font-weight: 700;
-  padding-bottom: 0.6rem;
+  font-size: 1.4rem;
+  color: var(--fg-dim);
+  font-weight: 500;
+  padding-bottom: var(--space-3);
 }
 .active-log-btn {
   width: 100%;
-  background: linear-gradient(180deg, var(--primary), var(--primary-strong));
-  border: 1px solid var(--primary-strong);
+  background: var(--primary);
+  border: 1px solid var(--primary);
   color: var(--primary-ink);
-  border-radius: 12px;
-  padding: 0.95rem 1rem;
-  font-weight: 800;
-  font-size: 1rem;
+  border-radius: var(--r-2);
+  padding: var(--space-4) var(--space-4);
+  font-weight: 600;
+  font-size: var(--fs-body);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  letter-spacing: 0.01em;
-  transition: filter 100ms, transform 80ms;
+  gap: var(--space-2);
+  letter-spacing: -0.005em;
+  transition: background var(--t-1) var(--ease-out), transform 80ms ease;
 }
-.active-log-btn:hover { filter: brightness(1.06); }
+.active-log-btn:hover { background: var(--primary-strong); }
 .active-log-btn:active { transform: scale(0.98); }
 .active-log-btn:disabled {
-  background: var(--bg-elev-2);
-  border-color: var(--border-strong);
-  color: var(--text-muted);
+  background: var(--s-2);
+  border-color: var(--line);
+  color: var(--fg-dim);
   cursor: not-allowed;
 }
 .active-log-tick {
