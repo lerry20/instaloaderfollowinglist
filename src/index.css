@@ -2526,3 +2526,47 @@ html[data-theme='light'] .progress-strip-fill {
 @media (min-width: 600px) {
   .app-shell.rest-active { padding-bottom: 56px; }
 }
+
+/* === Quick swap inline menu === */
+.quick-swap-menu {
+  min-width: 240px;
+  max-width: 320px;
+  padding: 0.35rem;
+  gap: 0.15rem;
+}
+.quick-swap-header {
+  padding: 0.45rem 0.65rem 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.2rem;
+}
+.quick-swap-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  padding: 0.55rem 0.65rem;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  gap: 0.15rem;
+}
+.quick-swap-item:hover { background: var(--bg-elev-2); }
+.quick-swap-item strong { font-weight: 600; }
+.quick-swap-browse {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.25rem;
+  padding: 0.55rem 0.65rem;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.quick-swap-browse:hover { background: var(--bg-elev-2); }

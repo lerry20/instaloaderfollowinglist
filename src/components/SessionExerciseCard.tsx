@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import {
   db,
+  MUSCLE_LABEL,
   type PlanItem,
   type SetLog,
   type Units,
@@ -56,6 +57,30 @@ export default function SessionExerciseCard({
   const [showImageZoom, setShowImageZoom] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [repeating, setRepeating] = useState(false)
+  const [showQuickSwap, setShowQuickSwap] = useState(false)
+
+  // Same-muscle alternatives, curated-first then by recent usage.
+  const suggestions = useLiveQuery(async () => {
+    if (!exercise) return []
+    const all = await db.exercises.toArray()
+    const candidates = all.filter(
+      (e) => e.id !== exercise.id && e.primaryMuscle === exercise.primaryMuscle,
+    )
+    const cutoff = Date.now() - 30 * 24 * 3600 * 1000
+    const recentLogs = await db.setLogs.where('loggedAt').above(cutoff).toArray()
+    const usage = new Map<string, number>()
+    for (const l of recentLogs) {
+      if (!l.isWarmup) usage.set(l.exerciseId, (usage.get(l.exerciseId) ?? 0) + 1)
+    }
+    candidates.sort((a, b) => {
+      if (a.isCurated !== b.isCurated) return a.isCurated ? -1 : 1
+      const ua = usage.get(a.id) ?? 0
+      const ub = usage.get(b.id) ?? 0
+      if (ua !== ub) return ub - ua
+      return a.name.localeCompare(b.name)
+    })
+    return candidates.slice(0, 6)
+  }, [exercise?.id, exercise?.primaryMuscle])
 
   const logs =
     useLiveQuery(
@@ -392,6 +417,55 @@ export default function SessionExerciseCard({
           <button
             type="button"
             className="btn small ghost"
+            onClick={() => setShowQuickSwap((v) => !v)}
+            aria-expanded={showQuickSwap}
+            aria-haspopup="menu"
+            disabled={!suggestions || suggestions.length === 0}
+          >
+            ⇄ Quick swap
+          </button>
+          {showQuickSwap && suggestions && suggestions.length > 0 ? (
+            <div className="more-menu quick-swap-menu" role="menu">
+              <div className="quick-swap-header muted small">
+                Other {exercise?.primaryMuscle ? MUSCLE_LABEL[exercise.primaryMuscle].toLowerCase() : 'similar'} moves
+              </div>
+              {suggestions.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="menuitem"
+                  className="quick-swap-item"
+                  onClick={() => {
+                    setShowQuickSwap(false)
+                    onSwap(s.id)
+                    toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
+                  }}
+                >
+                  <strong>{s.name}</strong>
+                  <span className="muted small">
+                    {s.equipment}
+                    {s.isCurated ? ' · ★ Core' : ''}
+                  </span>
+                </button>
+              ))}
+              <button
+                type="button"
+                role="menuitem"
+                className="quick-swap-browse"
+                onClick={() => {
+                  setShowQuickSwap(false)
+                  setShowSwap(true)
+                }}
+              >
+                Browse all options →
+              </button>
+            </div>
+          ) : null}
+        </div>
+        <div className="more-wrap">
+          <button
+            type="button"
+            className="btn small ghost"
             onClick={() => setShowMore((v) => !v)}
             aria-expanded={showMore}
             aria-haspopup="menu"
@@ -400,16 +474,6 @@ export default function SessionExerciseCard({
           </button>
           {showMore ? (
             <div className="more-menu" role="menu">
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setShowMore(false)
-                  setShowSwap(true)
-                }}
-              >
-                ⇄ Swap exercise
-              </button>
               <button
                 type="button"
                 role="menuitem"
