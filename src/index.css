@@ -2208,41 +2208,47 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 /* === Inline cues (beginner mode) === */
 .inline-cues {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.5rem 0.7rem;
-  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--s-1);
 }
 .inline-cues > summary {
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.92rem;
-  color: var(--text);
+  font-weight: 500;
+  font-size: var(--fs-small);
+  color: var(--fg-muted);
   list-style: none;
+  letter-spacing: -0.005em;
 }
+.inline-cues > summary:hover { color: var(--fg); }
+.inline-cues[open] > summary { color: var(--fg); }
 .inline-cues > summary::-webkit-details-marker { display: none; }
 .inline-cues > summary::before {
-  content: '▸';
+  content: '+';
   display: inline-block;
-  margin-right: 0.4rem;
-  color: var(--text-muted);
-  transition: transform 150ms;
+  margin-right: var(--space-2);
+  color: var(--fg-dim);
+  transition: transform var(--t-1) var(--ease-out);
+  font-weight: 400;
 }
-.inline-cues[open] > summary::before { transform: rotate(90deg); }
+.inline-cues[open] > summary::before { content: '−'; }
 .inline-cue-list {
-  margin: 0.55rem 0 0;
-  padding-left: 1.1rem;
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.88rem;
-  color: var(--text);
+  gap: var(--space-1);
+  font-size: var(--fs-small);
+  color: var(--fg);
+  line-height: var(--lh-body);
+  letter-spacing: -0.005em;
 }
-.inline-tip { margin-top: 0.5rem; line-height: 1.45; }
+.inline-tip { margin-top: var(--space-2); line-height: var(--lh-body); }
 .inline-explainer { margin-top: -0.2rem; }
 
 /* === Session header compact === */
-.session-header.compact { gap: 0.45rem; }
+.session-header.compact { gap: var(--space-2); }
 
 /* === Theme-aware tweaks === */
 /* Most light-mode overrides are obsolete now that tints are built on
@@ -2736,11 +2742,13 @@ html[data-theme='light'] .modal-backdrop.nested {
 /* === Image zoom modal === */
 .image-zoom-backdrop {
   z-index: 65;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.88);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--space-4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .image-zoom-container {
   position: relative;
@@ -2749,7 +2757,7 @@ html[data-theme='light'] .modal-backdrop.nested {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-3);
 }
 .image-zoom-image,
 .image-zoom-container .exercise-image,
@@ -2758,9 +2766,9 @@ html[data-theme='light'] .modal-backdrop.nested {
   max-width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
-  border-radius: 16px;
+  border-radius: var(--r-4);
   object-fit: cover;
-  background: var(--bg);
+  background: var(--s-2);
 }
 .image-zoom-close {
   position: absolute;
@@ -2768,20 +2776,23 @@ html[data-theme='light'] .modal-backdrop.nested {
   right: -8px;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border-strong);
-  background: var(--bg-elev);
-  color: var(--text);
-  font-size: 1rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--s-2);
+  color: var(--fg);
+  font-size: var(--fs-body);
   cursor: pointer;
   z-index: 1;
+  transition: background var(--t-1) var(--ease-out);
 }
+.image-zoom-close:hover { background: var(--s-3); }
 .image-zoom-caption {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
-  color: var(--text);
+  gap: 2px;
+  color: var(--fg);
+  font-size: var(--fs-small);
 }
 
 /* === Rest-bar-active padding === */
