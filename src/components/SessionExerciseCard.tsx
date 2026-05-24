@@ -260,6 +260,18 @@ export default function SessionExerciseCard({
           <span className="muted small">
             {exercise?.equipment ?? '—'}
           </span>
+          {exercise ? (
+            <div className="muscle-chips-row">
+              <span className="muscle-chip primary-chip">
+                {MUSCLE_LABEL[exercise.primaryMuscle]}
+              </span>
+              {exercise.secondaryMuscles.slice(0, 3).map((m) => (
+                <span key={m} className="muscle-chip">
+                  {MUSCLE_LABEL[m]}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </Link>
         {sparkValues.length >= 2 ? (
           <div className="sparkline-cell" title="Last 5 top-set weights">
@@ -493,23 +505,28 @@ export default function SessionExerciseCard({
         </div>
       </div>
 
-      {/* Beginner-only: collapsible cues inline */}
-      {skillLevel === 'beginner' && exercise?.cues && exercise.cues.length > 0 ? (
-        <details
-          className="inline-cues"
-          open={showAllCues}
-          onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
-        >
-          <summary>How to do this exercise</summary>
-          <ol className="inline-cue-list">
-            {exercise.cues.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ol>
-          {exercise.isCurated && exercise.bulkingTip ? (
-            <p className="inline-tip muted small">💡 {exercise.bulkingTip}</p>
+      {/* Always show the first cue inline. Expand for the rest. Beginner mode
+         also surfaces the bulking tip; advanced users tap through to detail. */}
+      {exercise?.cues && exercise.cues.length > 0 ? (
+        <div className="inline-cues-v2">
+          <p className="inline-cue-primary">💡 {exercise.cues[0]}</p>
+          {exercise.cues.length > 1 ? (
+            <details
+              open={showAllCues}
+              onToggle={(e) => setShowAllCues((e.target as HTMLDetailsElement).open)}
+            >
+              <summary>+ {exercise.cues.length - 1} more cue{exercise.cues.length - 1 === 1 ? '' : 's'}</summary>
+              <ol className="inline-cue-list">
+                {exercise.cues.slice(1).map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ol>
+            </details>
           ) : null}
-        </details>
+          {skillLevel === 'beginner' && exercise.isCurated && exercise.bulkingTip ? (
+            <p className="inline-bulking-tip muted small">{exercise.bulkingTip}</p>
+          ) : null}
+        </div>
       ) : null}
 
       {remaining === 0 && workingLogs.length > 0 ? (

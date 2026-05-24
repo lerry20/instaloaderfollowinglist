@@ -6,7 +6,7 @@ export const PRESET_ROUTINES: Routine[] = [
     id: 'beginner-lp',
     name: 'Beginner Strength + Hypertrophy (3-day)',
     description:
-      'Cycle A → B → A → B every other day. Compound focus with arm accessories so you actually grow, not just get strong. Add 2.5 kg to each main lift every session until you stall. Designed for your first 3–6 months.',
+      'Best for: your first 3–6 months of training. Train 3 days a week. Workouts alternate A → B → A → B. Each session you add 2.5 kg to the main lifts until you can\'t — that\'s how fast beginners get stronger. Arm work added so you actually grow muscle, not just get stronger. Skip if: you can already squat 1× bodyweight clean — move to Upper/Lower or PPL.',
     builtIn: true,
     workouts: [
       {
@@ -37,9 +37,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── 3-DAY FULL BODY ───────────────────
   {
     id: 'full-body-3day',
-    name: 'Full Body (3-day, intermediate)',
+    name: 'Full Body (3-day)',
     description:
-      'Three different sessions (A, B, C) for variety. Hits every major muscle once a week. Best when you can only train 3 times and want to keep size — also great as a busy-week fallback if your usual split has too much volume.',
+      'Best for: busy weeks when you can only train 3 days but still want to hit every muscle. Three different sessions (A, B, C) so it doesn\'t get stale. Each muscle gets one good workout per week — enough to hold size, less than ideal for growth. Skip if: you can train 4+ days a week — Upper/Lower or PPL will grow more muscle.',
     builtIn: true,
     workouts: [
       {
@@ -81,9 +81,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── UPPER / LOWER 4-DAY ───────────────────
   {
     id: 'upper-lower-4day',
-    name: 'Upper / Lower Hypertrophy (4-day)',
+    name: 'Upper / Lower for size (4-day)',
     description:
-      'The best 4-day split for size. Heavy upper, heavy lower, hypertrophy upper, hypertrophy lower. Each muscle hit twice a week (the sweet spot for growth). Cycle U-Heavy → L-Heavy → U-Hyper → L-Hyper.',
+      'Best for: intermediate lifters who can train 4 days a week. Each muscle gets worked twice a week (proven sweet spot for growth). Two heavy days build strength; two pump days build size. Cycle: heavy upper → heavy lower → pump upper → pump lower. Skip if: you can train 6 days — PPL hits each muscle twice AND lets you spread the workload further.',
     builtIn: true,
     workouts: [
       {
@@ -141,9 +141,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── PHUL 4-DAY ───────────────────
   {
     id: 'phul-4day',
-    name: 'PHUL — Power-Hypertrophy (4-day)',
+    name: 'PHUL — Strength + size (4-day)',
     description:
-      'Power-Hypertrophy Upper-Lower. Two heavy strength days (low reps, big compounds) + two pump-volume days (high reps, isolation focus). The blend most intermediate lifters need to actually keep growing once linear progression dies.',
+      'Best for: intermediate lifters who want to gain muscle AND get stronger at the same time. Two heavy strength days (3–5 reps, big compounds) + two pump days (8–15 reps, isolation work). The mix that most intermediates need once "add 2.5 kg every session" stops working. Skip if: you only care about size (use Upper/Lower or PPL) or only about strength (use a powerlifting program).',
     builtIn: true,
     workouts: [
       {
@@ -198,9 +198,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── PPL 6-DAY ───────────────────
   {
     id: 'ppl-6day',
-    name: 'Push / Pull / Legs Hypertrophy (6-day)',
+    name: 'Push / Pull / Legs for size (6-day)',
     description:
-      'The classic bulker\'s split with a hypertrophy bias. Push A and Pull A are heavier (5–8 rep range); B days lean into pump work and isolation. Hits each muscle twice a week. The flagship routine for serious muscle gain.',
+      'Best for: intermediate / advanced lifters chasing muscle size, training 5–6 days a week. The classic bulker\'s split. Each muscle hit twice a week (proven sweet spot for growth). A days are heavier (5–8 reps); B days are lighter and pump-focused (8–15 reps). The flagship for serious muscle gain — but only if you can show up consistently. Skip if: you can train 4 or fewer days a week — use Upper/Lower instead, or you\'ll under-recover.',
     builtIn: true,
     workouts: [
       {
@@ -283,9 +283,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── ARNOLD VOLUME 5-DAY ───────────────────
   {
     id: 'arnold-5day',
-    name: 'Arnold Volume Split (5-day)',
+    name: 'Arnold Volume Split (5-day, high volume)',
     description:
-      'Paired muscle groups, twice-a-week frequency. Modernised from Arnold\'s old volume approach. Heavy compounds first, then chase the pump with isolation. Demanding — only run this if your sleep and food are dialled in.',
+      'Best for: advanced lifters who already train 5+ days a week and recover well. Pairs muscle groups (chest+back, shoulders+arms, legs, then repeat A+B). Heavy compounds up front, lots of pump work at the end. The volume is brutal — every session is 60–90 minutes. Skip if: your sleep is under 7 hours, you\'re not getting enough calories, or you\'ve been training less than a year — you\'ll over-train fast.',
     builtIn: true,
     workouts: [
       {
@@ -357,9 +357,9 @@ export const PRESET_ROUTINES: Routine[] = [
   // ─────────────────── UPPER-FRONT SPECIALIZATION 2-DAY ───────────────────
   {
     id: 'upper-front-spec-2day',
-    name: 'Upper-Front Specialization (2-day) — Chest, Shoulders, Biceps, Abs',
+    name: 'Chest + Shoulders + Arms focus (2-day)',
     description:
-      'A specialization block. Hits all three chest regions across two sessions (upper, mid, AND lower — most splits neglect lower), plus shoulders, biceps and abs. Each muscle is trained twice a week, which is the sweet spot for growth. Run this for 6–8 weeks max, then rotate back to a balanced split so your back doesn\'t fall behind. Lower-chest emphasis lives in chest dips (forward lean) and the high-to-low cable fly angle.',
+      'Best for: 6–8 week focused blocks when you want to bring up your chest, shoulders, biceps, and abs specifically. Hits all three chest regions across two days (upper, mid, AND lower — lower is the part most splits miss). Each muscle trained twice a week. Lower-chest emphasis comes from chest dips (forward lean) and the high-to-low cable fly angle. Skip if: you want a balanced program — your back, glutes, and legs will fall behind on this one. Use as a temporary block, then return to PPL or Upper/Lower.',
     builtIn: true,
     workouts: [
       {

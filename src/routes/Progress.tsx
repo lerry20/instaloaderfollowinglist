@@ -27,6 +27,7 @@ import {
 import { displayToKg, kgToDisplay } from '../lib/units'
 import ProgressChart from '../components/ProgressChart'
 import VolumeBars from '../components/VolumeBars'
+import VolumeSummary from '../components/VolumeSummary'
 import TrainingCalendar from '../components/TrainingCalendar'
 import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
@@ -60,15 +61,18 @@ function WeeklyVolumeBarsSection() {
   return (
     <section className="card">
       <header className="section-head">
-        <h3>Weekly volume by muscle</h3>
-        <span className="muted small">last 7 days · working sets vs. growth landmarks</span>
+        <h3>This week, in plain English</h3>
+        <span className="muted small">based on your last 7 days</span>
       </header>
-      <VolumeBars />
-      <p className="muted small">
-        Each bar shows your working sets for the last 7 days against the range where growth happens.
-        Grey = under-trained (not enough stimulus). Green = the sweet spot. Yellow = diminishing
-        returns. Red = junk volume that won't grow anything new.
-      </p>
+      <VolumeSummary />
+      <details className="vol-details">
+        <summary>Show the chart</summary>
+        <VolumeBars />
+        <p className="muted small" style={{ marginTop: '0.5rem' }}>
+          Each bar = your working sets for the last 7 days. Grey = below the minimum for growth.
+          Green = the sweet spot. Yellow = diminishing returns. Red = junk volume.
+        </p>
+      </details>
     </section>
   )
 }
