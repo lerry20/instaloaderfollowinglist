@@ -3383,7 +3383,13 @@ html[data-theme='light'] .modal-backdrop.nested {
   letter-spacing: -0.003em;
   font-variant-numeric: tabular-nums;
 }
-.card-v3-more {
+.card-v3-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.card-v3-more,
+.card-v3-swap {
   background: transparent;
   border: 1px solid transparent;
   color: var(--fg-muted);
@@ -3392,28 +3398,48 @@ html[data-theme='light'] .modal-backdrop.nested {
   border-radius: var(--r-2);
   cursor: pointer;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: background var(--t-1) var(--ease-out),
               border-color var(--t-1) var(--ease-out),
               color var(--t-1) var(--ease-out);
 }
-.card-v3-more:hover {
+.card-v3-more:hover,
+.card-v3-swap:hover:not(:disabled) {
   background: var(--s-2);
   border-color: var(--line);
   color: var(--fg);
 }
-.card-v3-more[aria-expanded='true'] {
+.card-v3-more[aria-expanded='true'],
+.card-v3-swap[aria-expanded='true'] {
   background: var(--s-2);
   border-color: var(--line);
   color: var(--fg);
+}
+.card-v3-swap:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* The ⋯ menu is at the TOP of the card — drop it DOWN (was bottom-up
+   for the old card-actions row). */
+.card-v3-more-menu {
+  bottom: auto;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 14;
+  min-width: 220px;
 }
 .card-v3-head .more-menu a[role='menuitem'] {
   text-decoration: none;
   display: block;
 }
 .card-v3-head .more-menu .danger { color: var(--tone-danger); }
-.card-v3-head .more-menu button:disabled { opacity: 0.45; cursor: not-allowed; }
+.card-v3-head .more-menu button:disabled,
+.card-v3-head .more-menu a[role='menuitem']:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
 .card-v3-info {
   display: flex;

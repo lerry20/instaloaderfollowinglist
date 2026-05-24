@@ -253,37 +253,49 @@ export default function SessionExerciseCard({
             {exercise?.equipment ? ` · ${exercise.equipment}` : ''}
           </span>
         </Link>
-        <div className="more-wrap">
+        <div className="card-v3-head-actions">
           <button
             type="button"
-            className="card-v3-more"
-            onClick={() => setShowMore((v) => !v)}
-            aria-expanded={showMore}
-            aria-haspopup="menu"
-            aria-label="Exercise actions"
+            className="card-v3-swap"
+            onClick={() => setShowQuickSwap((v) => !v)}
+            disabled={!suggestions || suggestions.length === 0}
+            aria-expanded={showQuickSwap}
+            aria-label="Swap exercise for a similar one"
+            title="Swap for a similar exercise"
           >
-            ⋯
+            ⇄
           </button>
-          {showMore ? (
-            <div className="more-menu" role="menu">
-              {!pendingWarmup ? (
+          <div className="more-wrap">
+            <button
+              type="button"
+              className="card-v3-more"
+              onClick={() => setShowMore((v) => !v)}
+              aria-expanded={showMore}
+              aria-haspopup="menu"
+              aria-label="Exercise actions"
+            >
+              ⋯
+            </button>
+            {showMore ? (
+              <div className="more-menu card-v3-more-menu" role="menu">
+                {!pendingWarmup ? (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => { setShowMore(false); setPendingWarmup(true) }}
+                  >
+                    + Add warm-up set
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   role="menuitem"
-                  onClick={() => { setShowMore(false); setPendingWarmup(true) }}
+                  disabled={!suggestions || suggestions.length === 0}
+                  onClick={() => { setShowMore(false); setShowQuickSwap(true) }}
                 >
-                  + Add warm-up set
+                  ⇄ Swap exercise
                 </button>
-              ) : null}
-              <button
-                type="button"
-                role="menuitem"
-                disabled={!suggestions || suggestions.length === 0}
-                onClick={() => { setShowMore(false); setShowQuickSwap(true) }}
-              >
-                ⇄ Swap exercise
-              </button>
-              {exercise ? (
+                {exercise ? (
                 <a
                   role="menuitem"
                   href={demoSearchUrl(exercise.videoQuery, exercise.name)}
@@ -294,23 +306,57 @@ export default function SessionExerciseCard({
                   ▶ Watch demo on YouTube
                 </a>
               ) : null}
-              <button
-                type="button"
-                role="menuitem"
-                className="danger"
-                onClick={() => {
-                  setShowMore(false)
-                  if (workingLogs.length > 0 && !confirm('Skip this exercise? Your logged sets will remain.')) return
-                  onSkip()
-                  toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
-                }}
-              >
-                ⤼ Skip exercise
-              </button>
-            </div>
-          ) : null}
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="danger"
+                  onClick={() => {
+                    setShowMore(false)
+                    if (workingLogs.length > 0 && !confirm('Skip this exercise? Your logged sets will remain.')) return
+                    onSkip()
+                    toast(`${exercise?.name ?? 'Exercise'} skipped`, { kind: 'info', duration: 2000 })
+                  }}
+                >
+                  ⤼ Skip exercise
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </header>
+
+      {showQuickSwap && suggestions && suggestions.length > 0 ? (
+        <div className="card-v3-suggest" role="menu">
+          <div className="card-v3-suggest-head">
+            <span className="card-v3-info-label">Swap to</span>
+            <button type="button" className="link" onClick={() => setShowQuickSwap(false)}>Close</button>
+          </div>
+          {suggestions.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="menuitem"
+              className="card-v3-suggest-item"
+              onClick={() => {
+                setShowQuickSwap(false)
+                onSwap(s.id)
+                toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
+              }}
+            >
+              <strong>{s.name}</strong>
+              <span>{s.equipment}{s.isCurated ? ' · ★ Core' : ''}</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            role="menuitem"
+            className="card-v3-suggest-browse"
+            onClick={() => { setShowQuickSwap(false); setShowSwap(true) }}
+          >
+            Browse all exercises →
+          </button>
+        </div>
+      ) : null}
 
       <div className="card-v3-info">
         <div className="card-v3-info-row">
@@ -473,41 +519,6 @@ export default function SessionExerciseCard({
             <p className="card-v3-cue-tip">💡 {exercise.bulkingTip}</p>
           ) : null}
         </details>
-      ) : null}
-
-      {/* Hidden suggestions used by the SuggestionPanel from the menu.
-         Kept here so we don't re-query on toggle. */}
-      {showQuickSwap && suggestions && suggestions.length > 0 ? (
-        <div className="card-v3-suggest" role="menu">
-          <div className="card-v3-suggest-head">
-            <span className="card-v3-info-label">Swap to</span>
-            <button type="button" className="link" onClick={() => setShowQuickSwap(false)}>Close</button>
-          </div>
-          {suggestions.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              role="menuitem"
-              className="card-v3-suggest-item"
-              onClick={() => {
-                setShowQuickSwap(false)
-                onSwap(s.id)
-                toast(`Swapped to ${s.name}`, { kind: 'success', duration: 2000 })
-              }}
-            >
-              <strong>{s.name}</strong>
-              <span>{s.equipment}{s.isCurated ? ' · ★ Core' : ''}</span>
-            </button>
-          ))}
-          <button
-            type="button"
-            role="menuitem"
-            className="card-v3-suggest-browse"
-            onClick={() => { setShowQuickSwap(false); setShowSwap(true) }}
-          >
-            Browse all exercises →
-          </button>
-        </div>
       ) : null}
 
       {remaining === 0 && workingLogs.length > 0 ? (
