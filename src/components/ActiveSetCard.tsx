@@ -14,6 +14,10 @@ interface Props {
    * the exercise's cues across sets so the lifter sees every cue across
    * a session. Pass `null` to hide. */
   cue?: string | null
+  /** All-time max working weight (kg) for this exercise, excluding the
+   * current session. Drives the "PR territory" chip when the user's
+   * current weight would beat it. */
+  priorTopKg?: number | null
   /** Fires when the user taps the giant LOG button. */
   onLog: (data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean }) => void
   /** Optional default warm-up state (used when adding a warm-up). */
@@ -34,6 +38,7 @@ export default function ActiveSetCard({
   suggestedKg,
   suggestedReps,
   cue,
+  priorTopKg,
   onLog,
   defaultWarmup = false,
   onCancelWarmup,
@@ -132,6 +137,14 @@ export default function ActiveSetCard({
           </div>
         </div>
       </div>
+
+      {!warmup && priorTopKg !== null && priorTopKg !== undefined && priorTopKg > 0
+        && displayToKg(weight, units) > priorTopKg ? (
+        <p className="active-set-pr">
+          <span aria-hidden>🥇</span>
+          <span>PR territory — heaviest you\'ve ever pushed</span>
+        </p>
+      ) : null}
 
       {cue && !warmup ? (
         <p className="active-set-cue">

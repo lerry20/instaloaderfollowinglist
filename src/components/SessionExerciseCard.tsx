@@ -107,6 +107,17 @@ export default function SessionExerciseCard({
     [item.exerciseId, sessionId],
   )
 
+  // All-time top working weight for this exercise (excluding the current
+  // session). Drives the "PR territory" chip on the active set card.
+  const priorTopKg = useLiveQuery(async () => {
+    const logs = await db.setLogs
+      .where('exerciseId')
+      .equals(item.exerciseId)
+      .filter((l) => !l.isWarmup && l.sessionId !== sessionId)
+      .toArray()
+    return logs.reduce((m, l) => Math.max(m, l.weight), 0)
+  }, [item.exerciseId, sessionId])
+
   const startTimer = useRestTimer((s) => s.start)
 
   const workingLogs = logs.filter((l) => !l.isWarmup)
@@ -572,6 +583,7 @@ export default function SessionExerciseCard({
                 ? exLocalized.cues[workingLogs.length % exLocalized.cues.length]
                 : null
             }
+            priorTopKg={priorTopKg}
             onLog={(data) =>
               handleLog(workingLogs.length, data, exercise?.defaultRestSec ?? 90)
             }
