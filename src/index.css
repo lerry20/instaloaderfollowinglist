@@ -4972,6 +4972,33 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   padding-bottom: var(--space-3);
 }
 
+/* Page-level variant: bigger h3 title for top-of-page sections on
+   Progress / Daily / ExerciseDetail. Same chevron + toggle behavior,
+   typography matches an actual section header instead of a settings row. */
+.collapsible-section--page > summary {
+  padding: var(--space-4);
+}
+.collapsible-section--page > summary h3 {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  text-transform: none;
+}
+.collapsible-section-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.collapsible-section-title .muted.small {
+  font-size: var(--fs-small);
+  letter-spacing: -0.005em;
+  font-weight: 400;
+  text-transform: none;
+}
+
 /* Day cards on the routine preview are now collapsible <details>. */
 .day-card { padding: 0; }
 .day-card[open] { padding-bottom: var(--space-4); }

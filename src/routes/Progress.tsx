@@ -31,6 +31,7 @@ import VolumeSummary from '../components/VolumeSummary'
 import TrainingCalendar from '../components/TrainingCalendar'
 import MonthlySummaryCard from '../components/MonthlySummaryCard'
 import AchievementsCard from '../components/AchievementsCard'
+import CollapsibleSection from '../components/CollapsibleSection'
 import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
 
@@ -45,13 +46,9 @@ export default function Progress() {
       <MonthlySummaryCard units={units} />
       <AchievementsCard />
       <PRTicker units={units} />
-      <section className="card">
-        <header className="section-head">
-          <h3>Training calendar</h3>
-          <span className="muted small">last 13 weeks</span>
-        </header>
+      <CollapsibleSection title="Training calendar" subtitle="last 13 weeks">
         <TrainingCalendar />
-      </section>
+      </CollapsibleSection>
       <WeeklyVolumeBarsSection />
       <BodyweightSection units={units} />
       <TopSetCards units={units} />
@@ -63,11 +60,7 @@ export default function Progress() {
 
 function WeeklyVolumeBarsSection() {
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>This week, in plain English</h3>
-        <span className="muted small">based on your last 7 days</span>
-      </header>
+    <CollapsibleSection title="This week, in plain English" subtitle="based on your last 7 days">
       <VolumeSummary />
       <details className="vol-details">
         <summary>Show the chart</summary>
@@ -77,7 +70,7 @@ function WeeklyVolumeBarsSection() {
           Green = the sweet spot. Yellow = diminishing returns. Red = junk volume.
         </p>
       </details>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -119,10 +112,7 @@ function PRTicker({ units }: { units: Units }) {
   if (prs.length === 0) return null
 
   return (
-    <section className="card pr-ticker">
-      <header className="section-head">
-        <h3>🥇 Recent PRs</h3>
-      </header>
+    <CollapsibleSection title="🥇 Recent PRs">
       <ul className="pr-ticker-list">
         {prs.map((p, i) => (
           <li key={i}>
@@ -132,7 +122,7 @@ function PRTicker({ units }: { units: Units }) {
           </li>
         ))}
       </ul>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -148,16 +138,12 @@ function BodyweightSection({ units }: { units: Units }) {
 
   const showInput = !todayLog || editing
 
+  const subtitle = logs && logs.length > 0
+    ? `${kgToDisplay(logs[logs.length - 1].weightKg, units).toFixed(1)} ${units}`
+    : 'No entries'
+
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Bodyweight</h3>
-        <span className="muted small">
-          {logs && logs.length > 0
-            ? `${kgToDisplay(logs[logs.length - 1].weightKg, units).toFixed(1)} ${units}`
-            : 'No entries'}
-        </span>
-      </header>
+    <CollapsibleSection title="Bodyweight" subtitle={subtitle}>
       {showInput ? (
         <div className="bw-input-row">
           <input
@@ -193,7 +179,7 @@ function BodyweightSection({ units }: { units: Units }) {
         </div>
       )}
       <ProgressChart data={series} unit={units} />
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -237,10 +223,11 @@ function TopSetCards({ units }: { units: Units }) {
   if (series.length === 0) return null
 
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Top sets — your most-trained lifts</h3>
-      </header>
+    <CollapsibleSection
+      title="Top sets — your most-trained lifts"
+      subtitle={`${series.length} lifts`}
+      defaultOpen={false}
+    >
       <div className="top-set-grid">
         {series.map((s) => (
           <Link to={`/exercise/${s.id}`} key={s.id} className="top-set-cell">
@@ -249,7 +236,7 @@ function TopSetCards({ units }: { units: Units }) {
           </Link>
         ))}
       </div>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -285,11 +272,11 @@ function WeeklyVolumeSection({ units }: { units: Units }) {
   if (data.length === 0) return null
 
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Weekly volume by muscle (7 days)</h3>
-        <span className="muted small">{units}·reps</span>
-      </header>
+    <CollapsibleSection
+      title="Weekly volume by muscle"
+      subtitle={`7 days · ${units}·reps`}
+      defaultOpen={false}
+    >
       <div style={{ width: '100%', height: Math.max(180, data.length * 26) }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 4, right: 8, bottom: 4, left: 4 }}>
@@ -310,7 +297,7 @@ function WeeklyVolumeSection({ units }: { units: Units }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -338,16 +325,17 @@ function HistorySection({ units }: { units: Units }) {
 
   if (!sessions || sessions.length === 0) {
     return (
-      <section className="card">
-        <h3>Recent sessions</h3>
+      <CollapsibleSection title="Recent sessions" subtitle="No entries yet">
         <p className="muted">No sessions yet. <Link to="/" className="link">Start one →</Link></p>
-      </section>
+      </CollapsibleSection>
     )
   }
 
   return (
-    <section className="card">
-      <h3>Recent sessions</h3>
+    <CollapsibleSection
+      title="Recent sessions"
+      subtitle={`${sessions.length} ${sessions.length === 1 ? 'session' : 'sessions'}`}
+    >
       <ul className="session-history">
         {sessions.map((s) => {
           const logs = (allLogs ?? []).filter((l) => l.sessionId === s.id)
@@ -390,6 +378,6 @@ function HistorySection({ units }: { units: Units }) {
           )
         })}
       </ul>
-    </section>
+    </CollapsibleSection>
   )
 }

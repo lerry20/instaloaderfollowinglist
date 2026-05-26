@@ -13,6 +13,7 @@ import { db } from '../db/schema'
 import { todayISO, useBodyweightLogs, useSettings } from '../db/queries'
 import { displayToKg, kgToDisplay } from '../lib/units'
 import { toast } from '../state/toasts'
+import CollapsibleSection from '../components/CollapsibleSection'
 
 export default function Daily() {
   const settings = useSettings()
@@ -59,17 +60,14 @@ function NutritionSection() {
     protein: r.proteinG,
   }))
 
-  return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Nutrition</h3>
-        {kcalTarget && proteinTarget ? (
-          <span className="muted small">target {kcalTarget} kcal · {proteinTarget}g protein</span>
-        ) : (
-          <span className="muted small">set targets in Settings</span>
-        )}
-      </header>
+  const subtitle = todayLog
+    ? `today: ${todayLog.kcal} kcal · ${todayLog.proteinG}g protein`
+    : kcalTarget && proteinTarget
+      ? `target ${kcalTarget} kcal · ${proteinTarget}g protein`
+      : 'set targets in Settings'
 
+  return (
+    <CollapsibleSection title="Nutrition" subtitle={subtitle}>
       <div className="daily-input-row">
         <label className="field">
           <span>Calories</span>
@@ -135,7 +133,7 @@ function NutritionSection() {
           </ResponsiveContainer>
         </div>
       ) : null}
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -152,11 +150,12 @@ function SleepSection() {
     }
   }, [todayLog?.hours, todayLog?.soreness])
 
+  const subtitle = todayLog
+    ? `today: ${todayLog.hours}h · soreness ${todayLog.soreness}/5`
+    : 'how did you rest?'
+
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Sleep &amp; recovery</h3>
-      </header>
+    <CollapsibleSection title="Sleep & recovery" subtitle={subtitle} defaultOpen={false}>
       <div className="daily-input-row">
         <label className="field">
           <span>Last night's sleep (hours)</span>
@@ -195,7 +194,7 @@ function SleepSection() {
       >
         {todayLog ? 'Update today' : 'Log today'}
       </button>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -210,11 +209,15 @@ function BodyweightSection() {
     if (todayLog) setWeight(kgToDisplay(todayLog.weightKg, units))
   }, [todayLog?.weightKg, units])
 
+  const last = logs && logs.length > 0 ? logs[logs.length - 1] : null
+  const subtitle = todayLog
+    ? `today: ${kgToDisplay(todayLog.weightKg, units).toFixed(1)} ${units}`
+    : last
+      ? `last: ${kgToDisplay(last.weightKg, units).toFixed(1)} ${units}`
+      : 'No entries yet'
+
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Bodyweight</h3>
-      </header>
+    <CollapsibleSection title="Bodyweight" subtitle={subtitle}>
       <div className="bw-input-row">
         <input
           type="number"
@@ -237,7 +240,7 @@ function BodyweightSection() {
           {todayLog ? 'Update' : 'Log'}
         </button>
       </div>
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -268,12 +271,12 @@ function MeasurementsSection() {
   void units
   void useCm
 
+  const subtitle = last
+    ? `last (${last.date}): waist ${last.waistCm ?? '—'} · chest ${last.chestCm ?? '—'} · arm ${last.armCm ?? '—'}`
+    : 'weekly is enough'
+
   return (
-    <section className="card">
-      <header className="section-head">
-        <h3>Measurements (cm)</h3>
-        <span className="muted small">weekly is enough</span>
-      </header>
+    <CollapsibleSection title="Measurements (cm)" subtitle={subtitle} defaultOpen={false}>
       <div className="measurements-grid">
         <label className="field">
           <span>Waist</span>
@@ -325,11 +328,6 @@ function MeasurementsSection() {
         {todayLog ? 'Update today' : 'Log measurements'}
       </button>
 
-      {last ? (
-        <p className="muted small" style={{ marginTop: '0.5rem' }}>
-          Last entry ({last.date}): waist {last.waistCm ?? '—'} · chest {last.chestCm ?? '—'} · arm {last.armCm ?? '—'}
-        </p>
-      ) : null}
-    </section>
+    </CollapsibleSection>
   )
 }
