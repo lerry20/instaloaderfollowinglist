@@ -106,7 +106,6 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const [streak, setStreak] = useState(0)
   const [thisWeek, setThisWeek] = useState(0)
   const [prescribed, setPrescribed] = useState(routine.daysPerWeek ?? routine.workouts.length)
-  const [adherenceRatio, setAdherenceRatio] = useState(1)
   // Quick time budget for today (minutes). null = full session.
   const [quickBudget, setQuickBudget] = useState<number | null>(null)
 
@@ -131,7 +130,6 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         if (cancelled) return
         setThisWeek(a.thisWeek)
         setPrescribed(a.prescribedPerWeek)
-        setAdherenceRatio(a.ratio)
       })
       .catch(() => {})
     return () => { cancelled = true }
@@ -170,21 +168,14 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
     : []
 
   // Trim today's items to fit `quickBudget` minutes (null = full workout).
-  // 3 min/set + 10 min fixed warm-up overhead; walks exercises in routine
-  // order, stops when budget is hit. Always keeps at least one exercise so
-  // the user never sees an empty card.
+  // Roughly 15 min/exercise (setup + warm-up + working sets + rest), so
+  // 30m → 2 exercises, 45m → 3, 60m → 4, 90m → 6. Walks exercises in
+  // routine order and keeps the first N.
   const trimmedItems = useMemo(() => {
     if (!next) return []
     if (quickBudget === null) return next.items
-    const budgetSets = Math.max(3, Math.floor((quickBudget - 10) / 3))
-    const out: typeof next.items = []
-    let used = 0
-    for (const it of next.items) {
-      if (out.length > 0 && used + it.targetSets > budgetSets) break
-      out.push(it)
-      used += it.targetSets
-    }
-    return out
+    const budgetExercises = Math.max(1, Math.round(quickBudget / 15))
+    return next.items.slice(0, budgetExercises)
   }, [next, quickBudget])
 
   // Time estimate from sets × ~3 min + small fixed warm-up.
@@ -250,31 +241,24 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
           </header>
 
           {/* Quick time budget pills — trim today's session to fit
-              30/45/60/90 min. Adherence-aware nudge highlights one of
-              them when the user has been short on training. */}
+              30 / 45 / 60 / 90 min. Roughly 15 min/exercise. */}
           <div className="time-budget">
-            {adherenceRatio < 0.7 && adherenceRatio > 0 && quickBudget === null ? (
-              <p className="time-budget-hint">{t('budget.adherence_hint', { n: 45 })}</p>
-            ) : null}
             <div className="time-budget-pills">
               <button
                 type="button"
                 className={`time-budget-pill${quickBudget === null ? ' active' : ''}`}
                 onClick={() => setQuickBudget(null)}
               >{t('budget.full')}</button>
-              {[30, 45, 60, 90].map((m) => {
-                const suggested = adherenceRatio < 0.7 && adherenceRatio > 0 && m === 45
-                return (
-                  <button
-                    key={m}
-                    type="button"
-                    className={`time-budget-pill${quickBudget === m ? ' active' : ''}${suggested && quickBudget === null ? ' suggested' : ''}`}
-                    onClick={() => setQuickBudget(m)}
-                  >
-                    {m}m
-                  </button>
-                )
-              })}
+              {[30, 45, 60, 90].map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`time-budget-pill${quickBudget === m ? ' active' : ''}`}
+                  onClick={() => setQuickBudget(m)}
+                >
+                  {m}m
+                </button>
+              ))}
             </div>
           </div>
 
