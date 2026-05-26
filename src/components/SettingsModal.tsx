@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { db, type Settings } from '../db/schema'
+import { db, EQUIPMENT_LABEL, EQUIPMENT_TAGS, type EquipmentTag, type Settings } from '../db/schema'
 import { resetDatabase } from '../db/seed'
 import { useSettings } from '../db/queries'
 import { ensureNotificationPermission } from '../state/restTimer'
@@ -177,6 +177,9 @@ export default function SettingsModal({ onClose }: Props) {
           </div>
         </Row>
 
+        <EquipmentRow settings={settings} update={update} />
+
+
         <Row label="Notifications">
           {settings.notificationsEnabled ? (
             <span className="muted small">✓ Enabled</span>
@@ -350,3 +353,67 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     </div>
   )
 }
+
+/** Equipment availability multi-select. Default is "I have everything" —
+ * undefined available, no filtering. Tapping any chip switches to the
+ * explicit-list mode so the user can toggle each one off. */
+function EquipmentRow({
+  settings,
+  update,
+}: {
+  settings: Settings
+  update: <K extends keyof Settings>(key: K, value: Settings[K]) => void
+}) {
+  const available = settings.availableEquipment
+  const isAll = available === undefined
+  function toggle(tag: EquipmentTag) {
+    const current = available ?? [...EQUIPMENT_TAGS]
+    const next = current.includes(tag)
+      ? current.filter((t) => t !== tag)
+      : [...current, tag]
+    update('availableEquipment', next)
+  }
+  return (
+    <details className="card section-card collapsible-section">
+      <summary>
+        <h4>Equipment</h4>
+        <span className="muted small">
+          {isAll
+            ? 'Full gym'
+            : available!.length === 0
+            ? 'Bodyweight only'
+            : `${available!.length} of ${EQUIPMENT_TAGS.length}`}
+        </span>
+      </summary>
+      <p className="muted small">
+        Pick what you have access to. Picker and routine recommendations
+        will hide exercises that need missing equipment.
+      </p>
+      <div className="muscle-filters" style={{ marginTop: 'var(--space-2)' }}>
+        {EQUIPMENT_TAGS.map((tag) => {
+          const on = isAll || (available?.includes(tag) ?? false)
+          return (
+            <button
+              key={tag}
+              className={`chip${on ? ' active' : ''}`}
+              onClick={() => toggle(tag)}
+              aria-pressed={on}
+            >
+              {EQUIPMENT_LABEL[tag]}
+            </button>
+          )
+        })}
+      </div>
+      {!isAll ? (
+        <button
+          className="link small"
+          style={{ marginTop: 'var(--space-2)' }}
+          onClick={() => update('availableEquipment', undefined)}
+        >
+          Reset to full gym
+        </button>
+      ) : null}
+    </details>
+  )
+}
+

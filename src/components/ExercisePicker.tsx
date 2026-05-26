@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { db, MUSCLE_LABEL, type Exercise, type MuscleKey } from '../db/schema'
-import { useAllExercises } from '../db/queries'
+import { useAllExercises, useSettings } from '../db/queries'
 import { loadFullCatalog } from '../lib/extendedCatalog'
 import { useLocalizedExercise } from '../lib/exercise'
+import { canDoExercise } from '../lib/equipment'
 
 interface Props {
   title: string
@@ -70,6 +71,8 @@ export default function ExercisePicker({
   initialMuscle,
   initialEquipment,
 }: Props) {
+  const settings = useSettings()
+  const availableEquipment = settings?.availableEquipment
   const curated = useAllExercises() ?? []
   const [q, setQ] = useState('')
   const [muscle, setMuscle] = useState<'all' | MuscleKey>(initialMuscle ?? 'all')
@@ -113,6 +116,11 @@ export default function ExercisePicker({
 
   const filteredList = useMemo(() => {
     let list = allExercises
+    // Hard filter against the user's available equipment (Settings).
+    // undefined = "have everything" — no filtering.
+    if (availableEquipment !== undefined) {
+      list = list.filter((e) => canDoExercise(e, availableEquipment))
+    }
     if (muscle !== 'all') {
       list = list.filter(
         (e) => e.primaryMuscle === muscle || e.secondaryMuscles.includes(muscle as MuscleKey),
@@ -131,7 +139,7 @@ export default function ExercisePicker({
       )
     }
     return list
-  }, [allExercises, q, muscle, equipment])
+  }, [allExercises, q, muscle, equipment, availableEquipment])
 
   const visible = filteredList.slice(0, 200)
   const truncated = filteredList.length > 200

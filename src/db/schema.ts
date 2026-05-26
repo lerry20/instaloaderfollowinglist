@@ -54,6 +54,29 @@ export const WEIGHT_FORMAT_LABEL: Record<WeightFormat, string> = {
   generic: 'Total load you\'re moving',
 }
 
+/** What a lifter needs at the gym to do an exercise. Empty array =
+ * bodyweight, no equipment required. */
+export type EquipmentTag =
+  | 'barbell'
+  | 'dumbbell'
+  | 'cable'
+  | 'machine'
+  | 'bench'
+  | 'pullup_bar'
+
+export const EQUIPMENT_LABEL: Record<EquipmentTag, string> = {
+  barbell: 'Barbell',
+  dumbbell: 'Dumbbells',
+  cable: 'Cable machine',
+  machine: 'Gym machines',
+  bench: 'Bench',
+  pullup_bar: 'Pull-up bar / dip station',
+}
+
+export const EQUIPMENT_TAGS: EquipmentTag[] = [
+  'barbell', 'dumbbell', 'cable', 'machine', 'bench', 'pullup_bar',
+]
+
 export interface ExerciseI18n {
   name?: string
   equipment?: string
@@ -75,6 +98,10 @@ export interface Exercise {
   defaultRestSec: number
   isCurated: boolean
   weightFormat?: WeightFormat
+  /** Equipment a lifter needs to do this exercise. Empty array =
+   * bodyweight, doable anywhere. Filters exercise picker + routine
+   * recommendations against the user's available equipment. */
+  equipmentTags?: EquipmentTag[]
   /** Optional per-locale overrides. Falls back to the English fields above
    * whenever a locale or specific field is missing. Keyed by Locale code. */
   i18n?: Record<string, ExerciseI18n>
@@ -198,6 +225,9 @@ export interface Settings {
   aiApiKey?: string
   periodizationPhase: PeriodizationPhase
   periodizationWeek: number
+  /** Equipment the user has access to. undefined = all equipment available
+   * (default — assume a full gym). Empty array = bodyweight only. */
+  availableEquipment?: EquipmentTag[]
 }
 
 class WorkoutDB extends Dexie {

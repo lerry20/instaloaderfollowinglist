@@ -1,5 +1,6 @@
 import type { Exercise } from '../db/schema'
 import { EXERCISES_IT } from './curatedExercises.it'
+import { EXERCISE_EQUIPMENT } from './equipmentTags'
 
 const CDN = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises'
 
@@ -1184,10 +1185,15 @@ const RAW: Exercise[] = [
   },
 ]
 
-/** Each exercise gets every available locale's overrides merged in under
- * `i18n`. Adding a new language is a single import + one more line below. */
+/** Each exercise gets equipment tags merged in plus every available locale's
+ * overrides under `i18n`. Adding a new language is a single import + one
+ * more line in the i18n map below. */
 export const CURATED_EXERCISES: Exercise[] = RAW.map((ex) => {
   const i18n: Record<string, NonNullable<Exercise['i18n']>[string]> = {}
   if (EXERCISES_IT[ex.id]) i18n.it = EXERCISES_IT[ex.id]
-  return Object.keys(i18n).length > 0 ? { ...ex, i18n } : ex
+  const equipmentTags = EXERCISE_EQUIPMENT[ex.id]
+  const out: Exercise = { ...ex }
+  if (Object.keys(i18n).length > 0) out.i18n = i18n
+  if (equipmentTags !== undefined) out.equipmentTags = equipmentTags
+  return out
 })
