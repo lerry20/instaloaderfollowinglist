@@ -4527,6 +4527,71 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   margin-top: var(--space-2);
 }
 
+/* Reusable card-as-collapsible: a card whose summary is the section
+   header. Sits between always-visible cards in length but doesn't
+   dominate the page when closed. Used in Settings + Daily + Progress. */
+.collapsible-section {
+  cursor: default;
+}
+.collapsible-section > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-3);
+  transition: background var(--t-1) var(--ease-out);
+}
+.collapsible-section > summary:hover { background: var(--s-2); }
+.collapsible-section > summary::-webkit-details-marker { display: none; }
+.collapsible-section > summary h4 {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--fg);
+  text-transform: none;
+  letter-spacing: -0.005em;
+}
+.collapsible-section > summary::after {
+  content: '+';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--fg-muted);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  line-height: 1;
+  transition: transform var(--t-2) var(--ease-out);
+}
+.collapsible-section[open] > summary {
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: var(--space-3);
+}
+.collapsible-section[open] > summary::after { transform: rotate(45deg); }
+.collapsible-section[open] {
+  padding-bottom: var(--space-4);
+}
+.collapsible-section > *:not(summary) {
+  margin-left: var(--space-4);
+  margin-right: var(--space-4);
+}
+.collapsible-section > .row,
+.collapsible-section > .settings-grid-2 {
+  margin-top: var(--space-2);
+}
+/* Card already has its own padding; reset the bare card padding when
+   we're using the .collapsible-section variant so the summary controls
+   the spacing. */
+.card.collapsible-section { padding: 0; }
+.card.collapsible-section > summary { padding: var(--space-4); }
+.card.collapsible-section[open] > summary {
+  padding-bottom: var(--space-3);
+}
+
 /* Day cards on the routine preview are now collapsible <details>. */
 .day-card { padding: 0; }
 .day-card[open] { padding-bottom: var(--space-4); }

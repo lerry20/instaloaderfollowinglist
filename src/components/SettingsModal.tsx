@@ -196,10 +196,15 @@ export default function SettingsModal({ onClose }: Props) {
           )}
         </Row>
 
-        <section className="card section-card">
-          <header className="section-head">
+        <details className="card section-card collapsible-section">
+          <summary>
             <h4>Nutrition targets</h4>
-          </header>
+            <span className="muted small">
+              {settings.kcalTarget || settings.proteinTargetG
+                ? `${settings.kcalTarget ?? '—'} kcal · ${settings.proteinTargetG ?? '—'} g protein`
+                : 'Not set'}
+            </span>
+          </summary>
           <div className="settings-grid-2">
             <label className="field">
               <span>Daily kcal target</span>
@@ -225,13 +230,13 @@ export default function SettingsModal({ onClose }: Props) {
           <p className="muted small">
             Rough bulk targets: 1.6–2.2 g protein / kg bodyweight, +250–500 kcal above maintenance.
           </p>
-        </section>
+        </details>
 
-        <section className="card section-card">
-          <header className="section-head">
+        <details className="card section-card collapsible-section">
+          <summary>
             <h4>Periodization</h4>
             <span className="muted small">{PHASE_LABEL[settings.periodizationPhase]} · week {settings.periodizationWeek}</span>
-          </header>
+          </summary>
           <p className="muted small">{PHASE_DESCRIPTION[settings.periodizationPhase]}</p>
           <div className="row">
             <button className="btn small" onClick={advancePhase}>
@@ -242,13 +247,13 @@ export default function SettingsModal({ onClose }: Props) {
             </button>
           </div>
           {deloadInfo ? <p className="muted small" style={{ marginTop: '0.4rem' }}>{deloadInfo}</p> : null}
-        </section>
+        </details>
 
-        <section className="card section-card">
-          <header className="section-head">
+        <details className="card section-card collapsible-section">
+          <summary>
             <h4>AI Coach</h4>
             <span className="muted small">{settings.aiApiKey ? '✓ Key set' : 'No key'}</span>
-          </header>
+          </summary>
           <label className="field">
             <span>Anthropic API key</span>
             <input
@@ -264,12 +269,13 @@ export default function SettingsModal({ onClose }: Props) {
             Get a key at <a className="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>.
             Then tap 💬 in the header to chat.
           </p>
-        </section>
+        </details>
 
-        <section className="card section-card">
-          <header className="section-head">
+        <details className="card section-card collapsible-section">
+          <summary>
             <h4>Backup &amp; restore</h4>
-          </header>
+            <span className="muted small">JSON export / import</span>
+          </summary>
           <div className="row">
             <button className="btn small" onClick={exportAll} disabled={exporting}>
               {exporting ? 'Exporting…' : 'Export JSON'}
@@ -297,7 +303,7 @@ export default function SettingsModal({ onClose }: Props) {
             Use this to move data between devices, or as a safety net before clearing the app.
             Imports merge with existing data (won't wipe anything).
           </p>
-        </section>
+        </details>
 
         <details className="advanced-details">
           <summary>{tr('settings.advanced')}</summary>
