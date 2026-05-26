@@ -66,6 +66,8 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
           <button className="link" onClick={onClose}>Close</button>
         </header>
 
+        <SessionRpePrompt sessionId={sessionId} current={session.overallRPE} />
+
         <div className="summary-stats big">
           <div>
             <span className="muted small">Working sets</span>
@@ -182,6 +184,37 @@ function ConfettiBanner() {
           />
         )
       })}
+    </div>
+  )
+}
+
+/** Post-session intensity rating — 1-10 buttons. Stored on the session.
+ * Skippable. Feeds future adaptive recommendations. */
+function SessionRpePrompt({ sessionId, current }: { sessionId: number; current?: number }) {
+  const [picked, setPicked] = useState<number | null>(current ?? null)
+  async function rate(n: number) {
+    setPicked(n)
+    await db.sessions.update(sessionId, { overallRPE: n })
+  }
+  return (
+    <div className="session-rpe-prompt">
+      <span className="session-rpe-label">How hard was that overall?</span>
+      <div className="session-rpe-scale">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+          <button
+            key={n}
+            type="button"
+            className={`session-rpe-btn${picked === n ? ' active' : ''}`}
+            aria-label={`Rate ${n} out of 10`}
+            onClick={() => rate(n)}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      <span className="session-rpe-hint muted small">
+        1 = barely felt it · 5 = challenging · 10 = brutal
+      </span>
     </div>
   )
 }

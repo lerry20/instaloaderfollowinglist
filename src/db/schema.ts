@@ -126,6 +126,9 @@ export interface Session {
   items: PlanItem[]
   startedAt: number
   completedAt: number | null
+  /** Optional 1–10 overall intensity rating filled at session end.
+   * Drives future adaptive recommendations (Phase C). */
+  overallRPE?: number
 }
 
 export interface SetLog {

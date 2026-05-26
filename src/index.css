@@ -3190,6 +3190,56 @@ html[data-theme='light'] .modal-backdrop.nested {
   font-weight: 500;
   padding-bottom: var(--space-3);
 }
+/* End-of-session intensity rating in the workout summary modal */
+.session-rpe-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  margin: 0;
+}
+.session-rpe-label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+.session-rpe-scale {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+.session-rpe-btn {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--s-2);
+  color: var(--fg-muted);
+  border-radius: var(--r-1);
+  font-weight: 500;
+  font-size: var(--fs-small);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--t-1) var(--ease-out),
+              color var(--t-1) var(--ease-out),
+              border-color var(--t-1) var(--ease-out);
+}
+.session-rpe-btn:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+.session-rpe-btn.active {
+  background: var(--fg);
+  color: var(--fg-inverse);
+  border-color: var(--fg);
+}
+.session-rpe-hint {
+  font-size: var(--fs-caption);
+  color: var(--fg-dim);
+}
+
 /* Pre-heavy-compound warm-up prompt — appears above the active set
    card on barbell compounds when no sets have been logged yet. */
 .warmup-prompt {
