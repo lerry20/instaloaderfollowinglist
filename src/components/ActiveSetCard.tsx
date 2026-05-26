@@ -10,6 +10,10 @@ interface Props {
   /** Suggested starting weight in kg. Used to seed the editor. */
   suggestedKg: number | null
   suggestedReps: number | null
+  /** A single coaching cue shown above the LOG button — rotates between
+   * the exercise's cues across sets so the lifter sees every cue across
+   * a session. Pass `null` to hide. */
+  cue?: string | null
   /** Fires when the user taps the giant LOG button. */
   onLog: (data: { weightKg: number; reps: number; rpe: number | null; isWarmup: boolean }) => void
   /** Optional default warm-up state (used when adding a warm-up). */
@@ -29,6 +33,7 @@ export default function ActiveSetCard({
   units,
   suggestedKg,
   suggestedReps,
+  cue,
   onLog,
   defaultWarmup = false,
   onCancelWarmup,
@@ -127,6 +132,13 @@ export default function ActiveSetCard({
           </div>
         </div>
       </div>
+
+      {cue && !warmup ? (
+        <p className="active-set-cue">
+          <span className="active-set-cue-icon" aria-hidden>💡</span>
+          <span>{cue}</span>
+        </p>
+      ) : null}
 
       <button
         type="button"

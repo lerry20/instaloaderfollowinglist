@@ -497,6 +497,11 @@ export default function SessionExerciseCard({
             units={units}
             suggestedKg={suggestedKg}
             suggestedReps={suggestedReps}
+            cue={
+              exLocalized?.cues && exLocalized.cues.length > 0
+                ? exLocalized.cues[workingLogs.length % exLocalized.cues.length]
+                : null
+            }
             onLog={(data) =>
               handleLog(workingLogs.length, data, exercise?.defaultRestSec ?? 90)
             }
