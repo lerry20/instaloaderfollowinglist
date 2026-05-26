@@ -4972,14 +4972,14 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   padding-bottom: var(--space-3);
 }
 
-/* === Page-level collapsible (.cx-section) ====================
-   Used on Daily + Progress. Sleek Freeletics-inspired drawer:
-   animated chevron, headline stat, status dot, smooth height animation
-   via CSS grid 0fr → 1fr. Controlled by React (not <details>) so we
-   can animate the body and still expose aria-expanded.
-   The legacy .collapsible-section above is kept for Settings rows. */
+/* === Editorial collapsible (.cx-section) =====================
+   Used across Progress + Daily. Nike Run Club / Freeletics style:
+   small uppercase eyebrow + big bold display title + bare line
+   chevron. No pills, no dots — typography carries the hierarchy.
+   Smooth grid 0fr→1fr height animation, scroll-anchored, persisted. */
 .cx-section {
-  background: var(--bg-elev);
+  position: relative;
+  background: var(--s-1);
   border: 1px solid var(--line);
   border-radius: var(--r-3);
   overflow: hidden;
@@ -4989,22 +4989,20 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
               background var(--t-2) var(--ease-out),
               transform var(--t-1) var(--ease-out);
 }
-.cx-section:hover {
-  border-color: var(--line-strong);
-}
+.cx-section:hover { border-color: var(--line-strong); }
 .cx-section.cx-section-open {
   border-color: var(--line-strong);
-  background: var(--bg-elev-2);
-  box-shadow: 0 1px 0 var(--line-soft), 0 8px 20px -16px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 var(--line-soft),
+              0 12px 32px -20px rgba(0, 0, 0, 0.55);
 }
 
 .cx-section-trigger {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
   width: 100%;
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-5);
   background: transparent;
   border: none;
   border-radius: var(--r-3);
@@ -5016,8 +5014,7 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.cx-section-trigger:hover { background: var(--s-2); }
-.cx-section-trigger:active { background: var(--s-3); }
+.cx-section-trigger:hover { background: var(--s-hover); }
 .cx-section-trigger:focus-visible {
   outline: 2px solid var(--fg);
   outline-offset: -2px;
@@ -5026,41 +5023,43 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
 .cx-section-headline {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
+
+.cx-section-eyebrow {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  font-weight: 600;
+  line-height: 1;
+}
+
 .cx-section-title-row {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: baseline;
+  gap: var(--space-3);
   min-width: 0;
 }
 .cx-section-title {
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
   color: var(--fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.cx-section-status {
-  flex-shrink: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  transition: box-shadow var(--t-2) var(--ease-out);
-}
-.cx-section-status-good {
-  background: var(--tone-good);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone-good) 18%, transparent);
-}
-.cx-section-status-pending {
-  background: var(--fg-dim);
-}
-.cx-section-status-neutral {
-  background: var(--fg-muted);
+.cx-section-stat {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  transition: color var(--t-2) var(--ease-out);
 }
 
 .cx-section-subtitle {
@@ -5070,41 +5069,25 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
-.cx-section-stat {
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  color: var(--fg);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
+/* Bare line chevron — no pill background, no circle. */
 .cx-section-chevron {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--r-pill);
-  background: var(--s-2);
-  color: var(--fg-muted);
+  color: var(--fg-dim);
   transition: transform var(--t-3) var(--ease-spring),
-              background var(--t-2) var(--ease-out),
               color var(--t-2) var(--ease-out);
 }
-.cx-section-trigger:hover .cx-section-chevron {
-  background: var(--s-3);
-  color: var(--fg);
-}
+.cx-section-trigger:hover .cx-section-chevron { color: var(--fg); }
 .cx-section-open .cx-section-chevron {
   transform: rotate(-180deg);
-  background: var(--s-3);
   color: var(--fg);
 }
 
-/* The animated drawer: grid-template-rows 0fr → 1fr is the cleanest way
-   to animate height: auto. The clip is the row, the body is the content. */
+/* Drawer: grid-template-rows 0fr → 1fr animates height: auto cleanly. */
 .cx-section-drawer {
   display: grid;
   grid-template-rows: 0fr;
@@ -5118,9 +5101,7 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   min-height: 0;
 }
 .cx-section-body {
-  padding: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--line-soft);
+  padding: 0 var(--space-5) var(--space-5);
   opacity: 0;
   transform: translateY(-4px);
   transition: opacity var(--t-3) var(--ease-out),
@@ -5131,71 +5112,56 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   transform: translateY(0);
 }
 
-/* Body's direct children: kill the top-of-card double padding from
-   nested .card, since the body already provides its own. */
-.cx-section-body > h3:first-child,
-.cx-section-body > h4:first-child {
-  margin-top: 0;
-}
+/* If the body wraps a nested .card, strip its chrome so we don't get
+   card-inside-card visual nesting. */
 .cx-section-body > section.card,
 .cx-section-body > .card {
   padding: 0;
   border: none;
   background: transparent;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .cx-section-drawer,
-  .cx-section-chevron,
-  .cx-section-body { transition: none; }
+.cx-section-body > h3:first-child,
+.cx-section-body > h4:first-child {
+  margin-top: 0;
 }
 
-/* Tone variants. `success` paints a subtle gold rail on the left edge
-   when open (PRs etc); `warn` is a faint warning rail. Both stay nearly
-   monochrome until the user expands the section. */
-.cx-tone-success.cx-section-open {
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--tone-warn) 8%, transparent) 0,
-      color-mix(in srgb, var(--tone-warn) 0%, transparent) 50%
-    ),
-    var(--bg-elev-2);
-  border-color: color-mix(in srgb, var(--tone-warn) 35%, var(--line-strong));
+/* Tone accents: an inset 3px rail on the left edge when open. */
+.cx-section.cx-tone-success.cx-section-open {
+  box-shadow: inset 3px 0 0 var(--tone-warn),
+              0 1px 0 var(--line-soft),
+              0 12px 32px -20px rgba(0, 0, 0, 0.55);
+  border-color: color-mix(in srgb, var(--tone-warn) 22%, var(--line-strong));
 }
-.cx-tone-success.cx-section-open .cx-section-title {
-  color: var(--fg);
-}
-.cx-tone-success.cx-section-open .cx-section-chevron {
-  background: color-mix(in srgb, var(--tone-warn) 22%, var(--s-3));
-  color: var(--tone-warn);
-}
-.cx-tone-success.cx-section-open .cx-section-stat {
+.cx-section.cx-tone-success.cx-section-open .cx-section-stat {
   color: var(--tone-warn);
 }
 
-.cx-tone-warn.cx-section-open {
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--tone-danger) 6%, transparent) 0,
-      color-mix(in srgb, var(--tone-danger) 0%, transparent) 50%
-    ),
-    var(--bg-elev-2);
-  border-color: color-mix(in srgb, var(--tone-danger) 30%, var(--line-strong));
+.cx-section.cx-tone-warn.cx-section-open {
+  box-shadow: inset 3px 0 0 var(--tone-danger),
+              0 1px 0 var(--line-soft),
+              0 12px 32px -20px rgba(0, 0, 0, 0.55);
+  border-color: color-mix(in srgb, var(--tone-danger) 22%, var(--line-strong));
 }
 
-/* Press-scale: tiny squish on tap so the whole card feels alive.
-   :has() is supported in all modern browsers (Chrome 105+, Safari 15.4+,
-   Firefox 121+). */
+/* Press-feedback: small squish on the whole card. */
 .cx-section:has(.cx-section-trigger:active) {
   transform: scale(0.997);
 }
 
-/* The stat number subtly transitions when it updates so a freshly logged
-   value feels acknowledged rather than just appearing. */
-.cx-section-stat {
-  transition: color var(--t-2) var(--ease-out);
+@media (prefers-reduced-motion: reduce) {
+  .cx-section,
+  .cx-section-drawer,
+  .cx-section-chevron,
+  .cx-section-body,
+  .cx-section-stat { transition: none; }
+}
+
+/* Narrow screens — drop title size a touch so stat fits next to it. */
+@media (max-width: 380px) {
+  .cx-section-title { font-size: var(--fs-h2); }
+  .cx-section-stat { font-size: var(--fs-h3); }
+  .cx-section-trigger { padding: var(--space-4); }
+  .cx-section-body { padding: 0 var(--space-4) var(--space-4); }
 }
 
 /* Day cards on the routine preview are now collapsible <details>. */

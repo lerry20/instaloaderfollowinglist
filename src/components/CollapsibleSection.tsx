@@ -2,25 +2,24 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { haptics } from '../lib/haptics'
 
 type Tone = 'default' | 'success' | 'warn'
-type Status = 'good' | 'pending' | 'neutral'
 
 interface Props {
+  /** Required big bold display title (e.g. "Nutrition", "May 2026"). */
   title: string
-  /** One-line preview shown beneath the title in muted text. */
-  subtitle?: string
+  /** Small uppercase letterspaced label shown above the title
+   * (e.g. "TODAY", "THIS MONTH", "HIGHLIGHTS"). */
+  eyebrow?: string
   /** Optional headline value shown right of the title (e.g. "78.4 kg").
-   * Always visible — so even a collapsed section conveys its key number. */
+   * Always visible — even when the section is collapsed. */
   stat?: string
-  /** Small status dot. `good` = today's entry logged (green glow).
-   * `pending` = needs your attention. `neutral` = informational. */
-  status?: Status
-  /** Visual accent. `success` = subtle gold tint (e.g. PRs).
-   * `warn` = subtle warning tint. Default = monochrome. */
+  /** Optional one-line muted helper text beneath the title. */
+  subtitle?: string
+  /** Visual accent rail on the left when open. */
   tone?: Tone
   /** Whether the section starts open. Default true. */
   defaultOpen?: boolean
   /** Stable id — if provided, the open/close state persists across
-   * page loads via localStorage. Skip it for transient / one-off sections. */
+   * page loads via localStorage. */
   id?: string
   /** Optional className to scope styling per section. */
   className?: string
@@ -50,19 +49,16 @@ function writePersisted(id: string | undefined, open: boolean) {
   }
 }
 
-/** Freeletics-style collapsible: animated chevron, headline stat, status
- * dot, smooth grid-based height animation, optional gold/warn accent,
- * and per-id state persistence. Controlled with React state (not native
- * <details>) so we can animate the body and still expose aria-expanded.
- *
- * On toggle we also preserve scroll-anchor by adjusting `window.scrollY`
- * to keep the trigger row stationary in the viewport — collapsing a tall
- * section far down the page no longer makes the page jump. */
+/** Editorial-style collapsible: eyebrow + display title + optional stat,
+ * with a bare line chevron and a tone accent rail on the left edge when
+ * open. Smooth grid-based height animation. Press-to-toggle the whole
+ * row; scroll-anchored so the trigger stays put when toggled deep in
+ * the page. State persists per-id via localStorage. */
 export default function CollapsibleSection({
   title,
-  subtitle,
+  eyebrow,
   stat,
-  status,
+  subtitle,
   tone = 'default',
   defaultOpen = true,
   id,
@@ -81,13 +77,13 @@ export default function CollapsibleSection({
     const el = sectionRef.current
     const before = el ? el.getBoundingClientRect().top : 0
     setOpen((v) => !v)
-    // After paint, restore scroll position so the row stays put even when
-    // the page above grew or shrank. rAF runs after React commits.
     requestAnimationFrame(() => {
       if (!el) return
       const after = el.getBoundingClientRect().top
       const delta = after - before
-      if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior })
+      if (Math.abs(delta) > 1) {
+        window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior })
+      }
     })
   }
 
@@ -105,21 +101,19 @@ export default function CollapsibleSection({
         onClick={toggle}
       >
         <span className="cx-section-headline">
+          {eyebrow ? <span className="cx-section-eyebrow">{eyebrow}</span> : null}
           <span className="cx-section-title-row">
             <span className="cx-section-title">{title}</span>
-            {status ? (
-              <span className={`cx-section-status cx-section-status-${status}`} aria-hidden />
-            ) : null}
+            {stat ? <span className="cx-section-stat tabnum">{stat}</span> : null}
           </span>
           {subtitle ? <span className="cx-section-subtitle">{subtitle}</span> : null}
         </span>
-        {stat ? <span className="cx-section-stat tabnum">{stat}</span> : null}
         <span className="cx-section-chevron" aria-hidden>
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
             <path
-              d="M4 6.5L8 10.5L12 6.5"
+              d="M6 9.5L12 15L18 9.5"
               stroke="currentColor"
-              strokeWidth="1.75"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />

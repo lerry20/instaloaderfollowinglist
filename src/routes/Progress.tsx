@@ -48,6 +48,7 @@ export default function Progress() {
       <PRTicker units={units} />
       <CollapsibleSection
         id="progress-calendar"
+        eyebrow="Overview"
         title="Training calendar"
         subtitle="how consistent you've been"
       >
@@ -66,7 +67,8 @@ function WeeklyVolumeBarsSection() {
   return (
     <CollapsibleSection
       id="progress-weekly-summary"
-      title="This week, in plain English"
+      eyebrow="This week"
+      title="Volume, in plain English"
       subtitle="working sets across each muscle group"
     >
       <VolumeSummary />
@@ -122,10 +124,10 @@ function PRTicker({ units }: { units: Units }) {
   return (
     <CollapsibleSection
       id="progress-prs"
+      eyebrow="Highlights"
       title="Recent PRs"
-      subtitle="new top sets you've hit lately"
+      subtitle="new top sets you've hit"
       stat={String(prs.length)}
-      status="good"
       tone="success"
     >
       <ul className="pr-ticker-list">
@@ -164,10 +166,10 @@ function BodyweightSection({ units }: { units: Units }) {
   return (
     <CollapsibleSection
       id="progress-bodyweight"
+      eyebrow="Trends"
       title="Bodyweight"
       subtitle={subtitle}
       stat={stat}
-      status={todayLog ? 'good' : 'pending'}
     >
       {showInput ? (
         <div className="bw-input-row">
@@ -250,8 +252,9 @@ function TopSetCards({ units }: { units: Units }) {
   return (
     <CollapsibleSection
       id="progress-top-sets"
+      eyebrow="Lifts"
       title="Top sets"
-      subtitle="your most-trained lifts"
+      subtitle="your most-trained movements"
       stat={String(series.length)}
       defaultOpen={false}
     >
@@ -301,9 +304,9 @@ function WeeklyVolumeSection({ units }: { units: Units }) {
   return (
     <CollapsibleSection
       id="progress-volume-by-muscle"
-      title="Weekly volume by muscle"
+      eyebrow="Volume"
+      title="By muscle group"
       subtitle={`last 7 days · ${units}·reps`}
-      stat={String(data.length)}
       defaultOpen={false}
     >
       <div style={{ width: '100%', height: Math.max(180, data.length * 26) }}>
@@ -356,6 +359,7 @@ function HistorySection({ units }: { units: Units }) {
     return (
       <CollapsibleSection
         id="progress-recent-sessions"
+        eyebrow="History"
         title="Recent sessions"
         subtitle="No entries yet"
         defaultOpen={false}
@@ -368,6 +372,7 @@ function HistorySection({ units }: { units: Units }) {
   return (
     <CollapsibleSection
       id="progress-recent-sessions"
+      eyebrow="History"
       title="Recent sessions"
       subtitle="last 30 days"
       stat={String(sessions.length)}

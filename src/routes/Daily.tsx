@@ -70,10 +70,10 @@ function NutritionSection() {
   return (
     <CollapsibleSection
       id="daily-nutrition"
+      eyebrow="Today"
       title="Nutrition"
       subtitle={subtitle}
       stat={stat}
-      status={todayLog ? 'good' : 'pending'}
     >
       <div className="daily-input-row">
         <label className="field">
@@ -165,10 +165,10 @@ function SleepSection() {
   return (
     <CollapsibleSection
       id="daily-sleep"
+      eyebrow="Today"
       title="Sleep & recovery"
       subtitle={subtitle}
       stat={stat}
-      status={todayLog ? 'good' : 'pending'}
       defaultOpen={false}
     >
       <div className="daily-input-row">
@@ -239,10 +239,10 @@ function BodyweightSection() {
   return (
     <CollapsibleSection
       id="daily-bodyweight"
+      eyebrow="Today"
       title="Bodyweight"
       subtitle={subtitle}
       stat={stat}
-      status={todayLog ? 'good' : 'pending'}
     >
       <div className="bw-input-row">
         <input
@@ -304,9 +304,9 @@ function MeasurementsSection() {
   return (
     <CollapsibleSection
       id="daily-measurements"
+      eyebrow="Weekly"
       title="Measurements"
       subtitle={subtitle}
-      status="neutral"
       defaultOpen={false}
     >
       <div className="measurements-grid">

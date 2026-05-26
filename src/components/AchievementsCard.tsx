@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { computeAchievements, type Achievement } from '../lib/achievements'
 import { useT, type DictKey } from '../i18n'
+import CollapsibleSection from './CollapsibleSection'
 
 export default function AchievementsCard() {
   const t = useT()
@@ -20,14 +21,13 @@ export default function AchievementsCard() {
   const total = achievements.length
 
   return (
-    <section className="achievements-card">
-      <header className="achievements-head">
-        <div>
-          <span className="muted small">{t('ach.title')}</span>
-          <h3>{t('ach.earned', { n: earned, total })}</h3>
-        </div>
-      </header>
-
+    <CollapsibleSection
+      id="progress-achievements"
+      eyebrow={t('ach.title')}
+      title={t('ach.earned', { n: earned, total })}
+      tone={earned > 0 ? 'success' : 'default'}
+      defaultOpen={false}
+    >
       <ul className="achievements-grid">
         {achievements.map((a) => {
           const nameKey = `ach.${a.id}` as DictKey
@@ -48,6 +48,6 @@ export default function AchievementsCard() {
           )
         })}
       </ul>
-    </section>
+    </CollapsibleSection>
   )
 }

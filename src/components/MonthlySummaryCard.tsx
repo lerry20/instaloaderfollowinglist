@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Units } from '../db/schema'
 import { kgToDisplay } from '../lib/units'
 import { useLocaleStore, useT, type Locale } from '../i18n'
+import CollapsibleSection from './CollapsibleSection'
 
 const LOCALE_BCP47: Record<Locale, string> = {
   en: 'en-US',
@@ -81,11 +82,11 @@ export default function MonthlySummaryCard({ units }: Props) {
   }).format(monthStart)
 
   return (
-    <section className="monthly-summary">
-      <header className="monthly-summary-head">
-        <span className="muted small">{t('monthly.title')}</span>
-        <h2>{monthLabel}</h2>
-      </header>
+    <CollapsibleSection
+      id="progress-monthly"
+      eyebrow={t('monthly.title')}
+      title={monthLabel}
+    >
       <div className="monthly-summary-grid">
         <div className="monthly-stat">
           <span className="monthly-stat-value tabnum">{data.sessions}</span>
@@ -118,6 +119,6 @@ export default function MonthlySummaryCard({ units }: Props) {
           )}
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   )
 }
