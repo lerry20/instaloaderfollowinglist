@@ -202,6 +202,37 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         trimmedItems.reduce((a, it) => a + exerciseCostMin(it.targetSets), 0),
       ))
     : null
+
+  // Only offer budget chips that would actually drop an exercise.
+  // No point showing "90m" on a 70-min workout — it'd be identical
+  // to "Completa". And no point showing the whole row for a workout
+  // already shorter than every option.
+  const availableBudgets = useMemo(() => {
+    if (!next) return []
+    const full = next.items
+    return [30, 45, 60, 90].filter((m) => {
+      // Re-run the same greedy fill the trim uses
+      let used = 0
+      let kept = 0
+      for (const it of full) {
+        const cost = exerciseCostMin(it.targetSets)
+        if (kept === 0 || used + cost <= m) {
+          used += cost
+          kept++
+        } else break
+      }
+      return kept < full.length
+    })
+  }, [next])
+
+  // If the user switches routines and their previously-picked budget is
+  // no longer offered (e.g. picked 60m, then swapped to a 40-min routine),
+  // silently reset to Full so they don't end up on a phantom selection.
+  useEffect(() => {
+    if (quickBudget !== null && !availableBudgets.includes(quickBudget)) {
+      setQuickBudget(null)
+    }
+  }, [availableBudgets, quickBudget])
   const fullCount = next ? next.items.length : 0
   const skippedCount = fullCount - trimmedItems.length
 
@@ -261,27 +292,30 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
             </span>
           </header>
 
-          {/* Quick time budget pills — trim today's session to fit
-              30 / 45 / 60 / 90 min. Roughly 15 min/exercise. */}
-          <div className="time-budget">
-            <div className="time-budget-pills">
-              <button
-                type="button"
-                className={`time-budget-pill${quickBudget === null ? ' active' : ''}`}
-                onClick={() => setQuickBudget(null)}
-              >{t('budget.full')}</button>
-              {[30, 45, 60, 90].map((m) => (
+          {/* Quick time budget pills — only show options that would
+              actually trim the session. Cost per exercise: see
+              exerciseCostMin(). */}
+          {availableBudgets.length > 0 ? (
+            <div className="time-budget">
+              <div className="time-budget-pills">
                 <button
-                  key={m}
                   type="button"
-                  className={`time-budget-pill${quickBudget === m ? ' active' : ''}`}
-                  onClick={() => setQuickBudget(m)}
-                >
-                  {m}m
-                </button>
-              ))}
+                  className={`time-budget-pill${quickBudget === null ? ' active' : ''}`}
+                  onClick={() => setQuickBudget(null)}
+                >{t('budget.full')}</button>
+                {availableBudgets.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`time-budget-pill${quickBudget === m ? ' active' : ''}`}
+                    onClick={() => setQuickBudget(m)}
+                  >
+                    {m}m
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <ul className="today-card-exercises">
             {trimmedItems.slice(0, 5).map((it) => (
