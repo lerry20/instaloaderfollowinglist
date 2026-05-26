@@ -41,6 +41,7 @@ export type DictKey =
   | 'train.what_youll_do' | 'train.n_exercises'
   | 'train.bodyweight' | 'train.routine' | 'train.change' | 'train.log_it'
   | 'train.no_routine_selected'
+  | 'train.day_of_cycle' | 'train.more_count'
   // Active session
   | 'session.exercise_of' | 'session.set_of' | 'session.target'
   | 'session.last' | 'session.add_warmup' | 'session.swap_exercise'

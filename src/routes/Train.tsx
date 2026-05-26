@@ -229,7 +229,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
           <h2>{routine.name}</h2>
           {totalWorkouts > 0 ? (
             <span className="muted small">
-              Day {position} of {totalWorkouts} in the cycle
+              {t('train.day_of_cycle', { n: position, total: totalWorkouts })}
             </span>
           ) : null}
         </Link>
@@ -254,7 +254,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
               them when the user has been short on training. */}
           <div className="time-budget">
             {adherenceRatio < 0.7 && adherenceRatio > 0 && quickBudget === null ? (
-              <p className="time-budget-hint">{t('budget.adherence_hint')}</p>
+              <p className="time-budget-hint">{t('budget.adherence_hint', { n: 45 })}</p>
             ) : null}
             <div className="time-budget-pills">
               <button
@@ -291,7 +291,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
             ))}
             {trimmedItems.length > 5 ? (
               <li className="today-card-exercise more">
-                <span className="muted small">+ {trimmedItems.length - 5} more</span>
+                <span className="muted small">{t('train.more_count', { n: trimmedItems.length - 5 })}</span>
               </li>
             ) : null}
             {skippedCount > 0 ? (

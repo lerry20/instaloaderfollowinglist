@@ -53,6 +53,8 @@ export const fr: Dict = {
   'train.change': 'Changer →',
   'train.log_it': 'Enregistrer →',
   'train.no_routine_selected': 'Aucune routine sélectionnée',
+  'train.day_of_cycle': 'Jour {n} sur {total} du cycle',
+  'train.more_count': '+ {n} de plus',
   // Session
   'session.exercise_of': 'Exercice {n} sur {total}',
   'session.set_of': 'SÉRIE {n} SUR {total}',
@@ -196,7 +198,7 @@ export const fr: Dict = {
   'ach.20_days_d': 'Entraîné sur vingt jours distincts.',
   // Quick time budget
   'budget.full': 'Complet',
-  'budget.adherence_hint': 'Tu t\'es moins entraîné que d\'habitude — une séance plus courte aujourd\'hui vaut mieux que de la sauter.',
+  'budget.adherence_hint': 'Tu t\'es moins entraîné que d\'habitude — essaie {n}m aujourd\'hui plutôt que de sauter.',
   'budget.trimmed_one': '↪ 1 exercice retiré pour aujourd\'hui',
   'budget.trimmed_other': '↪ {n} exercices retirés pour aujourd\'hui',
   'budget.quick_tag': 'court',

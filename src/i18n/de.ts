@@ -53,6 +53,8 @@ export const de: Dict = {
   'train.change': 'Ändern →',
   'train.log_it': 'Eintragen →',
   'train.no_routine_selected': 'Kein Plan ausgewählt',
+  'train.day_of_cycle': 'Tag {n} von {total} im Zyklus',
+  'train.more_count': '+ {n} weitere',
   // Session
   'session.exercise_of': 'Übung {n} von {total}',
   'session.set_of': 'SATZ {n} VON {total}',
@@ -196,7 +198,7 @@ export const de: Dict = {
   'ach.20_days_d': 'An zwanzig verschiedenen Tagen trainiert.',
   // Quick time budget
   'budget.full': 'Voll',
-  'budget.adherence_hint': 'Du hast weniger trainiert als sonst — eine leichtere Einheit heute ist besser, als sie wieder ausfallen zu lassen.',
+  'budget.adherence_hint': 'Du hast weniger trainiert als sonst — versuche heute {n}m statt wieder auszufallen.',
   'budget.trimmed_one': '↪ 1 Übung heute weggelassen',
   'budget.trimmed_other': '↪ {n} Übungen heute weggelassen',
   'budget.quick_tag': 'kurz',
