@@ -46,8 +46,8 @@ export default defineConfig({
         short_name: 'BulkLog',
         description:
           'Personal workout dashboard for hypertrophy and bulking — weekly plan, set logger, technique cues, fully offline.',
-        theme_color: '#0b1020',
-        background_color: '#0b1020',
+        theme_color: '#0a0a0a',
+        background_color: '#0a0a0a',
         display: 'standalone',
         start_url: '/',
         icons: [
