@@ -59,6 +59,7 @@ export default function SessionExerciseCard({
   const [showImageZoom, setShowImageZoom] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [repeating, setRepeating] = useState(false)
+  const [dismissedWarmup, setDismissedWarmup] = useState(false)
   const [showQuickSwap, setShowQuickSwap] = useState(false)
 
   // Same-muscle alternatives, curated-first then by recent usage.
@@ -221,6 +222,34 @@ export default function SessionExerciseCard({
   }
 
   const repsContainsAmrap = /amrap/i.test(item.targetReps)
+
+  /** Add 2 warm-up sets at 50% and 75% of the working weight, 5 reps each.
+   * Logged directly so the user goes straight to working sets. */
+  async function addWarmupSeries(workingKg: number) {
+    setDismissedWarmup(true)
+    await db.setLogs.add({
+      sessionId,
+      exerciseId: item.exerciseId,
+      setIndex: 0,
+      weight: workingKg * 0.5,
+      reps: 5,
+      rpe: null,
+      isWarmup: true,
+      loggedAt: Date.now(),
+    })
+    await db.setLogs.add({
+      sessionId,
+      exerciseId: item.exerciseId,
+      setIndex: 1,
+      weight: workingKg * 0.75,
+      reps: 5,
+      rpe: null,
+      isWarmup: true,
+      loggedAt: Date.now() + 1,
+    })
+    haptics.pop()
+    toast(t('session.warmup_prompt_added'), { kind: 'success', duration: 1800 })
+  }
 
   async function repeatLastSet() {
     if (repeating) return
@@ -452,6 +481,47 @@ export default function SessionExerciseCard({
         </div>
       ) : null}
 
+      {/* Pre-heavy-compound warm-up prompt — appears before the first
+         working set on barbell compounds. One tap adds two sets at
+         50%/75% of suggested weight. Dismissed via the X. */}
+      {!pendingWarmup
+        && workingLogs.length === 0
+        && warmupLogs.length === 0
+        && exercise
+        && isHeavyCompound(exercise.id)
+        && suggestedKg !== null
+        && suggestedKg > 20
+        && !dismissedWarmup ? (
+        <div className="warmup-prompt">
+          <div className="warmup-prompt-body">
+            <strong>{t('session.warmup_prompt_title')}</strong>
+            <span className="muted small">
+              {t('session.warmup_prompt_sub', {
+                w1: fmt(kgToDisplay(suggestedKg * 0.5, units), units),
+                w2: fmt(kgToDisplay(suggestedKg * 0.75, units), units),
+                u: units,
+              })}
+            </span>
+          </div>
+          <div className="warmup-prompt-actions">
+            <button
+              type="button"
+              className="btn small primary"
+              onClick={() => addWarmupSeries(suggestedKg)}
+            >
+              {t('session.warmup_prompt_add')}
+            </button>
+            <button
+              type="button"
+              className="icon-btn-mini"
+              onClick={() => setDismissedWarmup(true)}
+              aria-label={t('common.close')}
+              title={t('common.close')}
+            >✕</button>
+          </div>
+        </div>
+      ) : null}
+
       {pendingWarmup ? (
         <ActiveSetCard
           key="pending-warmup"
@@ -609,4 +679,22 @@ function rpeExplainer(rpe: number): string {
   if (rpe >= 8) return 'RPE 8 = 2 reps short of failure. The hypertrophy sweet spot.'
   if (rpe >= 7) return 'RPE 7 = 3 reps short of failure. Warm-ups or speed work.'
   return 'RPE 6 or lower = 4+ reps in reserve. Light work.'
+}
+
+/** Heavy barbell compounds that meaningfully need warm-up ramping. */
+const HEAVY_COMPOUNDS = new Set([
+  'bench-press',
+  'incline-bench',
+  'decline-press',
+  'back-squat',
+  'front-squat',
+  'deadlift',
+  'rdl',
+  'ohp',
+  'close-grip-bench',
+  'barbell-row',
+  'good-morning',
+])
+function isHeavyCompound(id: string): boolean {
+  return HEAVY_COMPOUNDS.has(id)
 }

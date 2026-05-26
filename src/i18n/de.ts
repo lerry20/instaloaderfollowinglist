@@ -89,6 +89,10 @@ export const de: Dict = {
   'session.set_deleted': 'Satz gelöscht',
   'session.warmup_logged': 'Aufwärmen eingetragen',
   'session.warmup_removed': 'Aufwärmen entfernt',
+  'session.warmup_prompt_title': 'Erst aufwärmen?',
+  'session.warmup_prompt_sub': '2 schnelle Sätze bei {w1} und {w2} {u} × 5 Wdh.',
+  'session.warmup_prompt_add': 'Aufwärmen hinzufügen',
+  'session.warmup_prompt_added': 'Aufwärmen erledigt — los mit den Arbeitssätzen',
   // Toasts
   'toast.workout_discarded': 'Training verworfen',
   'toast.could_not_start': 'Training konnte nicht gestartet werden — versuche es nochmal',

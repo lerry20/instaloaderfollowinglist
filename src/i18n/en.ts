@@ -89,6 +89,10 @@ export const en: Dict = {
   'session.set_deleted': 'Set deleted',
   'session.warmup_logged': 'Warm-up logged',
   'session.warmup_removed': 'Warm-up removed',
+  'session.warmup_prompt_title': 'Warm up first?',
+  'session.warmup_prompt_sub': '2 quick sets at {w1} & {w2} {u} × 5 reps',
+  'session.warmup_prompt_add': 'Add warm-ups',
+  'session.warmup_prompt_added': 'Warm-ups logged — go for the working sets',
   // Toasts
   'toast.workout_discarded': 'Workout discarded',
   'toast.could_not_start': 'Could not start workout — try again',

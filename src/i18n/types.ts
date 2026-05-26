@@ -56,6 +56,8 @@ export type DictKey =
   | 'session.no_history' | 'session.exercise_skipped'
   | 'session.exercise_swapped' | 'session.set_updated' | 'session.set_deleted'
   | 'session.warmup_logged' | 'session.warmup_removed'
+  | 'session.warmup_prompt_title' | 'session.warmup_prompt_sub'
+  | 'session.warmup_prompt_add' | 'session.warmup_prompt_added'
   // Toasts
   | 'toast.workout_discarded' | 'toast.could_not_start'
   | 'toast.new_pr'

@@ -89,6 +89,10 @@ export const es: Dict = {
   'session.set_deleted': 'Serie eliminada',
   'session.warmup_logged': 'Calentamiento registrado',
   'session.warmup_removed': 'Calentamiento eliminado',
+  'session.warmup_prompt_title': '¿Calentamos primero?',
+  'session.warmup_prompt_sub': '2 series rápidas a {w1} y {w2} {u} × 5 reps',
+  'session.warmup_prompt_add': 'Añadir calentamiento',
+  'session.warmup_prompt_added': 'Calentamiento hecho — a por las series efectivas',
   // Toasts
   'toast.workout_discarded': 'Entrenamiento descartado',
   'toast.could_not_start': 'No se pudo iniciar — inténtalo de nuevo',

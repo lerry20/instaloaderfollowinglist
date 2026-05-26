@@ -89,6 +89,10 @@ export const fr: Dict = {
   'session.set_deleted': 'Série supprimée',
   'session.warmup_logged': 'Échauffement enregistré',
   'session.warmup_removed': 'Échauffement supprimé',
+  'session.warmup_prompt_title': 'On s\'échauffe d\'abord ?',
+  'session.warmup_prompt_sub': '2 séries rapides à {w1} et {w2} {u} × 5 reps',
+  'session.warmup_prompt_add': 'Ajouter l\'échauffement',
+  'session.warmup_prompt_added': 'Échauffement fait — passe aux séries effectives',
   // Toasts
   'toast.workout_discarded': 'Séance abandonnée',
   'toast.could_not_start': 'Impossible de démarrer la séance — réessaie',

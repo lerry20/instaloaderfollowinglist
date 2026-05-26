@@ -91,6 +91,10 @@ export const pt: Dict = {
   'session.set_deleted': 'Série excluída',
   'session.warmup_logged': 'Aquecimento registrado',
   'session.warmup_removed': 'Aquecimento removido',
+  'session.warmup_prompt_title': 'Aquecer primeiro?',
+  'session.warmup_prompt_sub': '2 séries rápidas em {w1} e {w2} {u} × 5 reps',
+  'session.warmup_prompt_add': 'Adicionar aquecimento',
+  'session.warmup_prompt_added': 'Aquecimento feito — bora pras séries efetivas',
   // Toasts
   'toast.workout_discarded': 'Treino descartado',
   'toast.could_not_start': 'Não foi possível iniciar — tente de novo',

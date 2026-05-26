@@ -89,6 +89,10 @@ export const it: Dict = {
   'session.set_deleted': 'Serie eliminata',
   'session.warmup_logged': 'Riscaldamento registrato',
   'session.warmup_removed': 'Riscaldamento rimosso',
+  'session.warmup_prompt_title': 'Prima il riscaldamento?',
+  'session.warmup_prompt_sub': '2 serie veloci a {w1} e {w2} {u} × 5 ripetizioni',
+  'session.warmup_prompt_add': 'Aggiungi riscaldamento',
+  'session.warmup_prompt_added': 'Riscaldamento fatto — vai con le serie effettive',
   // Toasts
   'toast.workout_discarded': 'Allenamento scartato',
   'toast.could_not_start': 'Impossibile iniziare l\'allenamento — riprova',

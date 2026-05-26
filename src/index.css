@@ -3190,6 +3190,41 @@ html[data-theme='light'] .modal-backdrop.nested {
   font-weight: 500;
   padding-bottom: var(--space-3);
 }
+/* Pre-heavy-compound warm-up prompt — appears above the active set
+   card on barbell compounds when no sets have been logged yet. */
+.warmup-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--tone-warn) 8%, var(--s-1));
+  border: 1px solid color-mix(in srgb, var(--tone-warn) 28%, var(--line));
+  border-radius: var(--r-3);
+}
+.warmup-prompt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.warmup-prompt-body strong {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+.warmup-prompt-body .muted.small {
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+.warmup-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
 /* The single coaching cue that rotates through cues across sets — sits
    just above the LOG button so the lifter sees it right before pressing. */
 .active-set-cue {
