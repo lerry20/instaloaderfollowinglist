@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { computeAchievements, type Achievement } from '../lib/achievements'
+import { useT, type DictKey } from '../i18n'
 
 export default function AchievementsCard() {
+  const t = useT()
   const [achievements, setAchievements] = useState<Achievement[] | null>(null)
 
   useEffect(() => {
@@ -21,25 +23,30 @@ export default function AchievementsCard() {
     <section className="achievements-card">
       <header className="achievements-head">
         <div>
-          <span className="muted small">Milestones</span>
-          <h3>{earned} / {total} earned</h3>
+          <span className="muted small">{t('ach.title')}</span>
+          <h3>{t('ach.earned', { n: earned, total })}</h3>
         </div>
       </header>
 
       <ul className="achievements-grid">
-        {achievements.map((a) => (
-          <li
-            key={a.id}
-            className={`achievement${a.earned ? ' earned' : ''}`}
-            title={a.detail}
-          >
-            <span className="achievement-icon" aria-hidden>{a.icon}</span>
-            <span className="achievement-text">
-              <strong>{a.name}</strong>
-              <span className="muted small">{a.detail}</span>
-            </span>
-          </li>
-        ))}
+        {achievements.map((a) => {
+          const nameKey = `ach.${a.id}` as DictKey
+          const detailKey = `ach.${a.id}_d` as DictKey
+          const detail = t(detailKey)
+          return (
+            <li
+              key={a.id}
+              className={`achievement${a.earned ? ' earned' : ''}`}
+              title={detail}
+            >
+              <span className="achievement-icon" aria-hidden>{a.icon}</span>
+              <span className="achievement-text">
+                <strong>{t(nameKey)}</strong>
+                <span className="muted small">{detail}</span>
+              </span>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

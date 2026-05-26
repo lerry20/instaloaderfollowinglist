@@ -23,7 +23,6 @@ import { toast } from '../state/toasts'
 import { haptics } from '../lib/haptics'
 import { buildProactiveMessage, currentStreak, type ProactiveMessage } from '../lib/streak'
 import { computeAdherence } from '../lib/adherence'
-import { computeFitnessSignal, type FitnessSignal } from '../lib/fitnessSignal'
 import Skeleton from '../components/Skeleton'
 import { useT, useLocaleStore, type Locale } from '../i18n'
 import { useLocalizedExercise } from '../lib/exercise'
@@ -108,7 +107,6 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const [thisWeek, setThisWeek] = useState(0)
   const [prescribed, setPrescribed] = useState(routine.daysPerWeek ?? routine.workouts.length)
   const [adherenceRatio, setAdherenceRatio] = useState(1)
-  const [signal, setSignal] = useState<FitnessSignal | null>(null)
   // Quick time budget for today (minutes). null = full session.
   const [quickBudget, setQuickBudget] = useState<number | null>(null)
 
@@ -135,9 +133,6 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         setPrescribed(a.prescribedPerWeek)
         setAdherenceRatio(a.ratio)
       })
-      .catch(() => {})
-    computeFitnessSignal(routine)
-      .then((s) => { if (!cancelled) setSignal(s) })
       .catch(() => {})
     return () => { cancelled = true }
   }, [routine.id])
@@ -240,30 +235,13 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         </Link>
       </header>
 
-      {signal && signal.score > 0 ? (
-        <div className={`fitness-signal trend-${signal.trend}`}>
-          <div className="fitness-signal-num">
-            <span className="fitness-signal-value tabnum">{signal.score}</span>
-            <span className="fitness-signal-label">
-              <span className="muted small">Fitness signal</span>
-              <strong className={`fitness-signal-trend trend-${signal.trend}`}>
-                {signal.trend === 'climbing' ? '↑ climbing' :
-                 signal.trend === 'steady'   ? '→ steady'   :
-                                                '↓ easing'}
-              </strong>
-            </span>
-          </div>
-          <p className="fitness-signal-reason">{signal.reason}</p>
-        </div>
-      ) : null}
-
       {next ? (
         <article className="today-card">
           <header className="today-card-head">
             <span className="muted small">{t('train.todays_workout')}</span>
             <h1 className="big-title">
               {next.name}
-              {quickBudget !== null ? <span className="quick-tag"> · quick</span> : null}
+              {quickBudget !== null ? <span className="quick-tag"> · {t('budget.quick_tag')}</span> : null}
             </h1>
             <span className="muted small">
               {t('train.n_exercises', { n: trimmedItems.length })}
@@ -276,17 +254,14 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
               them when the user has been short on training. */}
           <div className="time-budget">
             {adherenceRatio < 0.7 && adherenceRatio > 0 && quickBudget === null ? (
-              <p className="time-budget-hint">
-                You\'ve been short on training — a lighter session today might be
-                more sustainable than skipping again.
-              </p>
+              <p className="time-budget-hint">{t('budget.adherence_hint')}</p>
             ) : null}
             <div className="time-budget-pills">
               <button
                 type="button"
                 className={`time-budget-pill${quickBudget === null ? ' active' : ''}`}
                 onClick={() => setQuickBudget(null)}
-              >Full</button>
+              >{t('budget.full')}</button>
               {[30, 45, 60, 90].map((m) => {
                 const suggested = adherenceRatio < 0.7 && adherenceRatio > 0 && m === 45
                 return (
@@ -322,7 +297,9 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
             {skippedCount > 0 ? (
               <li className="today-card-exercise more">
                 <span className="muted small">
-                  ↪ {skippedCount} exercise{skippedCount === 1 ? '' : 's'} trimmed for today
+                  {skippedCount === 1
+                    ? t('budget.trimmed_one')
+                    : t('budget.trimmed_other', { n: skippedCount })}
                 </span>
               </li>
             ) : null}

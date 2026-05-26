@@ -90,5 +90,23 @@ export type DictKey =
   | 'routines.how_many_days' | 'routines.start_from'
   | 'routines.start_template' | 'routines.start_closest' | 'routines.start_empty'
   | 'routines.create'
+  // Monthly summary on Progress
+  | 'monthly.title' | 'monthly.sessions' | 'monthly.working_sets'
+  | 'monthly.prs' | 'monthly.pr_singular' | 'monthly.bw_label' | 'monthly.bw_unit_suffix'
+  // Achievements grid
+  | 'ach.title' | 'ach.earned'
+  | 'ach.first_workout' | 'ach.first_workout_d'
+  | 'ach.10_sessions' | 'ach.10_sessions_d'
+  | 'ach.50_sessions' | 'ach.50_sessions_d'
+  | 'ach.100_sessions' | 'ach.100_sessions_d'
+  | 'ach.first_pr' | 'ach.first_pr_d'
+  | 'ach.ten_prs' | 'ach.ten_prs_d'
+  | 'ach.7_streak' | 'ach.7_streak_d'
+  | 'ach.30_streak' | 'ach.30_streak_d'
+  | 'ach.20_days' | 'ach.20_days_d'
+  // Quick time-budget pills
+  | 'budget.full' | 'budget.adherence_hint'
+  | 'budget.trimmed_one' | 'budget.trimmed_other'
+  | 'budget.quick_tag'
 
 export type Dict = Record<DictKey, string>

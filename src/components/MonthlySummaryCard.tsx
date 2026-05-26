@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Units } from '../db/schema'
 import { kgToDisplay } from '../lib/units'
-import { useLocaleStore, type Locale } from '../i18n'
+import { useLocaleStore, useT, type Locale } from '../i18n'
 
 const LOCALE_BCP47: Record<Locale, string> = {
   en: 'en-US',
@@ -19,6 +19,7 @@ interface Props {
 /** Big summary card at the top of Progress. Always-on, recomputed live.
  * "May: 18 sessions · 312 working sets · 12 PRs · +1.2 kg". */
 export default function MonthlySummaryCard({ units }: Props) {
+  const t = useT()
   const locale = useLocaleStore((s) => s.locale)
 
   // Bounds: first millisecond of this month and the previous month
@@ -82,23 +83,23 @@ export default function MonthlySummaryCard({ units }: Props) {
   return (
     <section className="monthly-summary">
       <header className="monthly-summary-head">
-        <span className="muted small">This month</span>
+        <span className="muted small">{t('monthly.title')}</span>
         <h2>{monthLabel}</h2>
       </header>
       <div className="monthly-summary-grid">
         <div className="monthly-stat">
           <span className="monthly-stat-value tabnum">{data.sessions}</span>
-          <span className="muted small">sessions</span>
+          <span className="muted small">{t('monthly.sessions')}</span>
         </div>
         <div className="monthly-stat">
           <span className="monthly-stat-value tabnum">{data.workingSets}</span>
-          <span className="muted small">working sets</span>
+          <span className="muted small">{t('monthly.working_sets')}</span>
         </div>
         <div className="monthly-stat">
           <span className={`monthly-stat-value tabnum${data.prs > 0 ? ' shine' : ''}`}>
             {data.prs > 0 ? '🥇 ' : ''}{data.prs}
           </span>
-          <span className="muted small">{data.prs === 1 ? 'PR' : 'PRs'}</span>
+          <span className="muted small">{data.prs === 1 ? t('monthly.pr_singular') : t('monthly.prs')}</span>
         </div>
         <div className="monthly-stat">
           {data.bwDelta !== null ? (
@@ -107,12 +108,12 @@ export default function MonthlySummaryCard({ units }: Props) {
                 {data.bwDelta >= 0 ? '+' : ''}
                 {kgToDisplay(data.bwDelta, units).toFixed(1)}
               </span>
-              <span className="muted small">{units} this month</span>
+              <span className="muted small">{t('monthly.bw_unit_suffix', { u: units })}</span>
             </>
           ) : (
             <>
               <span className="monthly-stat-value tabnum">—</span>
-              <span className="muted small">bodyweight</span>
+              <span className="muted small">{t('monthly.bw_label')}</span>
             </>
           )}
         </div>

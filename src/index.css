@@ -4216,57 +4216,6 @@ select {
   font-weight: 600;
 }
 
-/* Fitness signal — composite score with a trend label and one-line read */
-.fitness-signal {
-  background: var(--s-1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-3);
-  padding: var(--space-3) var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.fitness-signal.trend-climbing { border-color: color-mix(in srgb, var(--tone-good) 35%, var(--line)); }
-.fitness-signal.trend-easing   { border-color: color-mix(in srgb, var(--tone-warn) 35%, var(--line)); }
-.fitness-signal-num {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-}
-.fitness-signal-value {
-  font-size: 2.25rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: var(--fg);
-}
-.fitness-signal-label {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.fitness-signal-label .muted.small {
-  font-size: var(--fs-caption);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--fg-dim);
-  font-weight: 600;
-}
-.fitness-signal-trend {
-  font-size: var(--fs-small);
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  color: var(--fg-muted);
-}
-.fitness-signal-trend.trend-climbing { color: var(--tone-good); }
-.fitness-signal-trend.trend-easing   { color: var(--tone-warn); }
-.fitness-signal-reason {
-  margin: 0;
-  font-size: var(--fs-small);
-  color: var(--fg-muted);
-  letter-spacing: -0.005em;
-  line-height: var(--lh-snug);
-}
 
 /* Quick time-budget pills inside the today card. Trims today's session
    to fit the chosen duration without modifying the routine. */
