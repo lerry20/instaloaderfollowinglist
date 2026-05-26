@@ -4268,6 +4268,65 @@ select {
   line-height: var(--lh-snug);
 }
 
+/* Quick time-budget pills inside the today card. Trims today's session
+   to fit the chosen duration without modifying the routine. */
+.time-budget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.time-budget-hint {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--fg-muted);
+  letter-spacing: -0.005em;
+  line-height: var(--lh-snug);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--tone-warn) 8%, var(--s-1));
+  border: 1px solid color-mix(in srgb, var(--tone-warn) 25%, var(--line));
+  border-radius: var(--r-2);
+}
+.time-budget-pills {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+.time-budget-pill {
+  flex: 1;
+  min-width: 56px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--fg-muted);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--t-1) var(--ease-out),
+              color var(--t-1) var(--ease-out),
+              border-color var(--t-1) var(--ease-out);
+}
+.time-budget-pill:hover {
+  background: var(--s-3);
+  color: var(--fg);
+}
+.time-budget-pill.active {
+  background: var(--fg);
+  color: var(--fg-inverse);
+  border-color: var(--fg);
+}
+.time-budget-pill.suggested {
+  border-color: color-mix(in srgb, var(--tone-warn) 50%, transparent);
+  color: var(--tone-warn);
+}
+.quick-tag {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--fg-dim);
+  letter-spacing: -0.005em;
+}
+
 /* Today card — the biggest thing on the page */
 .today-card {
   background: var(--s-1);

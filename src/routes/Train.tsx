@@ -107,7 +107,10 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const [streak, setStreak] = useState(0)
   const [thisWeek, setThisWeek] = useState(0)
   const [prescribed, setPrescribed] = useState(routine.daysPerWeek ?? routine.workouts.length)
+  const [adherenceRatio, setAdherenceRatio] = useState(1)
   const [signal, setSignal] = useState<FitnessSignal | null>(null)
+  // Quick time budget for today (minutes). null = full session.
+  const [quickBudget, setQuickBudget] = useState<number | null>(null)
 
   // Most recent completed session — for the "Last session" stat.
   const lastSession = useLiveQuery(async () => {
@@ -130,6 +133,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         if (cancelled) return
         setThisWeek(a.thisWeek)
         setPrescribed(a.prescribedPerWeek)
+        setAdherenceRatio(a.ratio)
       })
       .catch(() => {})
     computeFitnessSignal(routine)
@@ -142,7 +146,14 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
     if (!next || starting) return
     setStarting(true)
     try {
-      await startSession(routine, next)
+      // If the user has trimmed the session via the time-budget pills,
+      // pass a workout-shaped object with the trimmed items instead of
+      // the routine's full item list.
+      const workoutToStart =
+        trimmedItems.length === next.items.length
+          ? next
+          : { ...next, items: trimmedItems }
+      await startSession(routine, workoutToStart)
       void ensureNotificationPermission()
       navigate(`/train`)
     } catch (err) {
@@ -163,9 +174,29 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
     ? routine.workouts.slice(nextIdx).slice(0, 6)
     : []
 
+  // Trim today's items to fit `quickBudget` minutes (null = full workout).
+  // 3 min/set + 10 min fixed warm-up overhead; walks exercises in routine
+  // order, stops when budget is hit. Always keeps at least one exercise so
+  // the user never sees an empty card.
+  const trimmedItems = useMemo(() => {
+    if (!next) return []
+    if (quickBudget === null) return next.items
+    const budgetSets = Math.max(3, Math.floor((quickBudget - 10) / 3))
+    const out: typeof next.items = []
+    let used = 0
+    for (const it of next.items) {
+      if (out.length > 0 && used + it.targetSets > budgetSets) break
+      out.push(it)
+      used += it.targetSets
+    }
+    return out
+  }, [next, quickBudget])
+
   // Time estimate from sets × ~3 min + small fixed warm-up.
-  const totalSets = next ? next.items.reduce((a, it) => a + it.targetSets, 0) : 0
+  const totalSets = trimmedItems.reduce((a, it) => a + it.targetSets, 0)
   const minEstimate = totalSets > 0 ? Math.max(30, Math.round(totalSets * 3 + 10)) : null
+  const fullCount = next ? next.items.length : 0
+  const skippedCount = fullCount - trimmedItems.length
 
   const dateFmt = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
     weekday: 'long', month: 'long', day: 'numeric',
@@ -230,15 +261,50 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         <article className="today-card">
           <header className="today-card-head">
             <span className="muted small">{t('train.todays_workout')}</span>
-            <h1 className="big-title">{next.name}</h1>
+            <h1 className="big-title">
+              {next.name}
+              {quickBudget !== null ? <span className="quick-tag"> · quick</span> : null}
+            </h1>
             <span className="muted small">
-              {t('train.n_exercises', { n: next.items.length })}
+              {t('train.n_exercises', { n: trimmedItems.length })}
               {minEstimate ? ` · ${t('routines.min_per_session', { n: minEstimate })}` : ''}
             </span>
           </header>
 
+          {/* Quick time budget pills — trim today's session to fit
+              30/45/60/90 min. Adherence-aware nudge highlights one of
+              them when the user has been short on training. */}
+          <div className="time-budget">
+            {adherenceRatio < 0.7 && adherenceRatio > 0 && quickBudget === null ? (
+              <p className="time-budget-hint">
+                You\'ve been short on training — a lighter session today might be
+                more sustainable than skipping again.
+              </p>
+            ) : null}
+            <div className="time-budget-pills">
+              <button
+                type="button"
+                className={`time-budget-pill${quickBudget === null ? ' active' : ''}`}
+                onClick={() => setQuickBudget(null)}
+              >Full</button>
+              {[30, 45, 60, 90].map((m) => {
+                const suggested = adherenceRatio < 0.7 && adherenceRatio > 0 && m === 45
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`time-budget-pill${quickBudget === m ? ' active' : ''}${suggested && quickBudget === null ? ' suggested' : ''}`}
+                    onClick={() => setQuickBudget(m)}
+                  >
+                    {m}m
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <ul className="today-card-exercises">
-            {next.items.slice(0, 5).map((it) => (
+            {trimmedItems.slice(0, 5).map((it) => (
               <li key={it.exerciseId} className="today-card-exercise">
                 <span className="today-card-exercise-name">
                   <ExerciseName id={it.exerciseId} />
@@ -248,9 +314,16 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
                 </span>
               </li>
             ))}
-            {next.items.length > 5 ? (
+            {trimmedItems.length > 5 ? (
               <li className="today-card-exercise more">
-                <span className="muted small">+ {next.items.length - 5} more</span>
+                <span className="muted small">+ {trimmedItems.length - 5} more</span>
+              </li>
+            ) : null}
+            {skippedCount > 0 ? (
+              <li className="today-card-exercise more">
+                <span className="muted small">
+                  ↪ {skippedCount} exercise{skippedCount === 1 ? '' : 's'} trimmed for today
+                </span>
               </li>
             ) : null}
           </ul>
