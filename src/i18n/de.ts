@@ -119,7 +119,7 @@ export const de: Dict = {
   'settings.credits': 'Credits',
   'settings.exercises_in_english_note': 'Übungsnamen und Technik-Tipps bleiben vorerst auf Englisch.',
   // Onboarding
-  'onboarding.welcome_title': 'Willkommen bei BulkLog',
+  'onboarding.welcome_title': 'Willkommen bei MyBulkLog',
   'onboarding.welcome_sub': 'Ein persönlicher Hypertrophie-Tracker — wähle Sprache und Ziel, um loszulegen.',
   'onboarding.choose_language': 'Sprache',
   'onboarding.choose_goal': 'Wofür trainierst du?',

@@ -53,7 +53,7 @@ export async function renderShareCanvas(opts: RenderOpts): Promise<HTMLCanvasEle
   ctx.font = 'bold 30px system-ui, -apple-system, sans-serif'
   ctx.fillStyle = palette.text
   ctx.textBaseline = 'middle'
-  ctx.fillText('BulkLog', padding + 56, padding + 18)
+  ctx.fillText('MyBulkLog', padding + 56, padding + 18)
   // Date right-aligned
   ctx.font = '24px system-ui, -apple-system, sans-serif'
   ctx.fillStyle = palette.muted
@@ -144,7 +144,7 @@ export async function renderShareCanvas(opts: RenderOpts): Promise<HTMLCanvasEle
   ctx.font = '22px system-ui, -apple-system, sans-serif'
   ctx.fillStyle = palette.muted
   ctx.textAlign = 'center'
-  ctx.fillText('Tracked with BulkLog', size / 2, size - padding)
+  ctx.fillText('Tracked with MyBulkLog', size / 2, size - padding)
   ctx.textAlign = 'left'
 
   void estimateOneRepMax // silence unused import warning if not used here
@@ -170,7 +170,7 @@ export async function shareWorkoutImage(sessionId: number): Promise<void> {
   const blob: Blob = await new Promise((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png')
   })
-  const filename = `bulklog-${session.date}.png`
+  const filename = `mybulklog-${session.date}.png`
 
   // Prefer the Web Share API on supported devices (iOS Safari, Android Chrome).
   const file = new File([blob], filename, { type: 'image/png' })
@@ -180,7 +180,7 @@ export async function shareWorkoutImage(sessionId: number): Promise<void> {
   }
   if (navWithShare.canShare && navWithShare.share && navWithShare.canShare({ files: [file] })) {
     try {
-      await navWithShare.share({ files: [file], title: `${session.workoutName} — BulkLog` })
+      await navWithShare.share({ files: [file], title: `${session.workoutName} — MyBulkLog` })
       return
     } catch {
       // fall through to download

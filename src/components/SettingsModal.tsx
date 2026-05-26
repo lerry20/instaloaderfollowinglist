@@ -58,7 +58,7 @@ export default function SettingsModal({ onClose }: Props) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `bulklog-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = `mybulklog-backup-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
       toast('Backup downloaded', { kind: 'success' })
@@ -328,7 +328,7 @@ export default function SettingsModal({ onClose }: Props) {
         </details>
 
         <p className="muted small about-line">
-          BulkLog · local-only · IndexedDB · exercise data from{' '}
+          MyBulkLog · local-only · IndexedDB · exercise data from{' '}
           <a className="link" href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener noreferrer">free-exercise-db</a>
         </p>
       </div>

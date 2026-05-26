@@ -75,7 +75,7 @@ export async function buildCoachContext(): Promise<CoachContext> {
       ? 'No bodyweight history.'
       : bwSorted.map((b) => `${b.date}: ${b.weightKg.toFixed(1)} kg`).join(', ')
 
-  const systemPrompt = `You are BulkLog's in-app coach. The user is training for hypertrophy / muscle gain.
+  const systemPrompt = `You are MyBulkLog's in-app coach. The user is training for hypertrophy / muscle gain.
 
 Goal: ${settings?.goal ?? 'bulk'}.
 Active routine: see recent sessions.

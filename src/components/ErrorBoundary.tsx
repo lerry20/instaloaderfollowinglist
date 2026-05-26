@@ -53,7 +53,7 @@ export default class ErrorBoundary extends Component<
   async copyReport() {
     const { error, info } = this.state
     const payload = [
-      `BulkLog crash report`,
+      `MyBulkLog crash report`,
       `ts: ${new Date().toISOString()}`,
       `url: ${window.location.href}`,
       `ua: ${navigator.userAgent}`,
@@ -87,7 +87,7 @@ export default class ErrorBoundary extends Component<
         <div className="error-card">
           <h2>Something crashed / Errore inatteso</h2>
           <p className="muted small">
-            BulkLog hit an unexpected error and stopped rendering. The most
+            MyBulkLog hit an unexpected error and stopped rendering. The most
             common cause is a session that got into a bad state — try
             "Abandon active sessions" first.
           </p>

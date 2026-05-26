@@ -42,8 +42,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'BulkLog — Workout Dashboard',
-        short_name: 'BulkLog',
+        name: 'MyBulkLog — Workout Dashboard',
+        short_name: 'MyBulkLog',
         description:
           'Personal workout dashboard for hypertrophy and bulking — weekly plan, set logger, technique cues, fully offline.',
         theme_color: '#0a0a0a',

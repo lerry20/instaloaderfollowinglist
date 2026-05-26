@@ -35,7 +35,7 @@ export default function Layout() {
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark" aria-hidden />
-          <span>BulkLog</span>
+          <span>MyBulkLog</span>
           {streak >= 2 ? (
             <span className="streak-badge tabnum" title={`${streak}-day streak`}>
               🔥 {streak}

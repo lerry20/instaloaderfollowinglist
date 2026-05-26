@@ -26,7 +26,7 @@ export default function App() {
     return (
       <div className="boot-screen">
         <span className="brand-mark" aria-hidden />
-        <span>BulkLog</span>
+        <span>MyBulkLog</span>
       </div>
     )
   }

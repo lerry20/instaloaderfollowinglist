@@ -22,7 +22,7 @@ export default function UpdateBanner() {
 
   return (
     <div className="update-banner" role="status">
-      <span>A new version of BulkLog is available.</span>
+      <span>A new version of MyBulkLog is available.</span>
       <div className="update-banner-actions">
         <button
           className="link"
