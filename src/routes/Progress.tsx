@@ -29,6 +29,7 @@ import ProgressChart from '../components/ProgressChart'
 import VolumeBars from '../components/VolumeBars'
 import VolumeSummary from '../components/VolumeSummary'
 import TrainingCalendar from '../components/TrainingCalendar'
+import MonthlySummaryCard from '../components/MonthlySummaryCard'
 import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
 
@@ -40,6 +41,7 @@ export default function Progress() {
   return (
     <div className="page">
       <h1 className="big-title">Progress</h1>
+      <MonthlySummaryCard units={units} />
       <PRTicker units={units} />
       <section className="card">
         <header className="section-head">

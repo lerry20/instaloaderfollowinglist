@@ -3190,6 +3190,69 @@ html[data-theme='light'] .modal-backdrop.nested {
   font-weight: 500;
   padding-bottom: var(--space-3);
 }
+/* Monthly summary card at the top of Progress */
+.monthly-summary {
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-1);
+}
+.monthly-summary-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.monthly-summary-head .muted.small {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+.monthly-summary-head h2 {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+  margin: 0;
+}
+.monthly-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+@media (max-width: 480px) {
+  .monthly-summary-grid { grid-template-columns: 1fr 1fr; }
+}
+.monthly-stat {
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: var(--space-3) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+  min-width: 0;
+}
+.monthly-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.monthly-stat-value.up { color: var(--tone-good); }
+.monthly-stat-value.down { color: var(--tone-danger); }
+.monthly-stat-value.shine { color: var(--tone-warn); }
+.monthly-stat .muted.small {
+  font-size: var(--fs-caption);
+  letter-spacing: -0.003em;
+}
+
 /* End-of-session intensity rating in the workout summary modal */
 .session-rpe-prompt {
   display: flex;
