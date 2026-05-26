@@ -3190,6 +3190,81 @@ html[data-theme='light'] .modal-backdrop.nested {
   font-weight: 500;
   padding-bottom: var(--space-3);
 }
+/* Achievements / milestones grid on Progress */
+.achievements-card {
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.achievements-head .muted.small {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+.achievements-head h3 {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.achievements-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+@media (max-width: 380px) {
+  .achievements-grid { grid-template-columns: 1fr; }
+}
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  opacity: 0.4;
+  min-width: 0;
+}
+.achievement.earned {
+  opacity: 1;
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, var(--tone-warn) 6%, var(--s-1));
+}
+.achievement-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.achievement-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.achievement-text strong {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+.achievement-text .muted.small {
+  font-size: var(--fs-caption);
+  letter-spacing: -0.003em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Monthly summary card at the top of Progress */
 .monthly-summary {
   background: var(--s-1);

@@ -30,6 +30,7 @@ import VolumeBars from '../components/VolumeBars'
 import VolumeSummary from '../components/VolumeSummary'
 import TrainingCalendar from '../components/TrainingCalendar'
 import MonthlySummaryCard from '../components/MonthlySummaryCard'
+import AchievementsCard from '../components/AchievementsCard'
 import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
 
@@ -42,6 +43,7 @@ export default function Progress() {
     <div className="page">
       <h1 className="big-title">Progress</h1>
       <MonthlySummaryCard units={units} />
+      <AchievementsCard />
       <PRTicker units={units} />
       <section className="card">
         <header className="section-head">
