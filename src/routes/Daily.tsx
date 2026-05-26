@@ -60,14 +60,21 @@ function NutritionSection() {
     protein: r.proteinG,
   }))
 
+  const stat = todayLog ? `${todayLog.kcal} kcal` : undefined
   const subtitle = todayLog
-    ? `today: ${todayLog.kcal} kcal · ${todayLog.proteinG}g protein`
+    ? `${todayLog.proteinG}g protein${kcalTarget ? ` · target ${kcalTarget} kcal` : ''}`
     : kcalTarget && proteinTarget
       ? `target ${kcalTarget} kcal · ${proteinTarget}g protein`
       : 'set targets in Settings'
 
   return (
-    <CollapsibleSection title="Nutrition" subtitle={subtitle}>
+    <CollapsibleSection
+      id="daily-nutrition"
+      title="Nutrition"
+      subtitle={subtitle}
+      stat={stat}
+      status={todayLog ? 'good' : 'pending'}
+    >
       <div className="daily-input-row">
         <label className="field">
           <span>Calories</span>
@@ -150,12 +157,20 @@ function SleepSection() {
     }
   }, [todayLog?.hours, todayLog?.soreness])
 
+  const stat = todayLog ? `${todayLog.hours}h` : undefined
   const subtitle = todayLog
-    ? `today: ${todayLog.hours}h · soreness ${todayLog.soreness}/5`
-    : 'how did you rest?'
+    ? `soreness ${todayLog.soreness}/5`
+    : 'how did you rest last night?'
 
   return (
-    <CollapsibleSection title="Sleep & recovery" subtitle={subtitle} defaultOpen={false}>
+    <CollapsibleSection
+      id="daily-sleep"
+      title="Sleep & recovery"
+      subtitle={subtitle}
+      stat={stat}
+      status={todayLog ? 'good' : 'pending'}
+      defaultOpen={false}
+    >
       <div className="daily-input-row">
         <label className="field">
           <span>Last night's sleep (hours)</span>
@@ -210,14 +225,25 @@ function BodyweightSection() {
   }, [todayLog?.weightKg, units])
 
   const last = logs && logs.length > 0 ? logs[logs.length - 1] : null
-  const subtitle = todayLog
-    ? `today: ${kgToDisplay(todayLog.weightKg, units).toFixed(1)} ${units}`
+  const stat = todayLog
+    ? `${kgToDisplay(todayLog.weightKg, units).toFixed(1)} ${units}`
     : last
-      ? `last: ${kgToDisplay(last.weightKg, units).toFixed(1)} ${units}`
+      ? `${kgToDisplay(last.weightKg, units).toFixed(1)} ${units}`
+      : undefined
+  const subtitle = todayLog
+    ? 'logged today'
+    : last
+      ? `last entry ${last.date.slice(5)}`
       : 'No entries yet'
 
   return (
-    <CollapsibleSection title="Bodyweight" subtitle={subtitle}>
+    <CollapsibleSection
+      id="daily-bodyweight"
+      title="Bodyweight"
+      subtitle={subtitle}
+      stat={stat}
+      status={todayLog ? 'good' : 'pending'}
+    >
       <div className="bw-input-row">
         <input
           type="number"
@@ -272,11 +298,17 @@ function MeasurementsSection() {
   void useCm
 
   const subtitle = last
-    ? `last (${last.date}): waist ${last.waistCm ?? '—'} · chest ${last.chestCm ?? '—'} · arm ${last.armCm ?? '—'}`
+    ? `${last.date.slice(5)} · waist ${last.waistCm ?? '—'} · chest ${last.chestCm ?? '—'} · arm ${last.armCm ?? '—'}`
     : 'weekly is enough'
 
   return (
-    <CollapsibleSection title="Measurements (cm)" subtitle={subtitle} defaultOpen={false}>
+    <CollapsibleSection
+      id="daily-measurements"
+      title="Measurements"
+      subtitle={subtitle}
+      status="neutral"
+      defaultOpen={false}
+    >
       <div className="measurements-grid">
         <label className="field">
           <span>Waist</span>

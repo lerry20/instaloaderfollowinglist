@@ -4972,31 +4972,230 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   padding-bottom: var(--space-3);
 }
 
-/* Page-level variant: bigger h3 title for top-of-page sections on
-   Progress / Daily / ExerciseDetail. Same chevron + toggle behavior,
-   typography matches an actual section header instead of a settings row. */
-.collapsible-section--page > summary {
-  padding: var(--space-4);
+/* === Page-level collapsible (.cx-section) ====================
+   Used on Daily + Progress. Sleek Freeletics-inspired drawer:
+   animated chevron, headline stat, status dot, smooth height animation
+   via CSS grid 0fr → 1fr. Controlled by React (not <details>) so we
+   can animate the body and still expose aria-expanded.
+   The legacy .collapsible-section above is kept for Settings rows. */
+.cx-section {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  overflow: hidden;
+  transform-origin: center;
+  transition: border-color var(--t-2) var(--ease-out),
+              box-shadow var(--t-2) var(--ease-out),
+              background var(--t-2) var(--ease-out),
+              transform var(--t-1) var(--ease-out);
 }
-.collapsible-section--page > summary h3 {
-  margin: 0;
-  font-size: var(--fs-h2);
+.cx-section:hover {
+  border-color: var(--line-strong);
+}
+.cx-section.cx-section-open {
+  border-color: var(--line-strong);
+  background: var(--bg-elev-2);
+  box-shadow: 0 1px 0 var(--line-soft), 0 8px 20px -16px rgba(0, 0, 0, 0.6);
+}
+
+.cx-section-trigger {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-3);
+  text-align: left;
+  cursor: pointer;
+  color: var(--fg);
+  font: inherit;
+  transition: background var(--t-1) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.cx-section-trigger:hover { background: var(--s-2); }
+.cx-section-trigger:active { background: var(--s-3); }
+.cx-section-trigger:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: -2px;
+}
+
+.cx-section-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.cx-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.cx-section-title {
+  font-size: var(--fs-h3);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--fg);
-  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.collapsible-section-title {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+
+.cx-section-status {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transition: box-shadow var(--t-2) var(--ease-out);
 }
-.collapsible-section-title .muted.small {
+.cx-section-status-good {
+  background: var(--tone-good);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone-good) 18%, transparent);
+}
+.cx-section-status-pending {
+  background: var(--fg-dim);
+}
+.cx-section-status-neutral {
+  background: var(--fg-muted);
+}
+
+.cx-section-subtitle {
   font-size: var(--fs-small);
-  letter-spacing: -0.005em;
-  font-weight: 400;
-  text-transform: none;
+  color: var(--fg-muted);
+  letter-spacing: -0.003em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cx-section-stat {
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.cx-section-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  background: var(--s-2);
+  color: var(--fg-muted);
+  transition: transform var(--t-3) var(--ease-spring),
+              background var(--t-2) var(--ease-out),
+              color var(--t-2) var(--ease-out);
+}
+.cx-section-trigger:hover .cx-section-chevron {
+  background: var(--s-3);
+  color: var(--fg);
+}
+.cx-section-open .cx-section-chevron {
+  transform: rotate(-180deg);
+  background: var(--s-3);
+  color: var(--fg);
+}
+
+/* The animated drawer: grid-template-rows 0fr → 1fr is the cleanest way
+   to animate height: auto. The clip is the row, the body is the content. */
+.cx-section-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--t-3) var(--ease-out);
+}
+.cx-section-open .cx-section-drawer {
+  grid-template-rows: 1fr;
+}
+.cx-section-drawer-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+.cx-section-body {
+  padding: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line-soft);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--t-3) var(--ease-out),
+              transform var(--t-3) var(--ease-out);
+}
+.cx-section-open .cx-section-body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Body's direct children: kill the top-of-card double padding from
+   nested .card, since the body already provides its own. */
+.cx-section-body > h3:first-child,
+.cx-section-body > h4:first-child {
+  margin-top: 0;
+}
+.cx-section-body > section.card,
+.cx-section-body > .card {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-section-drawer,
+  .cx-section-chevron,
+  .cx-section-body { transition: none; }
+}
+
+/* Tone variants. `success` paints a subtle gold rail on the left edge
+   when open (PRs etc); `warn` is a faint warning rail. Both stay nearly
+   monochrome until the user expands the section. */
+.cx-tone-success.cx-section-open {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--tone-warn) 8%, transparent) 0,
+      color-mix(in srgb, var(--tone-warn) 0%, transparent) 50%
+    ),
+    var(--bg-elev-2);
+  border-color: color-mix(in srgb, var(--tone-warn) 35%, var(--line-strong));
+}
+.cx-tone-success.cx-section-open .cx-section-title {
+  color: var(--fg);
+}
+.cx-tone-success.cx-section-open .cx-section-chevron {
+  background: color-mix(in srgb, var(--tone-warn) 22%, var(--s-3));
+  color: var(--tone-warn);
+}
+.cx-tone-success.cx-section-open .cx-section-stat {
+  color: var(--tone-warn);
+}
+
+.cx-tone-warn.cx-section-open {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--tone-danger) 6%, transparent) 0,
+      color-mix(in srgb, var(--tone-danger) 0%, transparent) 50%
+    ),
+    var(--bg-elev-2);
+  border-color: color-mix(in srgb, var(--tone-danger) 30%, var(--line-strong));
+}
+
+/* Press-scale: tiny squish on tap so the whole card feels alive.
+   :has() is supported in all modern browsers (Chrome 105+, Safari 15.4+,
+   Firefox 121+). */
+.cx-section:has(.cx-section-trigger:active) {
+  transform: scale(0.997);
+}
+
+/* The stat number subtly transitions when it updates so a freshly logged
+   value feels acknowledged rather than just appearing. */
+.cx-section-stat {
+  transition: color var(--t-2) var(--ease-out);
 }
 
 /* Day cards on the routine preview are now collapsible <details>. */

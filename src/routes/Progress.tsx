@@ -46,7 +46,11 @@ export default function Progress() {
       <MonthlySummaryCard units={units} />
       <AchievementsCard />
       <PRTicker units={units} />
-      <CollapsibleSection title="Training calendar" subtitle="last 13 weeks">
+      <CollapsibleSection
+        id="progress-calendar"
+        title="Training calendar"
+        subtitle="how consistent you've been"
+      >
         <TrainingCalendar />
       </CollapsibleSection>
       <WeeklyVolumeBarsSection />
@@ -60,7 +64,11 @@ export default function Progress() {
 
 function WeeklyVolumeBarsSection() {
   return (
-    <CollapsibleSection title="This week, in plain English" subtitle="based on your last 7 days">
+    <CollapsibleSection
+      id="progress-weekly-summary"
+      title="This week, in plain English"
+      subtitle="working sets across each muscle group"
+    >
       <VolumeSummary />
       <details className="vol-details">
         <summary>Show the chart</summary>
@@ -112,7 +120,14 @@ function PRTicker({ units }: { units: Units }) {
   if (prs.length === 0) return null
 
   return (
-    <CollapsibleSection title="🥇 Recent PRs">
+    <CollapsibleSection
+      id="progress-prs"
+      title="Recent PRs"
+      subtitle="new top sets you've hit lately"
+      stat={String(prs.length)}
+      status="good"
+      tone="success"
+    >
       <ul className="pr-ticker-list">
         {prs.map((p, i) => (
           <li key={i}>
@@ -138,12 +153,22 @@ function BodyweightSection({ units }: { units: Units }) {
 
   const showInput = !todayLog || editing
 
-  const subtitle = logs && logs.length > 0
-    ? `${kgToDisplay(logs[logs.length - 1].weightKg, units).toFixed(1)} ${units}`
-    : 'No entries'
+  const latest = logs && logs.length > 0 ? logs[logs.length - 1] : null
+  const stat = latest ? `${kgToDisplay(latest.weightKg, units).toFixed(1)} ${units}` : undefined
+  const subtitle = todayLog
+    ? 'logged today'
+    : latest
+      ? `last entry ${latest.date.slice(5)}`
+      : 'No entries yet'
 
   return (
-    <CollapsibleSection title="Bodyweight" subtitle={subtitle}>
+    <CollapsibleSection
+      id="progress-bodyweight"
+      title="Bodyweight"
+      subtitle={subtitle}
+      stat={stat}
+      status={todayLog ? 'good' : 'pending'}
+    >
       {showInput ? (
         <div className="bw-input-row">
           <input
@@ -224,8 +249,10 @@ function TopSetCards({ units }: { units: Units }) {
 
   return (
     <CollapsibleSection
-      title="Top sets — your most-trained lifts"
-      subtitle={`${series.length} lifts`}
+      id="progress-top-sets"
+      title="Top sets"
+      subtitle="your most-trained lifts"
+      stat={String(series.length)}
       defaultOpen={false}
     >
       <div className="top-set-grid">
@@ -273,8 +300,10 @@ function WeeklyVolumeSection({ units }: { units: Units }) {
 
   return (
     <CollapsibleSection
+      id="progress-volume-by-muscle"
       title="Weekly volume by muscle"
-      subtitle={`7 days · ${units}·reps`}
+      subtitle={`last 7 days · ${units}·reps`}
+      stat={String(data.length)}
       defaultOpen={false}
     >
       <div style={{ width: '100%', height: Math.max(180, data.length * 26) }}>
@@ -325,7 +354,12 @@ function HistorySection({ units }: { units: Units }) {
 
   if (!sessions || sessions.length === 0) {
     return (
-      <CollapsibleSection title="Recent sessions" subtitle="No entries yet">
+      <CollapsibleSection
+        id="progress-recent-sessions"
+        title="Recent sessions"
+        subtitle="No entries yet"
+        defaultOpen={false}
+      >
         <p className="muted">No sessions yet. <Link to="/" className="link">Start one →</Link></p>
       </CollapsibleSection>
     )
@@ -333,8 +367,11 @@ function HistorySection({ units }: { units: Units }) {
 
   return (
     <CollapsibleSection
+      id="progress-recent-sessions"
       title="Recent sessions"
-      subtitle={`${sessions.length} ${sessions.length === 1 ? 'session' : 'sessions'}`}
+      subtitle="last 30 days"
+      stat={String(sessions.length)}
+      defaultOpen={false}
     >
       <ul className="session-history">
         {sessions.map((s) => {
