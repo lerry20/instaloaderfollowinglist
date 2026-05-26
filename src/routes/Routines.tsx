@@ -71,7 +71,32 @@ export default function Routines() {
           <ActiveRoutineCard
             routine={active}
             onSwitch={() => setShowAll(true)}
-            onEdit={() => setEditing(active)}
+            onEdit={async () => {
+              if (!active) return
+              // Built-in routines can't be edited in place. Auto-clone, swap
+              // the active routine to the copy, and open the editor on it —
+              // one tap, no dead-end.
+              if (active.builtIn) {
+                const cloneId = `custom-${Date.now()}`
+                const dup: Routine = {
+                  ...active,
+                  id: cloneId,
+                  name: `${active.name} (mine)`,
+                  builtIn: false,
+                  workouts: active.workouts.map((w, i) => ({
+                    ...w,
+                    id: `${cloneId}-w${i + 1}`,
+                    items: [...w.items],
+                  })),
+                }
+                await db.routines.put(dup)
+                await activate(cloneId)
+                setEditing(dup)
+                toast('Made a copy of this routine for you to edit', { kind: 'info', duration: 2500 })
+              } else {
+                setEditing(active)
+              }
+            }}
           />
         </>
       ) : null}

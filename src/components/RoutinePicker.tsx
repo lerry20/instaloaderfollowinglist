@@ -20,21 +20,26 @@ export default function RoutinePicker({ onClose }: Props) {
 
   const matches = useMemo(() => {
     if (days === null || level === null || focus === null) return []
-    // Pick built-in routines that match days exactly, level ≤ user's level,
-    // and either match the focus or are balanced.
+    // Pick built-in routines that match days exactly and level ≤ user's level.
     const levelOrder: Record<RoutineLevel, number> = { beginner: 1, intermediate: 2, advanced: 3 }
-    return allRoutines
+    const base = allRoutines
       .filter((r) => r.builtIn && r.daysPerWeek === days)
       .filter((r) => {
         if (!r.level) return true
         return levelOrder[r.level] <= levelOrder[level]
       })
-      .filter((r) => {
-        if (focus === 'balanced') return true
-        if (!r.focus || r.focus === 'balanced') return true
-        return r.focus === focus
-      })
-      .slice(0, 3)
+
+    // Rank: exact focus match first (e.g. user picked chest, routine.focus = chest),
+    // then balanced fallbacks, finally other focus categories. This keeps the same
+    // 3 cards from being shown for every focus answer when the matrix is thin.
+    const exactFocus = base.filter((r) => r.focus === focus && focus !== 'balanced')
+    const balancedFocus = base.filter((r) => !r.focus || r.focus === 'balanced')
+    const otherFocus = base.filter(
+      (r) => r.focus && r.focus !== focus && r.focus !== 'balanced',
+    )
+    return focus === 'balanced'
+      ? [...balancedFocus, ...exactFocus, ...otherFocus].slice(0, 3)
+      : [...exactFocus, ...balancedFocus, ...otherFocus].slice(0, 3)
   }, [allRoutines, days, level, focus])
 
   // If no exact match, soften the days filter by ±1
