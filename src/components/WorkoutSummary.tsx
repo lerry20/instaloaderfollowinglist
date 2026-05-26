@@ -66,8 +66,6 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
           <button className="link" onClick={onClose}>Close</button>
         </header>
 
-        <SessionRpePrompt sessionId={sessionId} current={session.overallRPE} />
-
         <div className="summary-stats big">
           <div>
             <span className="muted small">Working sets</span>
@@ -142,6 +140,8 @@ export default function WorkoutSummary({ sessionId, units, onClose }: Props) {
           )}
         </div>
 
+        <SessionRpePrompt sessionId={sessionId} current={session.overallRPE} />
+
         <div className="modal-foot">
           <button className="btn block" onClick={onShare} disabled={sharing}>
             {sharing ? 'Generating image…' : '📤 Share as image'}
@@ -188,8 +188,9 @@ function ConfettiBanner() {
   )
 }
 
-/** Post-session intensity rating — 1-10 buttons. Stored on the session.
- * Skippable. Feeds future adaptive recommendations. */
+/** Post-session intensity rating — collapsed by default. Tap "Rate intensity"
+ * to expand to a 1-10 row. Stored on the session for future adaptive logic.
+ * Completely optional, never blocks closing the summary. */
 function SessionRpePrompt({ sessionId, current }: { sessionId: number; current?: number }) {
   const [picked, setPicked] = useState<number | null>(current ?? null)
   async function rate(n: number) {
@@ -197,8 +198,13 @@ function SessionRpePrompt({ sessionId, current }: { sessionId: number; current?:
     await db.sessions.update(sessionId, { overallRPE: n })
   }
   return (
-    <div className="session-rpe-prompt">
-      <span className="session-rpe-label">How hard was that overall?</span>
+    <details className="session-rpe-prompt" open={picked !== null}>
+      <summary>
+        <span className="session-rpe-summary-label">
+          {picked !== null ? `Intensity: ${picked} / 10` : 'Rate intensity'}
+        </span>
+        <span className="muted small">optional</span>
+      </summary>
       <div className="session-rpe-scale">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
           <button
@@ -215,6 +221,6 @@ function SessionRpePrompt({ sessionId, current }: { sessionId: number; current?:
       <span className="session-rpe-hint muted small">
         1 = barely felt it · 5 = challenging · 10 = brutal
       </span>
-    </div>
+    </details>
   )
 }
