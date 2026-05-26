@@ -21,10 +21,20 @@ import { kgToDisplay } from '../lib/units'
 import { ensureNotificationPermission } from '../state/restTimer'
 import { toast } from '../state/toasts'
 import { haptics } from '../lib/haptics'
-import { buildProactiveMessage, type ProactiveMessage } from '../lib/streak'
+import { buildProactiveMessage, currentStreak, type ProactiveMessage } from '../lib/streak'
+import { computeAdherence } from '../lib/adherence'
 import Skeleton from '../components/Skeleton'
-import { useT } from '../i18n'
+import { useT, useLocaleStore, type Locale } from '../i18n'
 import { useLocalizedExercise } from '../lib/exercise'
+
+const LOCALE_BCP47: Record<Locale, string> = {
+  en: 'en-US',
+  it: 'it-IT',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  pt: 'pt-BR',
+}
 
 export default function Train() {
   const t = useT()
@@ -85,6 +95,7 @@ export default function Train() {
 
 function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | null }) {
   const t = useT()
+  const locale = useLocaleStore((s) => s.locale)
   const navigate = useNavigate()
   const settings = useSettings()
   const bw = useBodyweightLogs()
@@ -92,16 +103,35 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const units = settings?.units ?? 'kg'
   const [starting, setStarting] = useState(false)
   const [proactive, setProactive] = useState<ProactiveMessage | null>(null)
+  const [streak, setStreak] = useState(0)
+  const [thisWeek, setThisWeek] = useState(0)
+  const [prescribed, setPrescribed] = useState(routine.daysPerWeek ?? routine.workouts.length)
+
+  // Most recent completed session — for the "Last session" stat.
+  const lastSession = useLiveQuery(async () => {
+    const all = await db.sessions.toArray()
+    const completed = all.filter((s) => s.completedAt !== null)
+    completed.sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))
+    return completed[0] ?? null
+  }, [])
 
   useEffect(() => {
     let cancelled = false
     buildProactiveMessage()
       .then((m) => !cancelled && setProactive(m))
       .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    currentStreak()
+      .then((n) => !cancelled && setStreak(n))
+      .catch(() => {})
+    computeAdherence(routine)
+      .then((a) => {
+        if (cancelled) return
+        setThisWeek(a.thisWeek)
+        setPrescribed(a.prescribedPerWeek)
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [routine.id])
 
   async function start() {
     if (!next || starting) return
@@ -117,61 +147,153 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
     }
   }
 
+  // Where is the suggested next workout inside the routine cycle?
+  const nextIdx = next ? routine.workouts.findIndex((w) => w.id === next.id) : -1
+  const position = nextIdx >= 0 ? nextIdx + 1 : 1
+  const totalWorkouts = routine.workouts.length
+  const nextAfter = nextIdx >= 0 && totalWorkouts > 1
+    ? routine.workouts[(nextIdx + 1) % totalWorkouts]
+    : null
+
+  // Time estimate from sets × ~3 min + small fixed warm-up.
+  const totalSets = next ? next.items.reduce((a, it) => a + it.targetSets, 0) : 0
+  const minEstimate = totalSets > 0 ? Math.max(30, Math.round(totalSets * 3 + 10)) : null
+
+  const dateFmt = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+    weekday: 'long', month: 'long', day: 'numeric',
+  })
+  const lastSessionDateFmt = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
+    weekday: 'short', month: 'short', day: 'numeric',
+  })
+
   return (
-    <div className="page train-start">
+    <div className="page train-dashboard">
       {proactive ? (
         <div className={`proactive proactive-${proactive.kind}`}>{proactive.text}</div>
       ) : null}
-      <header className="hero">
-        <span className="muted small">{t('train.todays_workout')}</span>
-        <h1 className="big-title">{next?.name ?? t('train.no_workout_queued')}</h1>
-        <span className="muted small">{routine.name}</span>
+
+      <header className="dashboard-head">
+        <div className="dashboard-date-row">
+          <span className="muted small">{dateFmt.format(new Date())}</span>
+          {streak >= 2 ? (
+            <span className="streak-badge tabnum" title={`${streak}-day streak`}>
+              🔥 {streak}
+            </span>
+          ) : null}
+        </div>
+        <Link to="/routines" className="dashboard-routine">
+          <div className="dashboard-routine-meta">
+            {routine.level ? (
+              <span className="dashboard-chip">
+                {t(`routines.level_${routine.level}` as 'routines.level_beginner')}
+              </span>
+            ) : null}
+            <span className="dashboard-chip">
+              {t('routines.days_per_week', { n: routine.daysPerWeek ?? routine.workouts.length })}
+            </span>
+          </div>
+          <h2>{routine.name}</h2>
+          {totalWorkouts > 0 ? (
+            <span className="muted small">
+              Day {position} of {totalWorkouts} in the cycle
+            </span>
+          ) : null}
+        </Link>
       </header>
 
       {next ? (
-        <button className="btn primary block start-btn" onClick={start} disabled={starting}>
-          {starting ? t('common.starting') : t('train.start_workout')}
-        </button>
-      ) : (
-        <Link to="/routines" className="btn block">
-          {t('train.browse_routines')}
-        </Link>
-      )}
-
-      {next ? (
-        <section className="card">
-          <header className="section-head">
-            <h3>{t('train.what_youll_do')}</h3>
-            <span className="muted small">{t('train.n_exercises', { n: next.items.length })}</span>
+        <article className="today-card">
+          <header className="today-card-head">
+            <span className="muted small">{t('train.todays_workout')}</span>
+            <h1 className="big-title">{next.name}</h1>
+            <span className="muted small">
+              {t('train.n_exercises', { n: next.items.length })}
+              {minEstimate ? ` · ${t('routines.min_per_session', { n: minEstimate })}` : ''}
+            </span>
           </header>
-          <ul className="hero-items">
-            {next.items.map((it) => (
-              <li key={it.exerciseId} className="hero-item">
-                <span className="tabnum">
+
+          <ul className="today-card-exercises">
+            {next.items.slice(0, 5).map((it) => (
+              <li key={it.exerciseId} className="today-card-exercise">
+                <span className="today-card-exercise-name">
+                  <ExerciseName id={it.exerciseId} />
+                </span>
+                <span className="today-card-exercise-prescription tabnum">
                   {it.targetSets} × {it.targetReps}
                 </span>
-                <span><ExerciseName id={it.exerciseId} /></span>
               </li>
             ))}
+            {next.items.length > 5 ? (
+              <li className="today-card-exercise more">
+                <span className="muted small">+ {next.items.length - 5} more</span>
+              </li>
+            ) : null}
           </ul>
-        </section>
-      ) : null}
 
-      <section className="grid-2">
-        <Link to="/progress" className="card stat-link">
-          <span className="muted small">{t('train.bodyweight')}</span>
-          <span className="stat-value tabnum">
-            {latestBw ? kgToDisplay(latestBw.weightKg, units).toFixed(1) : '—'}
-            <span className="unit">{latestBw ? units : ''}</span>
+          <button
+            className="btn primary block today-card-cta"
+            onClick={start}
+            disabled={starting}
+          >
+            {starting ? t('common.starting') : t('train.start_workout')} →
+          </button>
+        </article>
+      ) : (
+        <div className="card">
+          <h2>{t('train.no_workout_queued')}</h2>
+          <p className="muted small">{t('train.pick_routine_title')}</p>
+          <Link to="/routines" className="btn block">
+            {t('train.browse_routines')}
+          </Link>
+        </div>
+      )}
+
+      <section className="dashboard-stats">
+        <div className="dashboard-stat">
+          <span className="muted small">This week</span>
+          <span className="dashboard-stat-value tabnum">
+            {thisWeek}
+            <span className="muted">/ {prescribed}</span>
           </span>
-          {!latestBw ? <span className="link small">{t('train.log_it')}</span> : null}
+          <span className="muted small">sessions</span>
+        </div>
+        <Link to="/progress" className="dashboard-stat">
+          <span className="muted small">Last session</span>
+          {lastSession ? (
+            <>
+              <span className="dashboard-stat-value-text">{lastSession.workoutName}</span>
+              <span className="muted small">
+                {lastSessionDateFmt.format(new Date(lastSession.completedAt ?? lastSession.startedAt))}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="dashboard-stat-value-text">—</span>
+              <span className="muted small">No history yet</span>
+            </>
+          )}
         </Link>
-        <Link to="/routines" className="card stat-link">
-          <span className="muted small">{t('train.routine')}</span>
-          <span className="stat-value-small">{routine.name}</span>
-          <span className="muted small">{t('train.change')}</span>
+        <Link to="/progress" className="dashboard-stat">
+          <span className="muted small">{t('train.bodyweight')}</span>
+          <span className="dashboard-stat-value tabnum">
+            {latestBw ? kgToDisplay(latestBw.weightKg, units).toFixed(1) : '—'}
+            <span className="unit">{latestBw ? ` ${units}` : ''}</span>
+          </span>
+          <span className="muted small">
+            {latestBw ? lastSessionDateFmt.format(new Date(latestBw.date)) : t('train.log_it')}
+          </span>
         </Link>
       </section>
+
+      {nextAfter ? (
+        <Link to={`/routines/${routine.id}`} className="dashboard-tomorrow">
+          <span className="muted small">Up next →</span>
+          <strong>{nextAfter.name}</strong>
+          <span className="muted small">
+            {t('train.n_exercises', { n: nextAfter.items.length })}
+          </span>
+        </Link>
+      ) : null}
     </div>
   )
 }
