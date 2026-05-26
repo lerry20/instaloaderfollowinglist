@@ -4153,6 +4153,26 @@ select {
   gap: var(--space-2);
 }
 
+/* Equipment-missing warning on routine cards when the user's available
+   equipment is set and the routine needs equipment they don't have. */
+.routine-equipment-warning {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--tone-warn) 8%, var(--s-1));
+  border: 1px solid color-mix(in srgb, var(--tone-warn) 30%, var(--line));
+  border-radius: var(--r-2);
+  font-size: var(--fs-small);
+  color: var(--fg);
+  letter-spacing: -0.005em;
+  line-height: var(--lh-snug);
+}
+/* Dim non-active routine cards with missing equipment so the eye lands
+   on the doable ones first. Active card stays full opacity — you need
+   to see your current routine clearly. */
+.routine-card-v2.missing-equipment:not(.active) {
+  opacity: 0.7;
+}
+
 /* ====================================================================
    Train dashboard — replaces the old StartScreen
    ==================================================================== */

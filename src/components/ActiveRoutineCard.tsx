@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { Routine } from '../db/schema'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db, type Routine } from '../db/schema'
+import { useSettings } from '../db/queries'
 import { computeAdherence, thisWeekCompletedDates, type RoutineAdherence } from '../lib/adherence'
+import { routineMissingCount } from '../lib/equipment'
 import { useT } from '../i18n'
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -14,6 +17,10 @@ interface Props {
 
 export default function ActiveRoutineCard({ routine, onSwitch, onEdit }: Props) {
   const t = useT()
+  const settings = useSettings()
+  const exercises = useLiveQuery(() => db.exercises.toArray(), [])
+  const exById = new Map((exercises ?? []).map((e) => [e.id, e]))
+  const missingCount = routineMissingCount(routine, exById, settings?.availableEquipment)
   const [adherence, setAdherence] = useState<RoutineAdherence | null>(null)
   const [thisWeekDates, setThisWeekDates] = useState<Set<string>>(new Set())
 
@@ -73,6 +80,13 @@ export default function ActiveRoutineCard({ routine, onSwitch, onEdit }: Props) 
 
       {adherence && adherence.verdict !== 'no-data' ? (
         <p className={`adherence adherence-${adherence.verdict}`}>{adherence.note}</p>
+      ) : null}
+
+      {missingCount > 0 ? (
+        <p className="routine-equipment-warning">
+          ⚠ {missingCount} exercise{missingCount === 1 ? '' : 's'} need equipment
+          you don\'t have. Swap them or update equipment in Settings.
+        </p>
       ) : null}
 
       <div className="active-routine-actions">

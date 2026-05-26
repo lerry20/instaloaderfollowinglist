@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Routine } from '../db/schema'
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
+import { routineMissingCount } from '../lib/equipment'
 import ActiveRoutineCard from '../components/ActiveRoutineCard'
 import NewRoutineModal from '../components/NewRoutineModal'
 import RoutinePicker from '../components/RoutinePicker'
@@ -167,6 +169,10 @@ interface RoutineCardV2Props {
 
 function RoutineCardV2({ routine, isActive, onActivate, onPreview, onClone, onEdit, onDelete }: RoutineCardV2Props) {
   const t = useT()
+  const settings = useSettings()
+  const exercises = useLiveQuery(() => db.exercises.toArray(), [])
+  const exById = new Map((exercises ?? []).map((e) => [e.id, e]))
+  const missingCount = routineMissingCount(routine, exById, settings?.availableEquipment)
   const days = routine.daysPerWeek ?? routine.workouts.length
   const sched = buildScheduleStrip(days)
   // Rough estimate: total working sets across all workouts × 3 min per set.
@@ -180,7 +186,7 @@ function RoutineCardV2({ routine, isActive, onActivate, onPreview, onClone, onEd
     : 60
 
   return (
-    <article className={`routine-card-v2${isActive ? ' active' : ''}`}>
+    <article className={`routine-card-v2${isActive ? ' active' : ''}${missingCount > 0 ? ' missing-equipment' : ''}`}>
       <header className="routine-card-v2-head">
         <div>
           <h3>{routine.name}</h3>
@@ -197,6 +203,13 @@ function RoutineCardV2({ routine, isActive, onActivate, onPreview, onClone, onEd
         <span className="dot">·</span>
         <span>{t('routines.min_per_session', { n: minPerSession })}</span>
       </div>
+
+      {missingCount > 0 ? (
+        <p className="routine-equipment-warning">
+          ⚠ {missingCount} exercise{missingCount === 1 ? '' : 's'} need equipment
+          you don\'t have. Swap them or update equipment in Settings.
+        </p>
+      ) : null}
 
       <ul className="routine-card-v2-schedule" aria-label="Weekly schedule">
         {sched.map((s, i) => (
