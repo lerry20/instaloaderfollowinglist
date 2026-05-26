@@ -8,6 +8,7 @@ import {
 } from '../db/schema'
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
 import ExercisePicker from '../components/ExercisePicker'
+import ActiveRoutineCard from '../components/ActiveRoutineCard'
 import { toast } from '../state/toasts'
 import { useT } from '../i18n'
 
@@ -17,6 +18,7 @@ export default function Routines() {
   const active = useActiveRoutine()
   const settings = useSettings()
   const [editing, setEditing] = useState<Routine | null>(null)
+  const [showAll, setShowAll] = useState(false)
 
   if (!routines || !settings) return <div className="page"><p className="muted">{t('common.loading')}</p></div>
 
@@ -51,11 +53,69 @@ export default function Routines() {
     toast('Routine deleted', { kind: 'warn' })
   }
 
+  const otherRoutines = routines.filter((r) => r.id !== active?.id)
+
   return (
     <div className="page">
       <h1 className="big-title">{t('nav.routines')}</h1>
 
-      <details className="glossary-card">
+      {active ? (
+        <>
+          <h4>{t('routines.your_program')}</h4>
+          <ActiveRoutineCard
+            routine={active}
+            onSwitch={() => setShowAll(true)}
+            onEdit={() => setEditing(active)}
+          />
+        </>
+      ) : null}
+
+      <div className="row" style={{ marginTop: 'var(--space-3)' }}>
+        <button
+          className="btn"
+          onClick={async () => {
+            const id = `custom-${Date.now()}`
+            const r: Routine = {
+              id,
+              name: 'New routine',
+              description: 'My custom routine.',
+              builtIn: false,
+              workouts: [{ id: `${id}-w1`, name: 'Day 1', items: [] }],
+            }
+            await db.routines.put(r)
+            setEditing(r)
+            await activate(id)
+          }}
+        >
+          + {t('routines.new_program')}
+        </button>
+      </div>
+
+      <div className="section-head" style={{ marginTop: 'var(--space-5)' }}>
+        <h4>{t('routines.all_programs')}</h4>
+        {otherRoutines.length > 3 ? (
+          <button className="link small" onClick={() => setShowAll((v) => !v)}>
+            {showAll ? '−' : `+ ${otherRoutines.length - 3}`}
+          </button>
+        ) : null}
+      </div>
+
+      <div className="routine-list">
+        {(showAll ? otherRoutines : otherRoutines.slice(0, 3)).map((r) => (
+          <RoutineCardV2
+            key={r.id}
+            routine={r}
+            isActive={active?.id === r.id}
+            onActivate={() => activate(r.id)}
+            onPreview={() => setEditing(r)}
+            onClone={() => clone(r)}
+            onEdit={() => setEditing(r)}
+            onDelete={() => deleteRoutine(r)}
+          />
+        ))}
+      </div>
+
+      <details className="glossary-card" style={{ marginTop: 'var(--space-4)' }}>
         <summary>What do <strong>RPE</strong>, <strong>RIR</strong>, and <strong>AMRAP</strong> mean?</summary>
         <ul className="glossary-list">
           <li><strong>RPE 7</strong> — effort 7 out of 10. About <em>3 reps short of failure</em>.</li>
@@ -67,68 +127,6 @@ export default function Routines() {
           <li><strong>PR</strong> — personal record. A new heaviest weight or rep total for that lift.</li>
         </ul>
       </details>
-
-      <div className="routine-list">
-        {routines.map((r) => (
-          <article key={r.id} className={`routine-card${active?.id === r.id ? ' active' : ''}`}>
-            <div className="routine-card-head">
-              <div>
-                <h3>{r.name}</h3>
-                <span className="muted small">
-                  {r.workouts.length} workouts
-                  {r.builtIn ? ' · built-in' : ' · custom'}
-                </span>
-              </div>
-              {active?.id === r.id ? <span className="badge good">●</span> : null}
-            </div>
-            <p className="muted small">{r.description}</p>
-            <ul className="routine-workouts">
-              {r.workouts.map((w) => (
-                <li key={w.id}>{w.name}</li>
-              ))}
-            </ul>
-            <div className="row">
-              {active?.id !== r.id ? (
-                <button className="btn primary small" onClick={() => activate(r.id)}>
-                  {t('common.activate')}
-                </button>
-              ) : null}
-              <button className="btn small" onClick={() => setEditing(r)}>
-                {r.builtIn ? t('common.preview') : t('common.edit')}
-              </button>
-              {r.builtIn ? (
-                <button className="btn small ghost" onClick={() => clone(r)}>
-                  {t('common.clone')}
-                </button>
-              ) : null}
-              {!r.builtIn ? (
-                <button className="btn small danger" onClick={() => deleteRoutine(r)}>
-                  {t('common.delete')}
-                </button>
-              ) : null}
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <button
-        className="btn block"
-        onClick={async () => {
-          const id = `custom-${Date.now()}`
-          const r: Routine = {
-            id,
-            name: 'New routine',
-            description: 'My custom routine.',
-            builtIn: false,
-            workouts: [{ id: `${id}-w1`, name: 'Workout 1', items: [] }],
-          }
-          await db.routines.put(r)
-          setEditing(r)
-          await activate(id)
-        }}
-      >
-        + New custom routine
-      </button>
 
       {editing ? (
         <RoutineEditor
@@ -142,6 +140,100 @@ export default function Routines() {
       ) : null}
     </div>
   )
+}
+
+interface RoutineCardV2Props {
+  routine: Routine
+  isActive: boolean
+  onActivate: () => void
+  onPreview: () => void
+  onClone: () => void
+  onEdit: () => void
+  onDelete: () => void
+}
+
+function RoutineCardV2({ routine, isActive, onActivate, onPreview, onClone, onEdit, onDelete }: RoutineCardV2Props) {
+  const t = useT()
+  const days = routine.daysPerWeek ?? routine.workouts.length
+  const sched = buildScheduleStrip(days)
+  // Rough estimate: total working sets across all workouts × 3 min per set.
+  // Falls back to a generic ~60min when items are empty.
+  const totalSets = routine.workouts.reduce(
+    (acc, w) => acc + w.items.reduce((a, i) => a + i.targetSets, 0),
+    0,
+  )
+  const minPerSession = routine.workouts.length > 0
+    ? Math.max(30, Math.round((totalSets / routine.workouts.length) * 3 + 10))
+    : 60
+
+  return (
+    <article className={`routine-card-v2${isActive ? ' active' : ''}`}>
+      <header className="routine-card-v2-head">
+        <div>
+          <h3>{routine.name}</h3>
+          {routine.level ? (
+            <span className="routine-card-v2-meta">
+              {t(`routines.level_${routine.level}` as 'routines.level_beginner')}
+            </span>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="routine-card-v2-stats">
+        <span>{t('routines.days_per_week', { n: days })}</span>
+        <span className="dot">·</span>
+        <span>{t('routines.min_per_session', { n: minPerSession })}</span>
+      </div>
+
+      <ul className="routine-card-v2-schedule" aria-label="Weekly schedule">
+        {sched.map((s, i) => (
+          <li key={i} className={`sched-day${s.train ? ' train' : ''}`}>
+            <span className="sched-day-letter">{s.letter}</span>
+            <span className="sched-day-code">{s.code}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="routine-card-v2-description">{routine.description}</p>
+
+      <div className="routine-card-v2-actions">
+        {!isActive ? (
+          <button className="btn primary small" onClick={onActivate}>{t('common.activate')}</button>
+        ) : null}
+        <button className="btn small" onClick={onPreview}>{t('routines.preview')}</button>
+        {routine.builtIn ? (
+          <button className="btn small ghost" onClick={onClone}>{t('routines.use_template')}</button>
+        ) : (
+          <>
+            <button className="btn small" onClick={onEdit}>{t('common.edit')}</button>
+            <button className="btn small danger" onClick={onDelete}>{t('common.delete')}</button>
+          </>
+        )}
+      </div>
+    </article>
+  )
+}
+
+// Build a 7-day visual schedule (M T W T F S S) with train-day shading.
+// Even distribution heuristic — close enough for the card, the user can
+// pick actual days in the editor.
+function buildScheduleStrip(daysPerWeek: number): { letter: string; code: string; train: boolean }[] {
+  const letters = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+  // Common splits — hard-code which days are train days for clean visuals.
+  const presets: Record<number, boolean[]> = {
+    2: [true, false, false, true, false, false, false],
+    3: [true, false, true, false, true, false, false],
+    4: [true, true, false, true, true, false, false],
+    5: [true, true, true, false, true, true, false],
+    6: [true, true, true, false, true, true, true],
+    7: [true, true, true, true, true, true, true],
+  }
+  const train = presets[daysPerWeek] ?? Array.from({ length: 7 }, (_, i) => i < daysPerWeek)
+  return letters.map((l, i) => ({
+    letter: l,
+    code: train[i] ? '·' : '',
+    train: train[i],
+  }))
 }
 
 function RoutineEditor({

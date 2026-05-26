@@ -76,5 +76,17 @@ export type DictKey =
   // Errors
   | 'error.crashed' | 'error.abandon_sessions' | 'error.just_reload'
   | 'error.reset_all' | 'error.copy_report'
+  // Routines + active-routine block
+  | 'active-routine.week' | 'active-routine.switch'
+  | 'routines.your_program' | 'routines.all_programs' | 'routines.recommended'
+  | 'routines.recommended_intro' | 'routines.preview' | 'routines.use_template'
+  | 'routines.level_beginner' | 'routines.level_intermediate' | 'routines.level_advanced'
+  | 'routines.days_per_week' | 'routines.min_per_session'
+  | 'routines.weekly_volume' | 'routines.why_it_works' | 'routines.who_shouldnt'
+  | 'routines.activate_this' | 'routines.find_program' | 'routines.start_picker'
+  | 'routines.new_program' | 'routines.new_name_placeholder'
+  | 'routines.how_many_days' | 'routines.start_from'
+  | 'routines.start_template' | 'routines.start_closest' | 'routines.start_empty'
+  | 'routines.create'
 
 export type Dict = Record<DictKey, string>

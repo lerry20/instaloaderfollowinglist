@@ -94,12 +94,27 @@ export interface WorkoutDef {
   items: PlanItem[]
 }
 
+export type RoutineLevel = 'beginner' | 'intermediate' | 'advanced'
+export type RoutineFocus = 'chest' | 'back' | 'legs' | 'balanced'
+
+export interface RoutineArchetypeNote {
+  whyItWorks: string
+  whoShouldnt: string
+}
+
 export interface Routine {
   id: string
   name: string
   description: string
   builtIn: boolean
   workouts: WorkoutDef[]
+  /** Optional metadata layered on by built-in routines. Custom routines
+   * leave these undefined and the card just shows fewer chips. */
+  level?: RoutineLevel
+  daysPerWeek?: number
+  focus?: RoutineFocus
+  weeksInBlock?: number
+  archetypeNote?: RoutineArchetypeNote
 }
 
 export interface Session {
