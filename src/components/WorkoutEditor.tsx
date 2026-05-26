@@ -50,10 +50,24 @@ export default function WorkoutEditor({
   }
 
   const isEmpty = workout.items.length === 0
+  // Empty workouts open so the "+ Add first exercise" CTA is visible.
+  // Filled workouts collapse to summary — you tap the row to edit.
+  const [open, setOpen] = useState(isEmpty)
+  const totalSets = workout.items.reduce((a, it) => a + it.targetSets, 0)
+  const minEstimate = totalSets > 0 ? Math.max(30, Math.round(totalSets * 3 + 10)) : null
 
   return (
-    <section className="workout-edit-v2">
+    <section className={`workout-edit-v2${open ? ' open' : ''}`}>
       <header className="workout-edit-v2-head">
+        <button
+          type="button"
+          className="workout-edit-v2-toggle"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-label={open ? 'Collapse this day' : 'Expand this day'}
+        >
+          {open ? '−' : '+'}
+        </button>
         <span className="day-tag">Day {workoutIndex + 1}</span>
         <input
           type="text"
@@ -62,9 +76,16 @@ export default function WorkoutEditor({
           placeholder="e.g. Push, Heavy Day, Monday"
           disabled={readOnly}
           onChange={(e) => onPatch({ name: e.target.value })}
+          onClick={(e) => e.stopPropagation()}
         />
+        {!open ? (
+          <span className="workout-edit-v2-summary-meta">
+            {workout.items.length} {workout.items.length === 1 ? 'lift' : 'lifts'}
+            {minEstimate ? ` · ~${minEstimate} min` : ''}
+          </span>
+        ) : null}
         {!readOnly ? (
-          <div className="workout-edit-v2-controls">
+          <div className="workout-edit-v2-controls" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               className="icon-btn-mini"
@@ -99,6 +120,8 @@ export default function WorkoutEditor({
         ) : null}
       </header>
 
+      {open ? (
+      <>
       {isEmpty ? (
         !readOnly ? (
           <button
@@ -145,6 +168,8 @@ export default function WorkoutEditor({
           + Add another exercise
         </button>
       ) : null}
+      </>
+      ) : null}
 
       {adding ? (
         <ExercisePicker
@@ -158,6 +183,7 @@ export default function WorkoutEditor({
               ],
             })
             setAdding(false)
+            setOpen(true)
           }}
         />
       ) : null}

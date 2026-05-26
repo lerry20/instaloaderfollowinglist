@@ -4527,6 +4527,102 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   margin-top: var(--space-2);
 }
 
+/* Day cards on the routine preview are now collapsible <details>. */
+.day-card { padding: 0; }
+.day-card[open] { padding-bottom: var(--space-4); }
+.day-card-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--r-3);
+  transition: background var(--t-1) var(--ease-out);
+}
+.day-card-summary:hover { background: var(--s-2); }
+.day-card-summary::-webkit-details-marker { display: none; }
+.day-card[open] .day-card-summary { border-bottom: 1px solid var(--line-soft); }
+.day-card-head { flex: 1; min-width: 0; }
+.day-card-toggle {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-muted);
+  font-size: var(--fs-h2);
+  line-height: 1;
+  font-weight: 400;
+  transition: transform var(--t-2) var(--ease-out);
+}
+.day-card[open] .day-card-toggle { transform: rotate(45deg); }
+.day-card[open] .day-card-freq,
+.day-card[open] .day-card-lifts {
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+/* Workout editor cards now collapse with a +/− toggle. The header stays
+   tappable + showing summary meta; the body hides on collapse. */
+.workout-edit-v2 {
+  cursor: default;
+}
+.workout-edit-v2-head {
+  cursor: pointer;
+}
+.workout-edit-v2-toggle {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  color: var(--fg-muted);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--t-1) var(--ease-out), color var(--t-1) var(--ease-out);
+}
+.workout-edit-v2-toggle:hover {
+  background: var(--s-2);
+  color: var(--fg);
+}
+.workout-edit-v2-summary-meta {
+  font-size: var(--fs-small);
+  color: var(--fg-muted);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+/* Cue list "+ N more cues" expander on ExerciseDetail */
+.cue-more {
+  margin-top: var(--space-2);
+}
+.cue-more > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--fg-muted);
+  letter-spacing: -0.005em;
+}
+.cue-more > summary::-webkit-details-marker { display: none; }
+.cue-more > summary:hover { color: var(--fg); }
+.cue-more[open] > summary { color: var(--fg); margin-bottom: var(--space-2); }
+.cue-list-extra {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 /* Sticky activate CTA at the bottom of the preview page */
 .routine-preview-cta {
   position: sticky;

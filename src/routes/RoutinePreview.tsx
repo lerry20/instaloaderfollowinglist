@@ -141,16 +141,20 @@ function DayCard({
   const sets = workout.items.reduce((acc, i) => acc + i.targetSets, 0)
   const minEstimate = Math.max(30, Math.round(sets * 3 + 10))
 
+  // First day expanded by default (a sample of what a session looks like);
+  // subsequent days collapsed so the page stays scannable.
   return (
-    <section className="card day-card">
-      <header className="day-card-head">
-        <span className="day-card-num">Day {index + 1}</span>
-        <h2>{workout.name}</h2>
-        <span className="day-card-meta">
-          {workout.items.length} {workout.items.length === 1 ? 'lift' : 'lifts'} ·
-          ~{minEstimate} min
-        </span>
-      </header>
+    <details className="card day-card" open={index === 0}>
+      <summary className="day-card-summary">
+        <div className="day-card-head">
+          <span className="day-card-num">Day {index + 1}</span>
+          <h2>{workout.name}</h2>
+          <span className="day-card-meta">
+            {workout.items.length} {workout.items.length === 1 ? 'lift' : 'lifts'} · ~{minEstimate} min
+          </span>
+        </div>
+        <span className="day-card-toggle" aria-hidden>+</span>
+      </summary>
 
       <ul className="day-card-freq" aria-label="Muscles trained this day, frequency this week">
         {dayMuscles.map((m) => (
@@ -165,7 +169,7 @@ function DayCard({
           <ItemRow key={item.exerciseId} item={item} ex={exById.get(item.exerciseId)} />
         ))}
       </ol>
-    </section>
+    </details>
   )
 }
 

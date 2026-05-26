@@ -83,9 +83,19 @@ export default function ExerciseDetail() {
       <section className="card">
         <h3>{ex.isCurated ? 'Technique cues' : 'Instructions'}</h3>
         <ol className="cue-list">
-          {cues.map((c, i) => (
+          {cues.slice(0, 2).map((c, i) => (
             <li key={i}>{c}</li>
           ))}
+          {cues.length > 2 ? (
+            <details className="cue-more">
+              <summary>+ {cues.length - 2} more cue{cues.length - 2 === 1 ? '' : 's'}</summary>
+              <ol className="cue-list cue-list-extra" start={3}>
+                {cues.slice(2).map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ol>
+            </details>
+          ) : null}
         </ol>
       </section>
 
