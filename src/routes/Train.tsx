@@ -151,9 +151,12 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const nextIdx = next ? routine.workouts.findIndex((w) => w.id === next.id) : -1
   const position = nextIdx >= 0 ? nextIdx + 1 : 1
   const totalWorkouts = routine.workouts.length
-  const nextAfter = nextIdx >= 0 && totalWorkouts > 1
-    ? routine.workouts[(nextIdx + 1) % totalWorkouts]
-    : null
+  // The remaining workouts in this pass through the cycle (today + after).
+  // We stop at the end of the routine sequence rather than wrapping, so the
+  // user sees a finite list of "what's left to finish this cycle".
+  const restOfCycle = nextIdx >= 0
+    ? routine.workouts.slice(nextIdx).slice(0, 6)
+    : []
 
   // Time estimate from sets × ~3 min + small fixed warm-up.
   const totalSets = next ? next.items.reduce((a, it) => a + it.targetSets, 0) : 0
@@ -285,14 +288,42 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         </Link>
       </section>
 
-      {nextAfter ? (
-        <Link to={`/routines/${routine.id}`} className="dashboard-tomorrow">
-          <span className="muted small">Up next →</span>
-          <strong>{nextAfter.name}</strong>
-          <span className="muted small">
-            {t('train.n_exercises', { n: nextAfter.items.length })}
-          </span>
-        </Link>
+      {restOfCycle.length > 1 ? (
+        <section className="dashboard-cycle">
+          <header className="dashboard-cycle-head">
+            <span className="muted small">Rest of the cycle</span>
+            <Link to={`/routines/${routine.id}`} className="link small">
+              View full routine →
+            </Link>
+          </header>
+          <ol className="dashboard-cycle-list">
+            {restOfCycle.map((w, i) => {
+              const isToday = i === 0
+              return (
+                <li
+                  key={w.id}
+                  className={`dashboard-cycle-row${isToday ? ' today' : ''}`}
+                >
+                  <span className="dashboard-cycle-marker" aria-hidden>
+                    {isToday ? '●' : '○'}
+                  </span>
+                  <span className="dashboard-cycle-name">{w.name}</span>
+                  <span className="dashboard-cycle-meta tabnum">
+                    {isToday ? 'TODAY' : t('train.n_exercises', { n: w.items.length })}
+                  </span>
+                </li>
+              )
+            })}
+            {nextIdx + restOfCycle.length < totalWorkouts ? (
+              <li className="dashboard-cycle-row more">
+                <span className="dashboard-cycle-marker" aria-hidden>+</span>
+                <span className="dashboard-cycle-name muted">
+                  {totalWorkouts - (nextIdx + restOfCycle.length)} more after this
+                </span>
+              </li>
+            ) : null}
+          </ol>
+        </section>
       ) : null}
     </div>
   )

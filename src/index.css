@@ -4051,35 +4051,78 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   text-overflow: ellipsis;
 }
 
-/* Up-next preview row */
-.dashboard-tomorrow {
+/* Rest-of-cycle list — what's left after today */
+.dashboard-cycle {
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--space-3) var(--space-4);
-  background: transparent;
-  border: 1px dashed var(--line);
-  border-radius: var(--r-2);
-  text-decoration: none;
-  color: var(--fg-muted);
-  transition: background var(--t-1) var(--ease-out), border-color var(--t-1) var(--ease-out);
+  gap: var(--space-2);
 }
-.dashboard-tomorrow:hover {
-  background: var(--s-1);
-  border-color: var(--line-strong);
+.dashboard-cycle-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
-.dashboard-tomorrow strong {
-  color: var(--fg);
-  font-weight: 500;
-  letter-spacing: -0.005em;
-}
-.dashboard-tomorrow .muted.small:first-child {
+.dashboard-cycle-head .muted.small {
   font-size: var(--fs-caption);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
   color: var(--fg-dim);
 }
+.dashboard-cycle-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-cycle-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-small);
+  letter-spacing: -0.005em;
+}
+.dashboard-cycle-row:last-child { border-bottom: none; }
+.dashboard-cycle-marker {
+  font-size: 10px;
+  color: var(--fg-dim);
+  line-height: 1;
+  text-align: center;
+}
+.dashboard-cycle-row.today .dashboard-cycle-marker { color: var(--fg); }
+.dashboard-cycle-name {
+  color: var(--fg);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dashboard-cycle-row.today .dashboard-cycle-name { font-weight: 600; }
+.dashboard-cycle-meta {
+  color: var(--fg-dim);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.dashboard-cycle-row.today .dashboard-cycle-meta {
+  background: var(--fg);
+  color: var(--fg-inverse);
+  padding: 2px var(--space-2);
+  border-radius: var(--r-1);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.dashboard-cycle-row.more .dashboard-cycle-name { color: var(--fg-dim); }
+.dashboard-cycle-row.more .dashboard-cycle-marker { color: var(--fg-dim); }
 
 /* Routine edit route — full page, beginner-friendly */
 .routine-edit { gap: var(--space-3); padding-bottom: 80px; }
