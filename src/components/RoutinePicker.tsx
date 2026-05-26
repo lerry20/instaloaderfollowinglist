@@ -4,6 +4,7 @@ import { db, type Routine, type RoutineFocus, type RoutineLevel } from '../db/sc
 import { useAllRoutines, useSettings } from '../db/queries'
 import { useT } from '../i18n'
 import { toast } from '../state/toasts'
+import { rankRoutines, type ScoredRoutine } from '../lib/recommender'
 
 interface Props {
   onClose: () => void
@@ -18,41 +19,22 @@ export default function RoutinePicker({ onClose }: Props) {
   const [level, setLevel] = useState<RoutineLevel | null>(null)
   const [focus, setFocus] = useState<RoutineFocus | null>(null)
 
-  const matches = useMemo(() => {
+  const matches: ScoredRoutine[] = useMemo(() => {
     if (days === null || level === null || focus === null) return []
-    // Pick built-in routines that match days exactly and level ≤ user's level.
-    const levelOrder: Record<RoutineLevel, number> = { beginner: 1, intermediate: 2, advanced: 3 }
-    const base = allRoutines
-      .filter((r) => r.builtIn && r.daysPerWeek === days)
-      .filter((r) => {
-        if (!r.level) return true
-        return levelOrder[r.level] <= levelOrder[level]
-      })
-
-    // Rank: exact focus match first (e.g. user picked chest, routine.focus = chest),
-    // then balanced fallbacks, finally other focus categories. This keeps the same
-    // 3 cards from being shown for every focus answer when the matrix is thin.
-    const exactFocus = base.filter((r) => r.focus === focus && focus !== 'balanced')
-    const balancedFocus = base.filter((r) => !r.focus || r.focus === 'balanced')
-    const otherFocus = base.filter(
-      (r) => r.focus && r.focus !== focus && r.focus !== 'balanced',
+    return rankRoutines(
+      allRoutines,
+      {
+        days,
+        level,
+        focus,
+        excludeRoutineId: settings?.activeRoutineId,
+      },
+      3,
     )
-    return focus === 'balanced'
-      ? [...balancedFocus, ...exactFocus, ...otherFocus].slice(0, 3)
-      : [...exactFocus, ...balancedFocus, ...otherFocus].slice(0, 3)
-  }, [allRoutines, days, level, focus])
-
-  // If no exact match, soften the days filter by ±1
-  const softMatches = useMemo(() => {
-    if (matches.length > 0 || days === null) return []
-    return allRoutines
-      .filter((r) => r.builtIn && r.daysPerWeek != null)
-      .filter((r) => Math.abs((r.daysPerWeek ?? 0) - days) <= 1)
-      .slice(0, 3)
-  }, [allRoutines, days, matches.length])
+  }, [allRoutines, days, level, focus, settings?.activeRoutineId])
 
   const allAnswered = days !== null && level !== null && focus !== null
-  const shown = matches.length > 0 ? matches : softMatches
+  const shown = matches
 
   async function activate(r: Routine) {
     if (!settings) return
@@ -112,7 +94,7 @@ export default function RoutinePicker({ onClose }: Props) {
 
         <div className="picker-question">
           <h4>3. Pick one priority</h4>
-          <div className="seg big" style={{ marginTop: 'var(--space-2)' }}>
+          <div className="seg big" style={{ marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
             <button
               className={focus === 'chest' ? 'active' : ''}
               onClick={() => setFocus('chest')}
@@ -123,7 +105,13 @@ export default function RoutinePicker({ onClose }: Props) {
               className={focus === 'back' ? 'active' : ''}
               onClick={() => setFocus('back')}
             >
-              Back / legs
+              Back
+            </button>
+            <button
+              className={focus === 'legs' ? 'active' : ''}
+              onClick={() => setFocus('legs')}
+            >
+              Legs / glutes
             </button>
             <button
               className={focus === 'balanced' ? 'active' : ''}
@@ -137,20 +125,26 @@ export default function RoutinePicker({ onClose }: Props) {
         {allAnswered ? (
           shown.length > 0 ? (
             <div>
-              <h4>
-                {matches.length > 0
-                  ? `Best matches (${matches.length})`
-                  : `Closest matches (${softMatches.length})`}
-              </h4>
+              <h4>Best matches ({shown.length})</h4>
               <div className="picker-results">
-                {shown.map((r) => (
-                  <article key={r.id} className="picker-result">
+                {shown.map((scored, idx) => {
+                  const r = scored.routine
+                  return (
+                  <article key={r.id} className={`picker-result${idx === 0 ? ' top-pick' : ''}`}>
+                    {idx === 0 ? <span className="picker-result-badge">Top pick</span> : null}
                     <div>
                       <strong>{r.name}</strong>
                       <span className="muted small">
                         {r.daysPerWeek} days/wk · {r.level ?? '—'}
                       </span>
                       <p className="muted small">{r.description}</p>
+                      {scored.reasons.length > 0 ? (
+                        <ul className="picker-reasons">
+                          {scored.reasons.map((reason, i) => (
+                            <li key={i}>✓ {reason}</li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </div>
                     <div className="row">
                       <button
@@ -167,7 +161,8 @@ export default function RoutinePicker({ onClose }: Props) {
                       </button>
                     </div>
                   </article>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ) : (

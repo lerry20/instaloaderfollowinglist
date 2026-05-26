@@ -810,6 +810,394 @@ export const PRESET_ROUTINES: Routine[] = [
       },
     ],
   },
+
+  // ─────────────────── FULL BODY 2-DAY (MINIMAL) ───────────────────
+  {
+    id: 'full-body-2day',
+    name: 'Minimum Effective 2×',
+    description:
+      'Two full-body sessions a week — the floor for keeping muscle when life gets in the way.',
+    builtIn: true,
+    level: 'beginner',
+    daysPerWeek: 2,
+    focus: 'balanced',
+    weeksInBlock: 8,
+    archetypeNote: {
+      whyItWorks:
+        'Two sessions a week is the bare minimum needed to maintain (and slowly grow) muscle. Each workout hits all major movement patterns. Better than skipping training entirely during a busy stretch.',
+      whoShouldnt:
+        'This is a holding pattern. If you can train 3+ days, you\'ll grow faster on any 3-day program. Don\'t pick this as your long-term default.',
+    },
+    workouts: [
+      {
+        id: 'fb2-a',
+        name: 'Day 1 — Squat focus',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'bench-press', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 3, targetReps: '8–10', targetRPE: 8 },
+          { exerciseId: 'ohp', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'leg-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'hammer-curl', targetSets: 2, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'fb2-b',
+        name: 'Day 2 — Deadlift focus',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 3, targetReps: '5', targetRPE: 8 },
+          { exerciseId: 'incline-db-press', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'pullup', targetSets: 3, targetReps: 'AMRAP', targetRPE: 9 },
+          { exerciseId: 'leg-press', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'lateral-raise', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'tricep-pushdown', targetSets: 2, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────── BEGINNER UPPER/LOWER 4-DAY ───────────────────
+  {
+    id: 'beginner-ul-4day',
+    name: 'Beginner Upper / Lower 4×',
+    description:
+      'A 4-day plan with arm work added. The natural next step after the 3-day beginner program.',
+    builtIn: true,
+    level: 'beginner',
+    daysPerWeek: 4,
+    focus: 'balanced',
+    weeksInBlock: 12,
+    archetypeNote: {
+      whyItWorks:
+        'Two upper and two lower sessions hit each muscle twice a week — the hypertrophy sweet spot — without the complexity of PPL. Just enough exercises per session that linear progression still works.',
+      whoShouldnt:
+        'If you\'re brand-new (under 3 months training), start with the 3-day beginner program first. If you\'re intermediate already, go straight to Upper/Lower 4× or PHUL.',
+    },
+    workouts: [
+      {
+        id: 'bul-upper-a',
+        name: 'Day 1 — Upper A (heavy)',
+        items: [
+          { exerciseId: 'bench-press', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'ohp', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'lat-pulldown', targetSets: 3, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'barbell-curl', targetSets: 2, targetReps: '8–10', targetRPE: 9 },
+          { exerciseId: 'tricep-pushdown', targetSets: 2, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bul-lower-a',
+        name: 'Day 2 — Lower A (heavy)',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'rdl', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'leg-press', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'leg-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'standing-calf-raise', targetSets: 3, targetReps: '10–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bul-upper-b',
+        name: 'Day 3 — Upper B (pump)',
+        items: [
+          { exerciseId: 'incline-db-press', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'pullup', targetSets: 4, targetReps: 'AMRAP', targetRPE: 9 },
+          { exerciseId: 'lateral-raise', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'seated-cable-row', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'overhead-tricep-ext', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bul-lower-b',
+        name: 'Day 4 — Lower B (pump)',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 3, targetReps: '5', targetRPE: 8 },
+          { exerciseId: 'hack-squat', targetSets: 3, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'walking-lunge', targetSets: 3, targetReps: '10/leg', targetRPE: 8 },
+          { exerciseId: 'leg-extension', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'seated-calf-raise', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────── BACK FOCUS 3-DAY ───────────────────
+  {
+    id: 'back-focus-3day',
+    name: 'Back Focus 3×',
+    description:
+      'Two back sessions plus one full-body day. The 3-day version of bringing up a lagging back.',
+    builtIn: true,
+    level: 'intermediate',
+    daysPerWeek: 3,
+    focus: 'back',
+    weeksInBlock: 6,
+    archetypeNote: {
+      whyItWorks:
+        'When you only have 3 days but want a back-emphasis block: two dedicated back days (width + thickness) plus one full-body session to maintain everything else. Compressed but effective.',
+      whoShouldnt:
+        'Short-term specialization only. Don\'t run this longer than 6–8 weeks — your chest, shoulders, and legs will atrophy at this volume.',
+    },
+    workouts: [
+      {
+        id: 'bf3-width',
+        name: 'Day 1 — Back Width',
+        items: [
+          { exerciseId: 'pullup', targetSets: 4, targetReps: '6–10', targetRPE: 9 },
+          { exerciseId: 'lat-pulldown', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'straight-arm-pulldown', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'barbell-curl', targetSets: 3, targetReps: '8–10', targetRPE: 9 },
+          { exerciseId: 'rear-delt-fly', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bf3-thickness',
+        name: 'Day 2 — Back Thickness',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 3, targetReps: '5', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 't-bar-row', targetSets: 3, targetReps: '8–10', targetRPE: 8 },
+          { exerciseId: 'seated-cable-row', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'db-shrug', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bf3-fullbody',
+        name: 'Day 3 — Maintenance Full Body',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 3, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'bench-press', targetSets: 3, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'ohp', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'leg-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'tricep-pushdown', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'standing-calf-raise', targetSets: 3, targetReps: '10–15', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────── UPPER/LOWER + PPL HYBRID 5-DAY ───────────────────
+  {
+    id: 'ulppl-5day',
+    name: 'Upper / Lower + PPL 5×',
+    description:
+      'Two upper-body days plus a 3-day PPL cycle. Each muscle hit 2–3× per week — high frequency without 6 days of training.',
+    builtIn: true,
+    level: 'intermediate',
+    daysPerWeek: 5,
+    focus: 'balanced',
+    weeksInBlock: 12,
+    archetypeNote: {
+      whyItWorks:
+        'The 5-day sweet spot: more frequency than Upper/Lower 4×, less burnout than PPL 6×. Chest, back, and shoulders get 2×/week; arms get 2–3× via PPL placement. Builds noticeably more muscle than 4-day splits while leaving one rest day in the middle of the week.',
+      whoShouldnt:
+        'If 5 days is a stretch for your schedule, drop to Upper/Lower 4×. If you can comfortably do 6 days, PPL 6× will spread the same volume across more sessions — easier recovery per day.',
+    },
+    workouts: [
+      {
+        id: 'ulppl-upper',
+        name: 'Day 1 — Upper (heavy)',
+        items: [
+          { exerciseId: 'bench-press', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'ohp', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'pullup', targetSets: 3, targetReps: 'AMRAP', targetRPE: 9 },
+          { exerciseId: 'tricep-pushdown', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'ulppl-lower',
+        name: 'Day 2 — Lower',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'rdl', targetSets: 3, targetReps: '6–10', targetRPE: 8 },
+          { exerciseId: 'leg-press', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'leg-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'standing-calf-raise', targetSets: 4, targetReps: '10–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'ulppl-push',
+        name: 'Day 3 — Push',
+        items: [
+          { exerciseId: 'incline-bench', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'incline-db-press', targetSets: 3, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'cable-lateral', targetSets: 4, targetReps: '12–20', targetRPE: 9 },
+          { exerciseId: 'overhead-tricep-ext', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'ulppl-pull',
+        name: 'Day 4 — Pull',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 3, targetReps: '5', targetRPE: 8 },
+          { exerciseId: 'lat-pulldown', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'chest-supported-row', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'barbell-curl', targetSets: 3, targetReps: '8–10', targetRPE: 9 },
+          { exerciseId: 'face-pull', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'ulppl-legs',
+        name: 'Day 5 — Legs',
+        items: [
+          { exerciseId: 'front-squat', targetSets: 4, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'hip-thrust', targetSets: 3, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'walking-lunge', targetSets: 3, targetReps: '10/leg', targetRPE: 8 },
+          { exerciseId: 'seated-leg-curl', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'seated-calf-raise', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────── 5/3/1 BBB 4-DAY ───────────────────
+  {
+    id: 'bbb-4day',
+    name: '5/3/1 BBB 4×',
+    description:
+      'Wendler\'s classic — one heavy main lift per day in 5/3/1 progression, then 5 sets of 10 on the same lift at 50–60%. Slow strength + lots of hypertrophy.',
+    builtIn: true,
+    level: 'intermediate',
+    daysPerWeek: 4,
+    focus: 'balanced',
+    weeksInBlock: 16,
+    archetypeNote: {
+      whyItWorks:
+        'A proven strength-building program that bolts hypertrophy onto a 5/3/1 base. The "Boring But Big" (BBB) sets — 5×10 on the same lift you just trained heavy — drive serious muscle growth alongside slow, predictable strength progress.',
+      whoShouldnt:
+        'If you\'re purely chasing physique (not strength), the Boring But Big sets are time-consuming for the muscle return. Pure hypertrophy programs (PPL, Upper/Lower) are more efficient if you don\'t care about pulling big numbers.',
+    },
+    workouts: [
+      {
+        id: 'bbb-press',
+        name: 'Day 1 — Bench',
+        items: [
+          { exerciseId: 'bench-press', targetSets: 5, targetReps: '5/3/1 + 5×10', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 5, targetReps: '10', targetRPE: 7 },
+          { exerciseId: 'tricep-pushdown', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bbb-squat',
+        name: 'Day 2 — Squat',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 5, targetReps: '5/3/1 + 5×10', targetRPE: 8 },
+          { exerciseId: 'leg-curl', targetSets: 5, targetReps: '10', targetRPE: 8 },
+          { exerciseId: 'standing-calf-raise', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'cable-crunch', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bbb-ohp',
+        name: 'Day 3 — OHP',
+        items: [
+          { exerciseId: 'ohp', targetSets: 5, targetReps: '5/3/1 + 5×10', targetRPE: 8 },
+          { exerciseId: 'chin-up', targetSets: 5, targetReps: '10', targetRPE: 8 },
+          { exerciseId: 'lateral-raise', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'barbell-curl', targetSets: 3, targetReps: '8–10', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'bbb-dead',
+        name: 'Day 4 — Deadlift',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 5, targetReps: '5/3/1 + 5×10', targetRPE: 8 },
+          { exerciseId: 'front-squat', targetSets: 5, targetReps: '10', targetRPE: 8 },
+          { exerciseId: 'leg-press', targetSets: 3, targetReps: '12–15', targetRPE: 8 },
+          { exerciseId: 'hanging-leg-raise', targetSets: 3, targetReps: '8–12', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────── ADVANCED POWERBUILDING 6-DAY ───────────────────
+  {
+    id: 'powerbuilding-6day',
+    name: 'Powerbuilding 6×',
+    description:
+      'Three strength days (low reps, big lifts) + three hypertrophy days (high reps, accessories). Strength AND size.',
+    builtIn: true,
+    level: 'advanced',
+    daysPerWeek: 6,
+    focus: 'balanced',
+    weeksInBlock: 12,
+    archetypeNote: {
+      whyItWorks:
+        'For advanced lifters who want both: three days train the main lifts (squat, bench, deadlift, OHP) in 3–5 rep range for raw strength; three days are pure hypertrophy at 8–15 reps with accessories. Each muscle 2×/week. Demands real recovery work — sleep, food, deload weeks.',
+      whoShouldnt:
+        'Two years of consistent lifting minimum. If your sleep is under 7 hours or you\'re cutting, the volume will outpace your recovery. Drop to PPL 6× or Upper/Lower 4× if life isn\'t supporting the training load.',
+    },
+    workouts: [
+      {
+        id: 'pb-squat-heavy',
+        name: 'Day 1 — Squat (heavy)',
+        items: [
+          { exerciseId: 'back-squat', targetSets: 5, targetReps: '3–5', targetRPE: 8 },
+          { exerciseId: 'front-squat', targetSets: 3, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'leg-press', targetSets: 3, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'standing-calf-raise', targetSets: 4, targetReps: '10–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'pb-bench-heavy',
+        name: 'Day 2 — Bench (heavy)',
+        items: [
+          { exerciseId: 'bench-press', targetSets: 5, targetReps: '3–5', targetRPE: 8 },
+          { exerciseId: 'ohp', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'barbell-row', targetSets: 4, targetReps: '5–8', targetRPE: 8 },
+          { exerciseId: 'close-grip-bench', targetSets: 3, targetReps: '6–8', targetRPE: 8 },
+        ],
+      },
+      {
+        id: 'pb-deadlift-heavy',
+        name: 'Day 3 — Deadlift (heavy)',
+        items: [
+          { exerciseId: 'deadlift', targetSets: 4, targetReps: '3–5', targetRPE: 8 },
+          { exerciseId: 'pullup', targetSets: 4, targetReps: '5–8', targetRPE: 9 },
+          { exerciseId: 't-bar-row', targetSets: 3, targetReps: '6–8', targetRPE: 8 },
+          { exerciseId: 'barbell-curl', targetSets: 3, targetReps: '6–8', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'pb-legs-hyper',
+        name: 'Day 4 — Legs (hypertrophy)',
+        items: [
+          { exerciseId: 'hack-squat', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'rdl', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'leg-extension', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'seated-leg-curl', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'seated-calf-raise', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'pb-chest-hyper',
+        name: 'Day 5 — Chest & Arms (hypertrophy)',
+        items: [
+          { exerciseId: 'incline-db-press', targetSets: 4, targetReps: '8–12', targetRPE: 8 },
+          { exerciseId: 'cable-fly', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'lateral-raise', targetSets: 4, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'incline-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+          { exerciseId: 'overhead-tricep-ext', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+      {
+        id: 'pb-back-hyper',
+        name: 'Day 6 — Back & Shoulders (hypertrophy)',
+        items: [
+          { exerciseId: 'lat-pulldown', targetSets: 4, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'chest-supported-row', targetSets: 4, targetReps: '10–12', targetRPE: 8 },
+          { exerciseId: 'rear-delt-fly', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'face-pull', targetSets: 3, targetReps: '12–15', targetRPE: 9 },
+          { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10–12', targetRPE: 9 },
+        ],
+      },
+    ],
+  },
 ]
 
 export const DEFAULT_ACTIVE_ROUTINE_ID = 'ppl-6day'
