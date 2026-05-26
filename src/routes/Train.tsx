@@ -167,20 +167,41 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
     ? routine.workouts.slice(nextIdx).slice(0, 6)
     : []
 
+  // Per-exercise time cost: 3 min/working set + 2 min setup + transitions.
+  // A 4×6-8 lift takes ~14 min, a 3-set accessory ~11 min, a 5×5
+  // compound ~17 min. The same cost drives both the budget trim
+  // below and the time estimate the card displays, so the chip
+  // label and the "~X min/session" line always agree.
+  const exerciseCostMin = (sets: number) => sets * 3 + 2
+
   // Trim today's items to fit `quickBudget` minutes (null = full workout).
-  // Roughly 15 min/exercise (setup + warm-up + working sets + rest), so
-  // 30m → 2 exercises, 45m → 3, 60m → 4, 90m → 6. Walks exercises in
-  // routine order and keeps the first N.
+  // Greedy: keeps walking through routine order and adds an exercise
+  // while it still fits the budget. Always keeps at least one so the
+  // card is never empty.
   const trimmedItems = useMemo(() => {
     if (!next) return []
     if (quickBudget === null) return next.items
-    const budgetExercises = Math.max(1, Math.round(quickBudget / 15))
-    return next.items.slice(0, budgetExercises)
+    const out: typeof next.items = []
+    let used = 0
+    for (const it of next.items) {
+      const cost = exerciseCostMin(it.targetSets)
+      if (out.length === 0 || used + cost <= quickBudget) {
+        out.push(it)
+        used += cost
+      } else {
+        break
+      }
+    }
+    return out
   }, [next, quickBudget])
 
-  // Time estimate from sets × ~3 min + small fixed warm-up.
-  const totalSets = trimmedItems.reduce((a, it) => a + it.targetSets, 0)
-  const minEstimate = totalSets > 0 ? Math.max(30, Math.round(totalSets * 3 + 10)) : null
+  // Time estimate uses the same per-exercise cost as the trim — so picking
+  // a 60m budget shows "~52 min" and never lies about the total length.
+  const minEstimate = trimmedItems.length > 0
+    ? Math.max(20, Math.round(
+        trimmedItems.reduce((a, it) => a + exerciseCostMin(it.targetSets), 0),
+      ))
+    : null
   const fullCount = next ? next.items.length : 0
   const skippedCount = fullCount - trimmedItems.length
 
