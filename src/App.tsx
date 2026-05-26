@@ -6,6 +6,7 @@ import DebugPanel from './components/DebugPanel'
 import Train from './routes/Train'
 import Routines from './routes/Routines'
 import RoutinePreview from './routes/RoutinePreview'
+import RoutineEdit from './routes/RoutineEdit'
 import Progress from './routes/Progress'
 import Daily from './routes/Daily'
 import ExerciseDetail from './routes/ExerciseDetail'
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/train" element={<Train />} />
             <Route path="/routines" element={<Routines />} />
             <Route path="/routines/:id" element={<RoutinePreview />} />
+            <Route path="/routines/:id/edit" element={<RoutineEdit />} />
             <Route path="/daily" element={<Daily />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/exercise/:id" element={<ExerciseDetail />} />
