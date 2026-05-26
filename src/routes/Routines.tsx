@@ -10,6 +10,8 @@ import {
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
 import ExercisePicker from '../components/ExercisePicker'
 import ActiveRoutineCard from '../components/ActiveRoutineCard'
+import NewRoutineModal from '../components/NewRoutineModal'
+import RoutinePicker from '../components/RoutinePicker'
 import { toast } from '../state/toasts'
 import { useT } from '../i18n'
 
@@ -21,6 +23,8 @@ export default function Routines() {
   const settings = useSettings()
   const [editing, setEditing] = useState<Routine | null>(null)
   const [showAll, setShowAll] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
 
   if (!routines || !settings) return <div className="page"><p className="muted">{t('common.loading')}</p></div>
 
@@ -73,22 +77,10 @@ export default function Routines() {
       ) : null}
 
       <div className="row" style={{ marginTop: 'var(--space-3)' }}>
-        <button
-          className="btn"
-          onClick={async () => {
-            const id = `custom-${Date.now()}`
-            const r: Routine = {
-              id,
-              name: 'New routine',
-              description: 'My custom routine.',
-              builtIn: false,
-              workouts: [{ id: `${id}-w1`, name: 'Day 1', items: [] }],
-            }
-            await db.routines.put(r)
-            setEditing(r)
-            await activate(id)
-          }}
-        >
+        <button className="btn primary" onClick={() => setShowPicker(true)}>
+          {t('routines.find_program')}
+        </button>
+        <button className="btn" onClick={() => setShowNew(true)}>
           + {t('routines.new_program')}
         </button>
       </div>
@@ -140,6 +132,19 @@ export default function Routines() {
           }}
         />
       ) : null}
+
+      {showNew ? (
+        <NewRoutineModal
+          onClose={() => setShowNew(false)}
+          onCreated={async (r) => {
+            setShowNew(false)
+            await activate(r.id)
+            setEditing(r)
+          }}
+        />
+      ) : null}
+
+      {showPicker ? <RoutinePicker onClose={() => setShowPicker(false)} /> : null}
     </div>
   )
 }

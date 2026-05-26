@@ -3951,6 +3951,58 @@ select {
   font-weight: 500;
 }
 
+/* "Help me choose" routine picker modal */
+.picker-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.picker-question:last-of-type { border-bottom: none; }
+.picker-question h4 {
+  font-size: var(--fs-body);
+  color: var(--fg);
+  text-transform: none;
+  letter-spacing: -0.005em;
+  margin: 0;
+  font-weight: 600;
+}
+.picker-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.picker-result {
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.picker-result strong {
+  display: block;
+  font-weight: 600;
+  font-size: var(--fs-body);
+  letter-spacing: -0.005em;
+}
+.picker-result p {
+  margin-top: var(--space-1);
+  font-size: var(--fs-small);
+  letter-spacing: -0.005em;
+}
+
+/* New-routine modal start-from options */
+.new-routine-start-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
 /* Sticky activate CTA at the bottom of the preview page */
 .routine-preview-cta {
   position: sticky;
