@@ -23,6 +23,7 @@ import { toast } from '../state/toasts'
 import { haptics } from '../lib/haptics'
 import { buildProactiveMessage, currentStreak, type ProactiveMessage } from '../lib/streak'
 import { computeAdherence } from '../lib/adherence'
+import { computeFitnessSignal, type FitnessSignal } from '../lib/fitnessSignal'
 import Skeleton from '../components/Skeleton'
 import { useT, useLocaleStore, type Locale } from '../i18n'
 import { useLocalizedExercise } from '../lib/exercise'
@@ -106,6 +107,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const [streak, setStreak] = useState(0)
   const [thisWeek, setThisWeek] = useState(0)
   const [prescribed, setPrescribed] = useState(routine.daysPerWeek ?? routine.workouts.length)
+  const [signal, setSignal] = useState<FitnessSignal | null>(null)
 
   // Most recent completed session — for the "Last session" stat.
   const lastSession = useLiveQuery(async () => {
@@ -129,6 +131,9 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         setThisWeek(a.thisWeek)
         setPrescribed(a.prescribedPerWeek)
       })
+      .catch(() => {})
+    computeFitnessSignal(routine)
+      .then((s) => { if (!cancelled) setSignal(s) })
       .catch(() => {})
     return () => { cancelled = true }
   }, [routine.id])
@@ -203,6 +208,23 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
           ) : null}
         </Link>
       </header>
+
+      {signal && signal.score > 0 ? (
+        <div className={`fitness-signal trend-${signal.trend}`}>
+          <div className="fitness-signal-num">
+            <span className="fitness-signal-value tabnum">{signal.score}</span>
+            <span className="fitness-signal-label">
+              <span className="muted small">Fitness signal</span>
+              <strong className={`fitness-signal-trend trend-${signal.trend}`}>
+                {signal.trend === 'climbing' ? '↑ climbing' :
+                 signal.trend === 'steady'   ? '→ steady'   :
+                                                '↓ easing'}
+              </strong>
+            </span>
+          </div>
+          <p className="fitness-signal-reason">{signal.reason}</p>
+        </div>
+      ) : null}
 
       {next ? (
         <article className="today-card">

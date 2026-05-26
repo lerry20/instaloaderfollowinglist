@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react'
 import { db } from '../db/schema'
+import { useLocaleStore, type Locale } from '../i18n'
 
 interface DayCell {
   date: string
   sets: number
   hasSession: boolean
+  isToday: boolean
+}
+
+const LOCALE_BCP47: Record<Locale, string> = {
+  en: 'en-US',
+  it: 'it-IT',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  pt: 'pt-BR',
 }
 
 const WEEKS = 13 // ~3 months
@@ -17,7 +28,9 @@ function isoDate(d: Date) {
 }
 
 export default function TrainingCalendar() {
+  const locale = useLocaleStore((s) => s.locale)
   const [cells, setCells] = useState<DayCell[]>([])
+  const [monthHeaders, setMonthHeaders] = useState<Array<{ col: number; label: string }>>([])
 
   useEffect(() => {
     let cancelled = false
@@ -33,6 +46,7 @@ export default function TrainingCalendar() {
         setsByDate.set(s.date, (setsByDate.get(s.date) ?? 0) + sessionLogs.length)
       }
       const today = new Date()
+      const todayIso = isoDate(today)
       // Align to the most recent Sunday → so the rightmost column is the
       // current week (Sun → Sat).
       const dayOfWeek = today.getDay() // 0 = Sunday
@@ -47,6 +61,7 @@ export default function TrainingCalendar() {
           date: iso,
           sets: setsByDate.get(iso) ?? 0,
           hasSession: datesWithSession.has(iso),
+          isToday: iso === todayIso,
         })
       }
       // Pad the trailing edge so the LAST cell is today (already true), and
@@ -54,7 +69,25 @@ export default function TrainingCalendar() {
       const leadPad = (7 - ((totalDays + dayOfWeek + 1) % 7)) % 7
       const padded: (DayCell | null)[] = Array.from({ length: leadPad }, () => null)
       padded.push(...days)
-      if (!cancelled) setCells(padded as DayCell[])
+      if (!cancelled) {
+        setCells(padded as DayCell[])
+        // Compute month-change column positions for the header strip.
+        const monthFmt = new Intl.DateTimeFormat(LOCALE_BCP47[locale], { month: 'short' })
+        const headers: Array<{ col: number; label: string }> = []
+        let lastMonth = ''
+        for (let colIdx = 0; colIdx < WEEKS; colIdx++) {
+          // First day of each week column.
+          const cellIdx = colIdx * 7 + leadPad
+          const cell = padded[cellIdx]
+          if (!cell) continue
+          const month = monthFmt.format(new Date(`${cell.date}T00:00:00`))
+          if (month !== lastMonth) {
+            headers.push({ col: colIdx, label: month })
+            lastMonth = month
+          }
+        }
+        setMonthHeaders(headers)
+      }
     })()
     return () => {
       cancelled = true
@@ -69,6 +102,21 @@ export default function TrainingCalendar() {
   const dayLabels = ['Mon', 'Wed', 'Fri']
   return (
     <div className="cal-wrap">
+      {monthHeaders.length > 0 ? (
+        <div className="cal-month-row" aria-hidden>
+          <span className="cal-row-label" />
+          <div className="cal-month-cells">
+            {Array.from({ length: WEEKS }, (_, col) => {
+              const header = monthHeaders.find((h) => h.col === col)
+              return (
+                <span key={col} className="cal-month-cell">
+                  {header ? header.label : ''}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+      ) : null}
       <div className="cal-rows">
         {[0, 1, 2, 3, 4, 5, 6].map((row) => (
           <div key={row} className="cal-row">
@@ -82,7 +130,7 @@ export default function TrainingCalendar() {
                   ) : (
                     <span
                       key={cell.date + i}
-                      className={`cal-cell ${intensityClass(cell.sets)}`}
+                      className={`cal-cell ${intensityClass(cell.sets)}${cell.isToday ? ' cal-cell-today' : ''}`}
                       title={cellTitle(cell)}
                     />
                   ),
