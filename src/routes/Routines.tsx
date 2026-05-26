@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   db,
@@ -14,6 +15,7 @@ import { useT } from '../i18n'
 
 export default function Routines() {
   const t = useT()
+  const navigate = useNavigate()
   const routines = useAllRoutines()
   const active = useActiveRoutine()
   const settings = useSettings()
@@ -107,7 +109,7 @@ export default function Routines() {
             routine={r}
             isActive={active?.id === r.id}
             onActivate={() => activate(r.id)}
-            onPreview={() => setEditing(r)}
+            onPreview={() => navigate(`/routines/${r.id}`)}
             onClone={() => clone(r)}
             onEdit={() => setEditing(r)}
             onDelete={() => deleteRoutine(r)}
@@ -261,7 +263,7 @@ function RoutineEditor({
   async function addWorkout() {
     if (isBuiltIn) return
     const id = `${routine.id}-w${Date.now()}`
-    const workouts = [...routine.workouts, { id, name: `Workout ${routine.workouts.length + 1}`, items: [] }]
+    const workouts = [...routine.workouts, { id, name: `Day ${routine.workouts.length + 1}`, items: [] }]
     await patch({ workouts })
   }
 
@@ -418,6 +420,7 @@ function WorkoutEditor({
           <input
             type="text"
             value={workout.name}
+            placeholder="e.g. Push, Heavy Day, Monday"
             onChange={(e) => onPatch({ name: e.target.value })}
           />
         )}

@@ -3869,3 +3869,105 @@ select {
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* Routine preview route */
+.routine-preview { padding-bottom: 80px; }
+.routine-preview .day-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.day-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.day-card-num {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+.day-card-head h2 {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.day-card-meta {
+  font-size: var(--fs-small);
+  color: var(--fg-muted);
+  letter-spacing: -0.005em;
+}
+.day-card-freq {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.day-card-freq li {
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  padding: 2px var(--space-2);
+  font-size: var(--fs-caption);
+  color: var(--fg-muted);
+  font-weight: 500;
+  letter-spacing: -0.003em;
+}
+.day-card-lifts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.day-card-lift {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-small);
+  letter-spacing: -0.005em;
+}
+.day-card-lift:last-child { border-bottom: none; }
+.day-card-lift-name {
+  flex: 1;
+  color: var(--fg);
+  font-weight: 500;
+}
+.day-card-lift-prescription {
+  color: var(--fg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.day-card-lift-rpe {
+  color: var(--fg-dim);
+  font-weight: 500;
+}
+
+/* Sticky activate CTA at the bottom of the preview page */
+.routine-preview-cta {
+  position: sticky;
+  bottom: 0;
+  margin: 0 calc(var(--space-3) * -1);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--s-0) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line-soft);
+  z-index: 8;
+}
+@media (min-width: 600px) {
+  .routine-preview-cta {
+    bottom: var(--space-3);
+    margin: var(--space-4) auto 0;
+    border-radius: var(--r-3);
+    border: 1px solid var(--line);
+  }
+}
