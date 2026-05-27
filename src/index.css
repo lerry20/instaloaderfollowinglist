@@ -5153,6 +5153,49 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   .cx-section-body { padding: 0 var(--space-4) var(--space-4); }
 }
 
+/* Routine editor day cards inherit .cx-section so all days in a routine
+   collapse / expand the same way the Progress + Daily sections do.
+   Inline rename and per-day controls live inside the open drawer. */
+.day-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.day-editor-rename {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.day-editor-rename > span {
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+.day-editor-rename input {
+  padding: var(--space-3) var(--space-4);
+  background: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  color: var(--fg);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.day-editor-rename input:hover { border-color: var(--line-strong); }
+.day-editor-rename input:focus {
+  outline: none;
+  border-color: var(--fg);
+}
+.day-editor-controls {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-soft);
+}
+
 /* Day cards on the routine preview are now collapsible <details>. */
 .day-card { padding: 0; }
 .day-card[open] { padding-bottom: var(--space-4); }

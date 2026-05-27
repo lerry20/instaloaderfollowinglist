@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type PlanItem, type WorkoutDef } from '../db/schema'
 import ExercisePicker from './ExercisePicker'
 import { useLocalizedExercise } from '../lib/exercise'
+import { haptics } from '../lib/haptics'
 
 interface Props {
   workout: WorkoutDef
@@ -16,6 +17,19 @@ interface Props {
   onMove: (dir: -1 | 1) => void
 }
 
+const exerciseCostMin = (sets: number) => sets * 3 + 2
+
+/** One day inside the routine editor.
+ *
+ * Uses the same editorial collapsible pattern as the rest of the app
+ * (eyebrow + display title + bare chevron, grid-template-rows height
+ * animation) so a multi-day routine stays scannable: collapsed days
+ * show their name + exercise count + minutes, only the one you're
+ * editing expands. Tap any header to switch focus.
+ *
+ * Inline rename + per-day controls (move / duplicate / delete) live
+ * inside the open drawer, so the trigger row stays a single
+ * uncluttered button. */
 export default function WorkoutEditor({
   workout,
   readOnly = false,
@@ -31,10 +45,27 @@ export default function WorkoutEditor({
   const exById = new Map(exercises.map((e) => [e.id, e]))
   const [adding, setAdding] = useState(false)
 
+  // Default: only the first day is open. Multi-day routines no longer
+  // unfurl all of their empty CTAs at once.
+  const [open, setOpen] = useState(workoutIndex === 0)
+
+  const isEmpty = workout.items.length === 0
+  const minEstimate = isEmpty
+    ? null
+    : Math.max(
+        20,
+        Math.round(workout.items.reduce((a, it) => a + exerciseCostMin(it.targetSets), 0)),
+      )
+
+  const displayName = workout.name || `Day ${workoutIndex + 1}`
+  const stat = isEmpty ? undefined : `${workout.items.length} · ~${minEstimate}m`
+  const subtitle = isEmpty ? 'Empty — tap to add exercises' : undefined
+
   function updateItem(idx: number, patch: Partial<PlanItem>) {
     if (readOnly) return
-    const items = workout.items.map((it, i) => (i === idx ? { ...it, ...patch } : it))
-    onPatch({ items })
+    onPatch({
+      items: workout.items.map((it, i) => (i === idx ? { ...it, ...patch } : it)),
+    })
   }
   function removeItem(idx: number) {
     if (readOnly) return
@@ -49,131 +80,143 @@ export default function WorkoutEditor({
     onPatch({ items: next })
   }
 
-  const isEmpty = workout.items.length === 0
-  // Empty workouts open so the "+ Add first exercise" CTA is visible.
-  // Filled workouts collapse to summary — you tap the row to edit.
-  const [open, setOpen] = useState(isEmpty)
-  const totalSets = workout.items.reduce((a, it) => a + it.targetSets, 0)
-  const minEstimate = totalSets > 0 ? Math.max(30, Math.round(totalSets * 3 + 10)) : null
+  function toggle() {
+    haptics.subtle()
+    setOpen((v) => !v)
+  }
 
   return (
-    <section className={`workout-edit-v2${open ? ' open' : ''}`}>
-      <header className="workout-edit-v2-head">
-        <button
-          type="button"
-          className="workout-edit-v2-toggle"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-label={open ? 'Collapse this day' : 'Expand this day'}
-        >
-          {open ? '−' : '+'}
-        </button>
-        <span className="day-tag">Day {workoutIndex + 1}</span>
-        <input
-          type="text"
-          className="workout-edit-v2-name"
-          value={workout.name}
-          placeholder="e.g. Push, Heavy Day, Monday"
-          disabled={readOnly}
-          onChange={(e) => onPatch({ name: e.target.value })}
-          onClick={(e) => e.stopPropagation()}
-        />
-        {!open ? (
-          <span className="workout-edit-v2-summary-meta">
-            {workout.items.length} {workout.items.length === 1 ? 'lift' : 'lifts'}
-            {minEstimate ? ` · ~${minEstimate} min` : ''}
+    <section className={`cx-section day-editor ${open ? 'cx-section-open' : ''}`.trim()}>
+      <button
+        type="button"
+        className="cx-section-trigger"
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        <span className="cx-section-headline">
+          <span className="cx-section-eyebrow">Day {workoutIndex + 1}</span>
+          <span className="cx-section-title-row">
+            <span className="cx-section-title">{displayName}</span>
+            {stat ? <span className="cx-section-stat tabnum">{stat}</span> : null}
           </span>
-        ) : null}
-        {!readOnly ? (
-          <div className="workout-edit-v2-controls" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="icon-btn-mini"
-              onClick={() => onMove(-1)}
-              disabled={!canMoveUp}
-              aria-label="Move day up"
-              title="Move up"
-            >↑</button>
-            <button
-              type="button"
-              className="icon-btn-mini"
-              onClick={() => onMove(1)}
-              disabled={!canMoveDown}
-              aria-label="Move day down"
-              title="Move down"
-            >↓</button>
-            <button
-              type="button"
-              className="icon-btn-mini"
-              onClick={onDuplicate}
-              aria-label="Duplicate day"
-              title="Duplicate"
-            >⎘</button>
-            <button
-              type="button"
-              className="icon-btn-mini danger"
-              onClick={onRemove}
-              aria-label="Remove day"
-              title="Remove"
-            >✕</button>
-          </div>
-        ) : null}
-      </header>
-
-      {open ? (
-      <>
-      {isEmpty ? (
-        !readOnly ? (
-          <button
-            type="button"
-            className="workout-empty-cta"
-            onClick={() => setAdding(true)}
-          >
-            <span className="workout-empty-cta-plus">+</span>
-            <span>
-              <strong>Add the first exercise</strong>
-              <span className="muted small">
-                Pick from the catalog or your recents
-              </span>
-            </span>
-          </button>
-        ) : (
-          <p className="muted small">No exercises yet.</p>
-        )
-      ) : (
-        <ul className="workout-items-v2">
-          {workout.items.map((item, idx) => (
-            <ItemRow
-              key={idx}
-              item={item}
-              idx={idx}
-              total={workout.items.length}
-              readOnly={readOnly}
-              exName={exById.get(item.exerciseId)?.name ?? item.exerciseId}
-              exFullObj={exById.get(item.exerciseId)}
-              onUpdate={(p) => updateItem(idx, p)}
-              onRemove={() => removeItem(idx)}
-              onMove={(d) => moveItem(idx, d)}
+          {subtitle ? <span className="cx-section-subtitle">{subtitle}</span> : null}
+        </span>
+        <span className="cx-section-chevron" aria-hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <path
+              d="M6 9.5L12 15L18 9.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          ))}
-        </ul>
-      )}
+          </svg>
+        </span>
+      </button>
 
-      {!readOnly && !isEmpty ? (
-        <button
-          type="button"
-          className="btn small workout-add-more"
-          onClick={() => setAdding(true)}
-        >
-          + Add another exercise
-        </button>
-      ) : null}
-      </>
-      ) : null}
+      <div className="cx-section-drawer" aria-hidden={!open}>
+        <div className="cx-section-drawer-clip">
+          <div className="cx-section-body day-editor-body">
+            {!readOnly ? (
+              <label className="day-editor-rename">
+                <span>Day name</span>
+                <input
+                  type="text"
+                  value={workout.name}
+                  placeholder={`e.g. Push, Heavy Day, Day ${workoutIndex + 1}`}
+                  onChange={(e) => onPatch({ name: e.target.value })}
+                />
+              </label>
+            ) : null}
+
+            {isEmpty ? (
+              !readOnly ? (
+                <button
+                  type="button"
+                  className="workout-empty-cta"
+                  onClick={() => setAdding(true)}
+                >
+                  <span className="workout-empty-cta-plus">+</span>
+                  <span>
+                    <strong>Add the first exercise</strong>
+                    <span className="muted small">
+                      Pick from the catalog or your recents
+                    </span>
+                  </span>
+                </button>
+              ) : (
+                <p className="muted small">No exercises yet.</p>
+              )
+            ) : (
+              <ul className="workout-items-v2">
+                {workout.items.map((item, idx) => (
+                  <ItemRow
+                    key={idx}
+                    item={item}
+                    idx={idx}
+                    total={workout.items.length}
+                    readOnly={readOnly}
+                    exName={exById.get(item.exerciseId)?.name ?? item.exerciseId}
+                    exFullObj={exById.get(item.exerciseId)}
+                    onUpdate={(p) => updateItem(idx, p)}
+                    onRemove={() => removeItem(idx)}
+                    onMove={(d) => moveItem(idx, d)}
+                  />
+                ))}
+              </ul>
+            )}
+
+            {!readOnly && !isEmpty ? (
+              <button
+                type="button"
+                className="btn small workout-add-more"
+                onClick={() => setAdding(true)}
+              >
+                + Add another exercise
+              </button>
+            ) : null}
+
+            {!readOnly ? (
+              <div className="day-editor-controls">
+                <button
+                  type="button"
+                  className="icon-btn-mini"
+                  onClick={() => onMove(-1)}
+                  disabled={!canMoveUp}
+                  aria-label="Move day up"
+                  title="Move up"
+                >↑</button>
+                <button
+                  type="button"
+                  className="icon-btn-mini"
+                  onClick={() => onMove(1)}
+                  disabled={!canMoveDown}
+                  aria-label="Move day down"
+                  title="Move down"
+                >↓</button>
+                <button
+                  type="button"
+                  className="icon-btn-mini"
+                  onClick={onDuplicate}
+                  aria-label="Duplicate day"
+                  title="Duplicate"
+                >⎘</button>
+                <button
+                  type="button"
+                  className="icon-btn-mini danger"
+                  onClick={onRemove}
+                  aria-label="Remove day"
+                  title="Remove"
+                >✕</button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
 
       {adding ? (
         <ExercisePicker
-          title={`Add to ${workout.name || `Day ${workoutIndex + 1}`}`}
+          title={`Add to ${displayName}`}
           onClose={() => setAdding(false)}
           onPick={(id) => {
             onPatch({
