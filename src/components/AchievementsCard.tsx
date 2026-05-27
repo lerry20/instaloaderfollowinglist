@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { computeAchievements, type Achievement } from '../lib/achievements'
 import { useT, type DictKey } from '../i18n'
+import { useDemoMode } from '../state/demoMode'
 import CollapsibleSection from './CollapsibleSection'
 
 export default function AchievementsCard() {
   const t = useT()
+  const demo = useDemoMode()
   const [achievements, setAchievements] = useState<Achievement[] | null>(null)
 
   useEffect(() => {
@@ -16,6 +18,7 @@ export default function AchievementsCard() {
   }, [])
 
   if (!achievements) return null
+  if (demo) return null
 
   const earned = achievements.filter((a) => a.earned).length
   const total = achievements.length

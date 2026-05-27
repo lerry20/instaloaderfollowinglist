@@ -23,6 +23,7 @@ import { toast } from '../state/toasts'
 import { haptics } from '../lib/haptics'
 import { buildProactiveMessage, currentStreak, type ProactiveMessage } from '../lib/streak'
 import { computeAdherence } from '../lib/adherence'
+import { useDemoMode } from '../state/demoMode'
 import Skeleton from '../components/Skeleton'
 import { useT, useLocaleStore, type Locale } from '../i18n'
 import { useLocalizedExercise } from '../lib/exercise'
@@ -98,6 +99,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
   const locale = useLocaleStore((s) => s.locale)
   const navigate = useNavigate()
   const settings = useSettings()
+  const demo = useDemoMode()
   const bw = useBodyweightLogs()
   const latestBw = bw && bw.length > 0 ? bw[bw.length - 1] : null
   const units = settings?.units ?? 'kg'
@@ -245,14 +247,14 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
 
   return (
     <div className="page train-dashboard">
-      {proactive ? (
+      {proactive && !demo ? (
         <div className={`proactive proactive-${proactive.kind}`}>{proactive.text}</div>
       ) : null}
 
       <header className="dashboard-head">
         <div className="dashboard-date-row">
           <span className="muted small">{dateFmt.format(new Date())}</span>
-          {streak >= 2 ? (
+          {streak >= 2 && !demo ? (
             <span className="streak-badge tabnum" title={`${streak}-day streak`}>
               🔥 {streak}
             </span>
@@ -270,7 +272,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
             </span>
           </div>
           <h2>{routine.name}</h2>
-          {totalWorkouts > 0 ? (
+          {totalWorkouts > 0 && !demo ? (
             <span className="muted small">
               {t('train.day_of_cycle', { n: position, total: totalWorkouts })}
             </span>
@@ -362,6 +364,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
         </div>
       )}
 
+      {demo ? null : (
       <section className="dashboard-stats">
         <div className="dashboard-stat">
           <span className="muted small">This week</span>
@@ -398,6 +401,7 @@ function StartScreen({ routine, next }: { routine: Routine; next: WorkoutDef | n
           </span>
         </Link>
       </section>
+      )}
 
       {restOfCycle.length > 1 ? (
         <section className="dashboard-cycle">

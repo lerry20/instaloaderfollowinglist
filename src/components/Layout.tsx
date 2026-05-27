@@ -7,6 +7,7 @@ import CoachChat from './CoachChat'
 import { currentStreak } from '../lib/streak'
 import { useRestTimer } from '../state/restTimer'
 import { useSettings } from '../db/queries'
+import { useDemoMode } from '../state/demoMode'
 import { useT } from '../i18n'
 
 export default function Layout() {
@@ -15,6 +16,7 @@ export default function Layout() {
   const [showCoach, setShowCoach] = useState(false)
   const [streak, setStreak] = useState<number>(0)
   const settings = useSettings()
+  const demo = useDemoMode()
   const restActive = useRestTimer((s) => s.totalSec > 0)
   // Only surface the AI coach when the user has actually configured an
   // API key. Hides a half-finished surface for users who haven't opted in.
@@ -41,7 +43,7 @@ export default function Layout() {
         <div className="brand">
           <span className="brand-mark" aria-hidden />
           <span>MyBulkLog</span>
-          {streak >= 2 ? (
+          {streak >= 2 && !demo ? (
             <span className="streak-badge tabnum" title={`${streak}-day streak`}>
               🔥 {streak}
             </span>

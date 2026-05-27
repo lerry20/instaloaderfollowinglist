@@ -46,6 +46,7 @@ export type DictKey =
   | 'workout.empty_cta_title' | 'workout.empty_cta_sub' | 'workout.empty_readonly'
   | 'workout.add_more' | 'workout.picker_add_to'
   | 'workout.field_sets' | 'workout.field_reps' | 'workout.field_rpe'
+  | 'demo.toggle_label' | 'demo.toggle_help' | 'demo.banner' | 'demo.empty_progress'
   // Active session
   | 'session.exercise_of' | 'session.set_of' | 'session.target'
   | 'session.last' | 'session.add_warmup' | 'session.swap_exercise'

@@ -13,6 +13,7 @@ import { db } from '../db/schema'
 import { todayISO, useBodyweightLogs, useSettings } from '../db/queries'
 import { displayToKg, kgToDisplay } from '../lib/units'
 import { toast } from '../state/toasts'
+import { useDemoMode } from '../state/demoMode'
 import CollapsibleSection from '../components/CollapsibleSection'
 
 export default function Daily() {
@@ -36,12 +37,15 @@ export default function Daily() {
 
 function NutritionSection() {
   const settings = useSettings()
+  const demo = useDemoMode()
   const today = todayISO()
-  const todayLog = useLiveQuery(() => db.nutrition.get(today), [today])
-  const recent = useLiveQuery(async () => {
+  const todayLogRaw = useLiveQuery(() => db.nutrition.get(today), [today])
+  const todayLog = demo ? undefined : todayLogRaw
+  const recentRaw = useLiveQuery(async () => {
     const all = await db.nutrition.toArray()
     return all.sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-14)
   }, [])
+  const recent = demo ? [] : recentRaw
 
   const [kcal, setKcal] = useState<number | ''>('')
   const [protein, setProtein] = useState<number | ''>('')
@@ -145,8 +149,10 @@ function NutritionSection() {
 }
 
 function SleepSection() {
+  const demo = useDemoMode()
   const today = todayISO()
-  const todayLog = useLiveQuery(() => db.sleep.get(today), [today])
+  const todayLogRaw = useLiveQuery(() => db.sleep.get(today), [today])
+  const todayLog = demo ? undefined : todayLogRaw
   const [hours, setHours] = useState<number | ''>('')
   const [soreness, setSoreness] = useState<number>(3)
 
@@ -215,7 +221,9 @@ function SleepSection() {
 
 function BodyweightSection() {
   const settings = useSettings()
-  const logs = useBodyweightLogs()
+  const demo = useDemoMode()
+  const logsRaw = useBodyweightLogs()
+  const logs = demo ? undefined : logsRaw
   const today = todayISO()
   const units = settings?.units ?? 'kg'
   const todayLog = logs?.find((l) => l.date === today)
@@ -272,11 +280,14 @@ function BodyweightSection() {
 
 function MeasurementsSection() {
   const settings = useSettings()
+  const demo = useDemoMode()
   const units = settings?.units ?? 'kg'
   const useCm = true // store cm always; could expose inches later
   const today = todayISO()
-  const todayLog = useLiveQuery(() => db.measurements.get(today), [today])
-  const all = useLiveQuery(() => db.measurements.toArray(), []) ?? []
+  const todayLogRaw = useLiveQuery(() => db.measurements.get(today), [today])
+  const todayLog = demo ? undefined : todayLogRaw
+  const allRaw = useLiveQuery(() => db.measurements.toArray(), []) ?? []
+  const all = demo ? [] : allRaw
 
   const [waist, setWaist] = useState<number | ''>('')
   const [chest, setChest] = useState<number | ''>('')

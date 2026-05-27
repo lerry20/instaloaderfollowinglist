@@ -6,6 +6,7 @@ import { ensureNotificationPermission } from '../state/restTimer'
 import { toast } from '../state/toasts'
 import { detectDeloadSignal, nextPhase, PHASE_DESCRIPTION, PHASE_LABEL } from '../lib/programming'
 import { useT, useLocaleStore, LOCALES, LOCALE_LABEL, LOCALE_FLAG, type Locale } from '../i18n'
+import { setDemoMode, useDemoMode } from '../state/demoMode'
 
 interface Props {
   onClose: () => void
@@ -21,6 +22,7 @@ export default function SettingsModal({ onClose }: Props) {
   const [importing, setImporting] = useState(false)
   const importInputRef = useRef<HTMLInputElement>(null)
   const [deloadInfo, setDeloadInfo] = useState<string | null>(null)
+  const demoMode = useDemoMode()
 
   if (!settings) return null
 
@@ -272,6 +274,28 @@ export default function SettingsModal({ onClose }: Props) {
             Get a key at <a className="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>.
             Then tap 💬 in the header to chat.
           </p>
+        </details>
+
+        <details className="card section-card collapsible-section" open={demoMode}>
+          <summary>
+            <h4>{tr('demo.toggle_label')}</h4>
+            <span className="muted small">{demoMode ? '● on' : 'off'}</span>
+          </summary>
+          <label className="row" style={{ alignItems: 'center', gap: 'var(--space-3)' }}>
+            <input
+              type="checkbox"
+              checked={demoMode}
+              onChange={(e) => {
+                setDemoMode(e.target.checked)
+                toast(
+                  e.target.checked ? tr('demo.banner') : tr('demo.toggle_label') + ' off',
+                  { kind: 'success', duration: 1800 },
+                )
+              }}
+            />
+            <span>{tr('demo.toggle_label')}</span>
+          </label>
+          <p className="muted small">{tr('demo.toggle_help')}</p>
         </details>
 
         <details className="card section-card collapsible-section">

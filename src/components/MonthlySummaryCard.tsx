@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Units } from '../db/schema'
 import { kgToDisplay } from '../lib/units'
 import { useLocaleStore, useT, type Locale } from '../i18n'
+import { useDemoMode } from '../state/demoMode'
 import CollapsibleSection from './CollapsibleSection'
 
 const LOCALE_BCP47: Record<Locale, string> = {
@@ -22,6 +23,7 @@ interface Props {
 export default function MonthlySummaryCard({ units }: Props) {
   const t = useT()
   const locale = useLocaleStore((s) => s.locale)
+  const demo = useDemoMode()
 
   // Bounds: first millisecond of this month and the previous month
   const now = new Date()
@@ -75,6 +77,7 @@ export default function MonthlySummaryCard({ units }: Props) {
   }, [])
 
   if (!data) return null
+  if (demo) return null
 
   const monthLabel = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
     month: 'long',

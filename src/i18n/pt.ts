@@ -69,6 +69,10 @@ export const pt: Dict = {
   'workout.field_sets': 'Séries',
   'workout.field_reps': 'Repetições',
   'workout.field_rpe': 'RPE',
+  'demo.toggle_label': 'Modo demo',
+  'demo.toggle_help': 'Oculta temporariamente suas estatísticas pessoais (sessões, PRs, sequência, peso). Nada é apagado — desligue para ver tudo de volta.',
+  'demo.banner': 'Modo demo ativo — seus dados estão ocultos mas em segurança.',
+  'demo.empty_progress': 'Seu progresso aparecerá aqui conforme você treinar.',
   // Session
   'session.exercise_of': 'Exercício {n} de {total}',
   'session.set_of': 'SÉRIE {n} DE {total}',

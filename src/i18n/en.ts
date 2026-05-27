@@ -67,6 +67,10 @@ export const en: Dict = {
   'workout.field_sets': 'Sets',
   'workout.field_reps': 'Reps',
   'workout.field_rpe': 'RPE',
+  'demo.toggle_label': 'Demo mode',
+  'demo.toggle_help': 'Temporarily hides your personal stats (sessions, PRs, streak, bodyweight). Nothing is deleted — toggle off to bring everything back.',
+  'demo.banner': 'Demo mode is on — your data is hidden but safe.',
+  'demo.empty_progress': 'Progress will appear here as you train.',
   // Session
   'session.exercise_of': 'Exercise {n} of {total}',
   'session.set_of': 'SET {n} OF {total}',
