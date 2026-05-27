@@ -6,6 +6,7 @@ import SettingsModal from './SettingsModal'
 import CoachChat from './CoachChat'
 import { currentStreak } from '../lib/streak'
 import { useRestTimer } from '../state/restTimer'
+import { useSettings } from '../db/queries'
 import { useT } from '../i18n'
 
 export default function Layout() {
@@ -13,7 +14,11 @@ export default function Layout() {
   const [showSettings, setShowSettings] = useState(false)
   const [showCoach, setShowCoach] = useState(false)
   const [streak, setStreak] = useState<number>(0)
+  const settings = useSettings()
   const restActive = useRestTimer((s) => s.totalSec > 0)
+  // Only surface the AI coach when the user has actually configured an
+  // API key. Hides a half-finished surface for users who haven't opted in.
+  const coachAvailable = !!settings?.aiApiKey
 
   useEffect(() => {
     let cancelled = false
@@ -49,15 +54,17 @@ export default function Layout() {
             <NavLink to="/daily">{t('nav.daily')}</NavLink>
             <NavLink to="/progress">{t('nav.progress')}</NavLink>
           </nav>
-          <button
-            type="button"
-            className="icon-btn"
-            aria-label="Open AI coach"
-            onClick={() => setShowCoach(true)}
-            title="AI coach"
-          >
-            <span aria-hidden style={{ fontSize: '1rem' }}>💬</span>
-          </button>
+          {coachAvailable ? (
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="Open AI coach"
+              onClick={() => setShowCoach(true)}
+              title="AI coach"
+            >
+              <span aria-hidden style={{ fontSize: '1rem' }}>💬</span>
+            </button>
+          ) : null}
           <button
             type="button"
             className="icon-btn"

@@ -42,6 +42,10 @@ export type DictKey =
   | 'train.bodyweight' | 'train.routine' | 'train.change' | 'train.log_it'
   | 'train.no_routine_selected'
   | 'train.day_of_cycle' | 'train.more_count'
+  | 'workout.day_label' | 'workout.day_fallback' | 'workout.day_name_label' | 'workout.day_name_placeholder'
+  | 'workout.empty_cta_title' | 'workout.empty_cta_sub' | 'workout.empty_readonly'
+  | 'workout.add_more' | 'workout.picker_add_to'
+  | 'workout.field_sets' | 'workout.field_reps' | 'workout.field_rpe'
   // Active session
   | 'session.exercise_of' | 'session.set_of' | 'session.target'
   | 'session.last' | 'session.add_warmup' | 'session.swap_exercise'

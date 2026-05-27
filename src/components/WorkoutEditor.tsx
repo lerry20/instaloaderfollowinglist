@@ -4,6 +4,7 @@ import { db, type PlanItem, type WorkoutDef } from '../db/schema'
 import ExercisePicker from './ExercisePicker'
 import { useLocalizedExercise } from '../lib/exercise'
 import { haptics } from '../lib/haptics'
+import { useT } from '../i18n'
 
 interface Props {
   workout: WorkoutDef
@@ -41,6 +42,7 @@ export default function WorkoutEditor({
   onDuplicate,
   onMove,
 }: Props) {
+  const t = useT()
   const exercises = useLiveQuery(() => db.exercises.toArray(), []) ?? []
   const exById = new Map(exercises.map((e) => [e.id, e]))
   const [adding, setAdding] = useState(false)
@@ -57,7 +59,8 @@ export default function WorkoutEditor({
         Math.round(workout.items.reduce((a, it) => a + exerciseCostMin(it.targetSets), 0)),
       )
 
-  const displayName = workout.name || `Day ${workoutIndex + 1}`
+  const dayFallback = t('workout.day_fallback', { n: workoutIndex + 1 })
+  const displayName = workout.name || dayFallback
   const stat = isEmpty ? undefined : `${workout.items.length} · ~${minEstimate}m`
   const subtitle = isEmpty ? 'Empty — tap to add exercises' : undefined
 
@@ -94,7 +97,7 @@ export default function WorkoutEditor({
         onClick={toggle}
       >
         <span className="cx-section-headline">
-          <span className="cx-section-eyebrow">Day {workoutIndex + 1}</span>
+          <span className="cx-section-eyebrow">{t('workout.day_label', { n: workoutIndex + 1 })}</span>
           <span className="cx-section-title-row">
             <span className="cx-section-title">{displayName}</span>
             {stat ? <span className="cx-section-stat tabnum">{stat}</span> : null}
@@ -119,11 +122,11 @@ export default function WorkoutEditor({
           <div className="cx-section-body day-editor-body">
             {!readOnly ? (
               <label className="day-editor-rename">
-                <span>Day name</span>
+                <span>{t('workout.day_name_label')}</span>
                 <input
                   type="text"
                   value={workout.name}
-                  placeholder={`e.g. Push, Heavy Day, Day ${workoutIndex + 1}`}
+                  placeholder={t('workout.day_name_placeholder', { n: workoutIndex + 1 })}
                   onChange={(e) => onPatch({ name: e.target.value })}
                 />
               </label>
@@ -138,14 +141,14 @@ export default function WorkoutEditor({
                 >
                   <span className="workout-empty-cta-plus">+</span>
                   <span>
-                    <strong>Add the first exercise</strong>
+                    <strong>{t('workout.empty_cta_title')}</strong>
                     <span className="muted small">
-                      Pick from the catalog or your recents
+                      {t('workout.empty_cta_sub')}
                     </span>
                   </span>
                 </button>
               ) : (
-                <p className="muted small">No exercises yet.</p>
+                <p className="muted small">{t('workout.empty_readonly')}</p>
               )
             ) : (
               <ul className="workout-items-v2">
@@ -172,7 +175,7 @@ export default function WorkoutEditor({
                 className="btn small workout-add-more"
                 onClick={() => setAdding(true)}
               >
-                + Add another exercise
+                {t('workout.add_more')}
               </button>
             ) : null}
 
@@ -216,14 +219,19 @@ export default function WorkoutEditor({
 
       {adding ? (
         <ExercisePicker
-          title={`Add to ${displayName}`}
+          title={t('workout.picker_add_to', { name: displayName })}
           onClose={() => setAdding(false)}
           onPick={(id) => {
+            const ex = exById.get(id)
+            // Smart defaults so a deadlift doesn't land at 3×8-10 like a curl.
+            // Compounds → hypertrophy-leaning 4×6-8 @ RPE 8.
+            // Isolations → higher-rep stretch-mediated 3×10-12 @ RPE 9.
+            const isCompound = ex?.category === 'compound'
+            const defaults: Omit<PlanItem, 'exerciseId'> = isCompound
+              ? { targetSets: 4, targetReps: '6–8', targetRPE: 8 }
+              : { targetSets: 3, targetReps: '10–12', targetRPE: 9 }
             onPatch({
-              items: [
-                ...workout.items,
-                { exerciseId: id, targetSets: 3, targetReps: '8–10', targetRPE: 8 },
-              ],
+              items: [...workout.items, { exerciseId: id, ...defaults }],
             })
             setAdding(false)
             setOpen(true)
@@ -255,6 +263,7 @@ function ItemRow({
   onRemove: () => void
   onMove: (dir: -1 | 1) => void
 }) {
+  const t = useT()
   const local = useLocalizedExercise(exFullObj)
   return (
     <li className="workout-item-v2">
@@ -290,7 +299,7 @@ function ItemRow({
       </div>
       <div className="workout-item-v2-fields">
         <label>
-          <span>Sets</span>
+          <span>{t('workout.field_sets')}</span>
           <input
             type="number"
             inputMode="numeric"
@@ -302,7 +311,7 @@ function ItemRow({
           />
         </label>
         <label>
-          <span>Reps</span>
+          <span>{t('workout.field_reps')}</span>
           <input
             type="text"
             disabled={readOnly}
@@ -312,7 +321,7 @@ function ItemRow({
           />
         </label>
         <label>
-          <span>RPE</span>
+          <span>{t('workout.field_rpe')}</span>
           <input
             type="number"
             inputMode="decimal"
