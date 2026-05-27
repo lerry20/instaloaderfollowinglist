@@ -71,6 +71,13 @@ export const en: Dict = {
   'demo.toggle_help': 'Temporarily hides your personal stats (sessions, PRs, streak, bodyweight). Nothing is deleted — toggle off to bring everything back.',
   'demo.banner': 'Demo mode is on — your data is hidden but safe.',
   'demo.empty_progress': 'Progress will appear here as you train.',
+  'train.empty_title': 'Ready to start?',
+  'train.empty_sub': 'Pick a routine from the library or build your own.',
+  'train.empty_browse_eyebrow': 'Recommended',
+  'train.empty_browse_title': 'Browse the library',
+  'train.empty_browse_sub': 'Coach-written routines — beginner LP, PPL, Upper/Lower, Arnold split and more.',
+  'train.empty_create_title': 'Build your own',
+  'train.empty_create_sub': 'Start blank — pick the days, choose the exercises, set the targets.',
   // Session
   'session.exercise_of': 'Exercise {n} of {total}',
   'session.set_of': 'SET {n} OF {total}',

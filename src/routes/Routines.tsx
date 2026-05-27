@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Routine } from '../db/schema'
 import { useActiveRoutine, useAllRoutines, useSettings } from '../db/queries'
@@ -19,6 +19,23 @@ export default function Routines() {
   const [showAll, setShowAll] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
+  const [params, setParams] = useSearchParams()
+
+  // ?new=1 in the URL opens the new-routine modal — used by the Train
+  // empty state's "Build your own" card so the user lands straight in
+  // the creation flow.
+  useEffect(() => {
+    if (params.get('new') === '1') {
+      setShowNew(true)
+      params.delete('new')
+      setParams(params, { replace: true })
+    }
+    if (params.get('pick') === '1') {
+      setShowPicker(true)
+      params.delete('pick')
+      setParams(params, { replace: true })
+    }
+  }, [params, setParams])
 
   if (!routines || !settings) return <div className="page"><p className="muted">{t('common.loading')}</p></div>
 

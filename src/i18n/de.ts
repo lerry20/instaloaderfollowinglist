@@ -71,6 +71,13 @@ export const de: Dict = {
   'demo.toggle_help': 'Blendet deine persönlichen Statistiken (Sessions, PRs, Streak, Gewicht) vorübergehend aus. Nichts wird gelöscht — wieder deaktivieren, um alles zu sehen.',
   'demo.banner': 'Demo-Modus aktiv — deine Daten sind ausgeblendet, aber sicher.',
   'demo.empty_progress': 'Dein Fortschritt erscheint hier, sobald du trainierst.',
+  'train.empty_title': 'Bereit anzufangen?',
+  'train.empty_sub': 'Wähle einen Plan aus der Bibliothek oder erstelle deinen eigenen.',
+  'train.empty_browse_eyebrow': 'Empfohlen',
+  'train.empty_browse_title': 'Bibliothek durchsuchen',
+  'train.empty_browse_sub': 'Von Coaches geschriebene Pläne — Anfänger-LP, PPL, Upper/Lower, Arnold-Split und mehr.',
+  'train.empty_create_title': 'Eigenen erstellen',
+  'train.empty_create_sub': 'Starte leer — wähle Tage, Übungen, Ziele.',
   // Session
   'session.exercise_of': 'Übung {n} von {total}',
   'session.set_of': 'SATZ {n} VON {total}',

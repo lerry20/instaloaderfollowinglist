@@ -71,6 +71,13 @@ export const es: Dict = {
   'demo.toggle_help': 'Oculta temporalmente tus estadísticas personales (sesiones, PR, racha, peso). No se borra nada — desactívalo para verlo todo.',
   'demo.banner': 'Modo demo activo — tus datos están ocultos pero a salvo.',
   'demo.empty_progress': 'Tu progreso aparecerá aquí a medida que entrenes.',
+  'train.empty_title': '¿Listo para empezar?',
+  'train.empty_sub': 'Elige una rutina de la biblioteca o crea la tuya.',
+  'train.empty_browse_eyebrow': 'Recomendado',
+  'train.empty_browse_title': 'Explora la biblioteca',
+  'train.empty_browse_sub': 'Rutinas escritas por coaches — principiante, PPL, Upper/Lower, split Arnold y más.',
+  'train.empty_create_title': 'Crea la tuya',
+  'train.empty_create_sub': 'Empieza desde cero — elige días, ejercicios y objetivos.',
   // Session
   'session.exercise_of': 'Ejercicio {n} de {total}',
   'session.set_of': 'SERIE {n} DE {total}',

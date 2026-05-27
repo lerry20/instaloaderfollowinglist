@@ -42,6 +42,7 @@ export default function Train() {
   const settings = useSettings()
   const routine = useActiveRoutine()
   const session = useActiveSession()
+  const demo = useDemoMode()
   const navigate = useNavigate()
   const [next, setNext] = useState<WorkoutDef | null>(null)
 
@@ -58,20 +59,11 @@ export default function Train() {
     )
   }
 
-  if (!routine) {
-    // Active routine id points to a routine that doesn't exist — graceful empty state
-    // instead of an infinite "Loading…".
-    return (
-      <div className="page">
-        <header className="hero">
-          <span className="muted small">{t('train.no_routine_selected')}</span>
-          <h1 className="big-title">{t('train.pick_routine_title')}</h1>
-        </header>
-        <Link to="/routines" className="btn primary block">
-          {t('train.browse_routines')}
-        </Link>
-      </div>
-    )
+  // First view when nothing is selected yet — and also the demo-mode
+  // landing screen so the PT sees a pristine "pick a routine" hero
+  // instead of the user's actual routine card.
+  if (!routine || demo) {
+    return <TrainEmpty />
   }
 
   if (session) {
@@ -591,4 +583,53 @@ function ExerciseName({ id }: { id: string }) {
   const ex = useLiveQuery(() => db.exercises.get(id), [id])
   const local = useLocalizedExercise(ex)
   return <>{local?.name ?? ex?.name ?? id}</>
+}
+
+/** Train empty-state hero. Shown whenever no routine is active (first-
+ * time use) and whenever demo mode is on (so the PT sees a pristine
+ * "pick a routine" screen instead of the user's actual workout).
+ *
+ * Two clear options, Claude-style: a recommended primary card for the
+ * built-in library and a secondary card for building your own. */
+function TrainEmpty() {
+  const t = useT()
+  return (
+    <div className="page train-empty-page">
+      <header className="train-empty-head">
+        <h1>{t('train.empty_title')}</h1>
+        <p>{t('train.empty_sub')}</p>
+      </header>
+
+      <div className="train-empty-options">
+        <Link to="/routines" className="train-empty-option train-empty-option-primary">
+          <div className="train-empty-option-body">
+            <span className="train-empty-option-eyebrow">
+              {t('train.empty_browse_eyebrow')}
+            </span>
+            <h2>{t('train.empty_browse_title')}</h2>
+            <p>{t('train.empty_browse_sub')}</p>
+          </div>
+          <span className="train-empty-option-arrow" aria-hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </Link>
+
+        <Link to="/routines?new=1" className="train-empty-option">
+          <div className="train-empty-option-body">
+            <h2>{t('train.empty_create_title')}</h2>
+            <p>{t('train.empty_create_sub')}</p>
+          </div>
+          <span className="train-empty-option-arrow" aria-hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </Link>
+      </div>
+    </div>
+  )
 }

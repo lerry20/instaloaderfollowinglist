@@ -5153,6 +5153,210 @@ a.dashboard-stat:hover { background: var(--s-2); border-color: var(--line-strong
   .cx-section-body { padding: 0 var(--space-4) var(--space-4); }
 }
 
+/* Demo-mode card at the top of Settings. Always visible (not in a
+   collapsible) and has a proper iOS-style switch so the user can find
+   it instantly when they need to hide their data for a demo. */
+.demo-mode-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  transition: border-color var(--t-2) var(--ease-out),
+              background var(--t-2) var(--ease-out);
+}
+.demo-mode-card.is-on {
+  border-color: color-mix(in srgb, var(--tone-warn) 35%, var(--line-strong));
+  background: color-mix(in srgb, var(--tone-warn) 6%, var(--s-1));
+}
+.demo-mode-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.demo-mode-card-body h4 {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  color: var(--fg);
+}
+.demo-mode-card-body p { margin: 0; }
+
+.demo-mode-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 28px;
+  cursor: pointer;
+}
+.demo-mode-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.demo-mode-switch-track {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--s-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  position: relative;
+  transition: background var(--t-2) var(--ease-out),
+              border-color var(--t-2) var(--ease-out);
+}
+.demo-mode-switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: var(--fg-muted);
+  border-radius: 50%;
+  transition: transform var(--t-2) var(--ease-spring),
+              background var(--t-2) var(--ease-out);
+}
+.demo-mode-switch input:checked + .demo-mode-switch-track {
+  background: var(--tone-warn);
+  border-color: var(--tone-warn);
+}
+.demo-mode-switch input:checked + .demo-mode-switch-track::after {
+  transform: translateX(20px);
+  background: var(--fg-inverse);
+}
+.demo-mode-switch input:focus-visible + .demo-mode-switch-track {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+/* Train empty state — Claude-style hero when no routine is active
+   (first-time use) or demo mode is on. Big title, muted sub, then two
+   tall option cards (Browse / Create) with a sliding arrow on hover. */
+.train-empty-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-7);
+  max-width: 560px;
+  margin: 0 auto;
+}
+.train-empty-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+}
+.train-empty-head h1 {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
+  margin: 0;
+  color: var(--fg);
+}
+.train-empty-head p {
+  margin: 0;
+  font-size: var(--fs-body);
+  color: var(--fg-muted);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.005em;
+}
+.train-empty-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.train-empty-option {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color var(--t-2) var(--ease-out),
+              background var(--t-2) var(--ease-out),
+              transform var(--t-2) var(--ease-out);
+}
+.train-empty-option:hover {
+  border-color: var(--line-strong);
+  background: var(--s-2);
+  transform: translateY(-1px);
+}
+.train-empty-option:active { transform: translateY(0); }
+.train-empty-option-primary {
+  background: var(--s-2);
+  border-color: var(--line-strong);
+}
+.train-empty-option-primary:hover { background: var(--s-3); }
+.train-empty-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.train-empty-option-eyebrow {
+  align-self: flex-start;
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--tone-warn);
+  margin-bottom: var(--space-1);
+}
+.train-empty-option h2 {
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin: 0;
+  color: var(--fg);
+}
+.train-empty-option p {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--fg-muted);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.003em;
+}
+.train-empty-option-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-pill);
+  background: var(--s-3);
+  color: var(--fg-muted);
+  transition: transform var(--t-2) var(--ease-out),
+              color var(--t-2) var(--ease-out),
+              background var(--t-2) var(--ease-out);
+  flex-shrink: 0;
+}
+.train-empty-option:hover .train-empty-option-arrow {
+  transform: translateX(3px);
+  color: var(--fg);
+  background: var(--fg);
+  color: var(--fg-inverse);
+}
+@media (prefers-reduced-motion: reduce) {
+  .train-empty-option,
+  .train-empty-option-arrow { transition: none; }
+  .train-empty-option:hover { transform: none; }
+}
+
 /* Routine editor day cards inherit .cx-section so all days in a routine
    collapse / expand the same way the Progress + Daily sections do.
    Inline rename and per-day controls live inside the open drawer. */

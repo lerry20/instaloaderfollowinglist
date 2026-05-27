@@ -122,6 +122,27 @@ export default function SettingsModal({ onClose }: Props) {
           <button className="link" onClick={onClose}>{tr('common.close')}</button>
         </header>
 
+        <div className={`demo-mode-card${demoMode ? ' is-on' : ''}`}>
+          <div className="demo-mode-card-body">
+            <h4>{tr('demo.toggle_label')}</h4>
+            <p className="muted small">{tr('demo.toggle_help')}</p>
+          </div>
+          <label className="demo-mode-switch">
+            <input
+              type="checkbox"
+              checked={demoMode}
+              onChange={(e) => {
+                setDemoMode(e.target.checked)
+                toast(
+                  e.target.checked ? tr('demo.banner') : `${tr('demo.toggle_label')} · off`,
+                  { kind: 'success', duration: 1800 },
+                )
+              }}
+            />
+            <span className="demo-mode-switch-track" aria-hidden />
+          </label>
+        </div>
+
         <Row label={tr('settings.language')}>
           <div className="seg" style={{ flexWrap: 'wrap' }}>
             {LOCALES.map((l: Locale) => (
@@ -274,28 +295,6 @@ export default function SettingsModal({ onClose }: Props) {
             Get a key at <a className="link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>.
             Then tap 💬 in the header to chat.
           </p>
-        </details>
-
-        <details className="card section-card collapsible-section" open={demoMode}>
-          <summary>
-            <h4>{tr('demo.toggle_label')}</h4>
-            <span className="muted small">{demoMode ? '● on' : 'off'}</span>
-          </summary>
-          <label className="row" style={{ alignItems: 'center', gap: 'var(--space-3)' }}>
-            <input
-              type="checkbox"
-              checked={demoMode}
-              onChange={(e) => {
-                setDemoMode(e.target.checked)
-                toast(
-                  e.target.checked ? tr('demo.banner') : tr('demo.toggle_label') + ' off',
-                  { kind: 'success', duration: 1800 },
-                )
-              }}
-            />
-            <span>{tr('demo.toggle_label')}</span>
-          </label>
-          <p className="muted small">{tr('demo.toggle_help')}</p>
         </details>
 
         <details className="card section-card collapsible-section">

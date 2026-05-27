@@ -47,6 +47,9 @@ export type DictKey =
   | 'workout.add_more' | 'workout.picker_add_to'
   | 'workout.field_sets' | 'workout.field_reps' | 'workout.field_rpe'
   | 'demo.toggle_label' | 'demo.toggle_help' | 'demo.banner' | 'demo.empty_progress'
+  | 'train.empty_title' | 'train.empty_sub'
+  | 'train.empty_browse_eyebrow' | 'train.empty_browse_title' | 'train.empty_browse_sub'
+  | 'train.empty_create_title' | 'train.empty_create_sub'
   // Active session
   | 'session.exercise_of' | 'session.set_of' | 'session.target'
   | 'session.last' | 'session.add_warmup' | 'session.swap_exercise'

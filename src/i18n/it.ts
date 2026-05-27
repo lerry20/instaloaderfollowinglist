@@ -71,6 +71,13 @@ export const it: Dict = {
   'demo.toggle_help': 'Nasconde temporaneamente le tue statistiche personali (sessioni, PR, streak, peso). Nulla viene cancellato — disattiva per rivedere tutto.',
   'demo.banner': 'Modalità demo attiva — i tuoi dati sono nascosti ma al sicuro.',
   'demo.empty_progress': 'I progressi appariranno qui mentre ti alleni.',
+  'train.empty_title': 'Pronto a iniziare?',
+  'train.empty_sub': 'Scegli una scheda dalla libreria o creane una tua.',
+  'train.empty_browse_eyebrow': 'Consigliato',
+  'train.empty_browse_title': 'Sfoglia la libreria',
+  'train.empty_browse_sub': 'Schede scritte da coach — principiante, PPL, Upper/Lower, split Arnold e altre.',
+  'train.empty_create_title': 'Crea la tua scheda',
+  'train.empty_create_sub': 'Parti da zero — scegli i giorni, gli esercizi, i target.',
   // Session
   'session.exercise_of': 'Esercizio {n} di {total}',
   'session.set_of': 'SERIE {n} DI {total}',
