@@ -180,6 +180,8 @@ export const it: Dict = {
   'routines.why_it_works': 'Perché funziona',
   'routines.who_shouldnt': 'A chi non conviene',
   'routines.activate_this': 'Attiva questa scheda',
+  'routines.active_pill': '● Attiva',
+  'routines.no_active_prompt': 'Nessuna scheda attiva al momento. Tocca Attiva su una qui sotto per scegliere quella su cui ti stai allenando.',
   'routines.find_program': 'Aiutami a scegliere',
   'routines.start_picker': 'Inizia →',
   'routines.new_program': 'Nuova scheda',

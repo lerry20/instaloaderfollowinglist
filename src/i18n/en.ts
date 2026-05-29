@@ -180,6 +180,8 @@ export const en: Dict = {
   'routines.why_it_works': 'Why this works',
   'routines.who_shouldnt': "Who shouldn't do this",
   'routines.activate_this': 'Activate this program',
+  'routines.active_pill': '● Active',
+  'routines.no_active_prompt': 'No routine is active right now. Tap Activate on one below to pick the one you’re training on.',
   'routines.find_program': 'Help me choose',
   'routines.start_picker': 'Start the picker →',
   'routines.new_program': 'New program',

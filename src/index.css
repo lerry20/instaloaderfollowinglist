@@ -4035,6 +4035,33 @@ select {
   font-size: 0.6rem;
   line-height: 1;
 }
+.active-routine-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--space-2);
+  background: color-mix(in srgb, var(--tone-good) 16%, transparent);
+  color: var(--tone-good);
+  border: 1px solid color-mix(in srgb, var(--tone-good) 40%, transparent);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-2);
+  width: fit-content;
+}
+.no-active-routine-prompt {
+  padding: var(--space-4) var(--space-5);
+  background: color-mix(in srgb, var(--tone-warn) 8%, var(--s-1));
+  border: 1px solid color-mix(in srgb, var(--tone-warn) 30%, var(--line));
+  border-radius: var(--r-3);
+  color: var(--fg);
+  font-size: var(--fs-small);
+  line-height: var(--lh-snug);
+  margin: var(--space-4) 0;
+}
 .active-routine-week {
   display: flex;
   gap: 4px;

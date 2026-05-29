@@ -180,6 +180,8 @@ export const de: Dict = {
   'routines.why_it_works': 'Warum es funktioniert',
   'routines.who_shouldnt': 'Für wen es nichts ist',
   'routines.activate_this': 'Diesen Plan aktivieren',
+  'routines.active_pill': '● Aktiv',
+  'routines.no_active_prompt': 'Aktuell ist kein Plan aktiv. Tippe unten auf Aktivieren bei dem Plan, den du gerade trainierst.',
   'routines.find_program': 'Hilf mir wählen',
   'routines.start_picker': 'Starten →',
   'routines.new_program': 'Neuer Plan',

@@ -182,6 +182,8 @@ export const pt: Dict = {
   'routines.why_it_works': 'Por que funciona',
   'routines.who_shouldnt': 'Pra quem não serve',
   'routines.activate_this': 'Ativar esta rotina',
+  'routines.active_pill': '● Ativa',
+  'routines.no_active_prompt': 'Nenhuma rotina está ativa agora. Toque em Ativar em uma abaixo para escolher a que está treinando.',
   'routines.find_program': 'Me ajude a escolher',
   'routines.start_picker': 'Começar →',
   'routines.new_program': 'Nova rotina',

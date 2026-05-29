@@ -67,9 +67,16 @@ export default function Routines() {
     if (r.builtIn) return
     if (!confirm(`Delete "${r.name}"? This cannot be undone.`)) return
     await db.routines.delete(r.id)
-    if (active?.id === r.id) {
-      const fallback = routines?.find((x) => x.id !== r.id)
-      if (fallback) await activate(fallback.id)
+    // Always re-read the latest list before picking a fallback — the
+    // useLiveQuery snapshot above may not have caught up yet, which
+    // could otherwise leave us with an orphan activeRoutineId.
+    const fresh = await db.routines.orderBy('id').toArray()
+    const settingsFresh = await db.settings.get(1)
+    if (settingsFresh && settingsFresh.activeRoutineId === r.id) {
+      const fallback = fresh[0]
+      if (fallback) {
+        await db.settings.put({ ...settingsFresh, activeRoutineId: fallback.id })
+      }
     }
     toast('Routine deleted', { kind: 'warn' })
   }
@@ -79,6 +86,12 @@ export default function Routines() {
   return (
     <div className="page">
       <h1 className="big-title">{t('nav.routines')}</h1>
+
+      {!active && routines.length > 0 ? (
+        <p className="no-active-routine-prompt">
+          ↓ {t('routines.no_active_prompt')}
+        </p>
+      ) : null}
 
       {active ? (
         <>

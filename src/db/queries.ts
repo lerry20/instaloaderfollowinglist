@@ -23,7 +23,18 @@ export function useActiveRoutine(): Routine | undefined {
   return useLiveQuery(async () => {
     const s = await db.settings.get(1)
     if (!s) return undefined
-    return db.routines.get(s.activeRoutineId)
+    const r = await db.routines.get(s.activeRoutineId)
+    if (r) return r
+    // Self-heal: settings.activeRoutineId points to a routine that no
+    // longer exists (the user deleted it, or DB was migrated). Fall
+    // back to the first routine and patch settings so the UI never
+    // gets stuck in a "no active" state with no obvious way out.
+    const fallback = (await db.routines.orderBy('id').toArray())[0]
+    if (fallback) {
+      await db.settings.put({ ...s, activeRoutineId: fallback.id })
+      return fallback
+    }
+    return undefined
   }, [])
 }
 

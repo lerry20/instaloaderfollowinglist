@@ -95,6 +95,7 @@ export type DictKey =
   | 'routines.days_per_week' | 'routines.min_per_session'
   | 'routines.weekly_volume' | 'routines.why_it_works' | 'routines.who_shouldnt'
   | 'routines.activate_this' | 'routines.find_program' | 'routines.start_picker'
+  | 'routines.active_pill' | 'routines.no_active_prompt'
   | 'routines.new_program' | 'routines.new_name_placeholder'
   | 'routines.how_many_days' | 'routines.start_from'
   | 'routines.start_template' | 'routines.start_closest' | 'routines.start_empty'

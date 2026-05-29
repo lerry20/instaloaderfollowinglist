@@ -56,13 +56,13 @@ export default function ActiveRoutineCard({ routine, onSwitch, onEdit }: Props) 
     <article className="active-routine-card">
       <header className="active-routine-head">
         <div>
+          <span className="active-routine-pill">{t('routines.active_pill')}</span>
           <h2>{routine.name}</h2>
           <span className="muted small">
             {t('routines.days_per_week', { n: days })}
             {routine.level ? ` · ${t(`routines.level_${routine.level}` as 'routines.level_beginner')}` : ''}
           </span>
         </div>
-        <span className="active-routine-dot" aria-label="Active">●</span>
       </header>
 
       <ul className="active-routine-week" aria-label="This week">
