@@ -18,10 +18,14 @@ export default function AchievementsCard() {
   }, [])
 
   if (!achievements) return null
-  if (demo) return null
 
-  const earned = achievements.filter((a) => a.earned).length
-  const total = achievements.length
+  // Demo mode: show the milestone grid as if none had been earned yet,
+  // so the PT can see the categories without seeing the user's status.
+  const displayAch = demo
+    ? achievements.map((a) => ({ ...a, earned: false }))
+    : achievements
+  const earned = displayAch.filter((a) => a.earned).length
+  const total = displayAch.length
 
   return (
     <CollapsibleSection
@@ -32,7 +36,7 @@ export default function AchievementsCard() {
       defaultOpen={false}
     >
       <ul className="achievements-grid">
-        {achievements.map((a) => {
+        {displayAch.map((a) => {
           const nameKey = `ach.${a.id}` as DictKey
           const detailKey = `ach.${a.id}_d` as DictKey
           const detail = t(detailKey)

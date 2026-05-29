@@ -77,7 +77,12 @@ export default function MonthlySummaryCard({ units }: Props) {
   }, [])
 
   if (!data) return null
-  if (demo) return null
+
+  // Demo mode: show the card structure with zeros so the PT understands
+  // what this card tracks, without exposing the user's actual numbers.
+  const displayData = demo
+    ? { sessions: 0, workingSets: 0, prs: 0, bwDelta: null }
+    : data
 
   const monthLabel = new Intl.DateTimeFormat(LOCALE_BCP47[locale], {
     month: 'long',
@@ -92,25 +97,25 @@ export default function MonthlySummaryCard({ units }: Props) {
     >
       <div className="monthly-summary-grid">
         <div className="monthly-stat">
-          <span className="monthly-stat-value tabnum">{data.sessions}</span>
+          <span className="monthly-stat-value tabnum">{displayData.sessions}</span>
           <span className="muted small">{t('monthly.sessions')}</span>
         </div>
         <div className="monthly-stat">
-          <span className="monthly-stat-value tabnum">{data.workingSets}</span>
+          <span className="monthly-stat-value tabnum">{displayData.workingSets}</span>
           <span className="muted small">{t('monthly.working_sets')}</span>
         </div>
         <div className="monthly-stat">
-          <span className={`monthly-stat-value tabnum${data.prs > 0 ? ' shine' : ''}`}>
-            {data.prs > 0 ? '🥇 ' : ''}{data.prs}
+          <span className={`monthly-stat-value tabnum${displayData.prs > 0 ? ' shine' : ''}`}>
+            {displayData.prs > 0 ? '🥇 ' : ''}{displayData.prs}
           </span>
-          <span className="muted small">{data.prs === 1 ? t('monthly.pr_singular') : t('monthly.prs')}</span>
+          <span className="muted small">{displayData.prs === 1 ? t('monthly.pr_singular') : t('monthly.prs')}</span>
         </div>
         <div className="monthly-stat">
-          {data.bwDelta !== null ? (
+          {displayData.bwDelta !== null ? (
             <>
-              <span className={`monthly-stat-value tabnum ${data.bwDelta >= 0 ? 'up' : 'down'}`}>
-                {data.bwDelta >= 0 ? '+' : ''}
-                {kgToDisplay(data.bwDelta, units).toFixed(1)}
+              <span className={`monthly-stat-value tabnum ${displayData.bwDelta >= 0 ? 'up' : 'down'}`}>
+                {displayData.bwDelta >= 0 ? '+' : ''}
+                {kgToDisplay(displayData.bwDelta, units).toFixed(1)}
               </span>
               <span className="muted small">{t('monthly.bw_unit_suffix', { u: units })}</span>
             </>

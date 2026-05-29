@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { db } from '../db/schema'
 import { useLocaleStore, type Locale } from '../i18n'
+import { useDemoMode } from '../state/demoMode'
 
 interface DayCell {
   date: string
@@ -29,14 +30,17 @@ function isoDate(d: Date) {
 
 export default function TrainingCalendar() {
   const locale = useLocaleStore((s) => s.locale)
+  const demo = useDemoMode()
   const [cells, setCells] = useState<DayCell[]>([])
   const [monthHeaders, setMonthHeaders] = useState<Array<{ col: number; label: string }>>([])
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const sessions = await db.sessions.toArray()
-      const logs = await db.setLogs.toArray()
+      // Demo mode: render the empty calendar grid so the PT sees the
+      // visualisation shape without seeing the user's actual training days.
+      const sessions = demo ? [] : await db.sessions.toArray()
+      const logs = demo ? [] : await db.setLogs.toArray()
       const setsByDate = new Map<string, number>()
       const datesWithSession = new Set<string>()
       for (const s of sessions) {
@@ -92,7 +96,7 @@ export default function TrainingCalendar() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [demo])
 
   if (cells.length === 0) {
     return <p className="muted small">No training history yet.</p>

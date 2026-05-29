@@ -35,30 +35,23 @@ import CollapsibleSection from '../components/CollapsibleSection'
 import { formatDuration } from '../lib/strength'
 import { toast } from '../state/toasts'
 import { useDemoMode } from '../state/demoMode'
-import { useT } from '../i18n'
 
 export default function Progress() {
   const settings = useSettings()
   const demo = useDemoMode()
-  const t = useT()
   if (!settings) return <div className="page"><p className="muted">Loading…</p></div>
   const units = settings.units
-
-  if (demo) {
-    return (
-      <div className="page">
-        <h1 className="big-title">Progress</h1>
-        <p className="muted">{t('demo.empty_progress')}</p>
-      </div>
-    )
-  }
 
   return (
     <div className="page">
       <h1 className="big-title">Progress</h1>
       <MonthlySummaryCard units={units} />
       <AchievementsCard />
-      <PRTicker units={units} />
+      {demo ? null : (
+        <>
+          <PRTicker units={units} />
+        </>
+      )}
       <CollapsibleSection
         id="progress-calendar"
         eyebrow="Overview"
@@ -67,11 +60,15 @@ export default function Progress() {
       >
         <TrainingCalendar />
       </CollapsibleSection>
-      <WeeklyVolumeBarsSection />
-      <BodyweightSection units={units} />
-      <TopSetCards units={units} />
-      <WeeklyVolumeSection units={units} />
-      <HistorySection units={units} />
+      {demo ? null : (
+        <>
+          <WeeklyVolumeBarsSection />
+          <BodyweightSection units={units} />
+          <TopSetCards units={units} />
+          <WeeklyVolumeSection units={units} />
+          <HistorySection units={units} />
+        </>
+      )}
     </div>
   )
 }
