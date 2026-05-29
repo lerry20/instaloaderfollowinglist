@@ -46,8 +46,9 @@ export default function RoutinePreview() {
   const isActive = settings?.activeRoutineId === routine.id
 
   async function activate() {
-    if (!settings) return
-    await db.settings.put({ ...settings, activeRoutineId: routine!.id })
+    const fresh = await db.settings.get(1)
+    if (!fresh) return
+    await db.settings.put({ ...fresh, activeRoutineId: routine!.id })
     toast(`Activated: ${routine!.name}`, { kind: 'success' })
     navigate('/routines')
   }

@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Routine, type WorkoutDef } from '../db/schema'
-import { useSettings } from '../db/queries'
 import WorkoutEditor from '../components/WorkoutEditor'
 import { toast } from '../state/toasts'
 import { useT } from '../i18n'
@@ -10,7 +9,6 @@ export default function RoutineEdit() {
   const t = useT()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const settings = useSettings()
   const routine = useLiveQuery(
     async (): Promise<Routine | undefined> => (id ? db.routines.get(id) : undefined),
     [id],
@@ -64,7 +62,8 @@ export default function RoutineEdit() {
       })),
     }
     await db.routines.put(dup)
-    if (settings) await db.settings.put({ ...settings, activeRoutineId: newId })
+    const fresh = await db.settings.get(1)
+    if (fresh) await db.settings.put({ ...fresh, activeRoutineId: newId })
     navigate(`/routines/${newId}/edit`, { replace: true })
   }
 

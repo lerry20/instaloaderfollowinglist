@@ -40,9 +40,13 @@ export default function Routines() {
   if (!routines || !settings) return <div className="page"><p className="muted">{t('common.loading')}</p></div>
 
   async function activate(id: string) {
-    if (!settings) return
+    // Always read settings fresh from the DB before merging — using the
+    // hook value (closure) risks clobbering other fields with stale
+    // values if the user toggled something else in the same render.
+    const fresh = await db.settings.get(1)
+    if (!fresh) return
     const r = routines?.find((x) => x.id === id)
-    await db.settings.put({ ...settings, activeRoutineId: id })
+    await db.settings.put({ ...fresh, activeRoutineId: id })
     toast(`Activated: ${r?.name ?? id}`, { kind: 'success' })
   }
 

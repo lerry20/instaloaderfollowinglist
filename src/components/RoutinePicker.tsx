@@ -37,8 +37,9 @@ export default function RoutinePicker({ onClose }: Props) {
   const shown = matches
 
   async function activate(r: Routine) {
-    if (!settings) return
-    await db.settings.put({ ...settings, activeRoutineId: r.id })
+    const fresh = await db.settings.get(1)
+    if (!fresh) return
+    await db.settings.put({ ...fresh, activeRoutineId: r.id })
     toast(`Activated: ${r.name}`, { kind: 'success' })
     onClose()
     navigate('/train')

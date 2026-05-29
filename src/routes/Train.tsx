@@ -42,7 +42,6 @@ export default function Train() {
   const settings = useSettings()
   const routine = useActiveRoutine()
   const session = useActiveSession()
-  const demo = useDemoMode()
   const navigate = useNavigate()
   const [next, setNext] = useState<WorkoutDef | null>(null)
 
@@ -59,10 +58,11 @@ export default function Train() {
     )
   }
 
-  // First view when nothing is selected yet — and also the demo-mode
-  // landing screen so the PT sees a pristine "pick a routine" hero
-  // instead of the user's actual routine card.
-  if (!routine || demo) {
+  // First view when nothing is selected yet (genuine first-time use,
+  // or after deleting the active routine). Demo mode only hides
+  // personal stats — it keeps the daily workout visible so the PT
+  // can see the actual training flow.
+  if (!routine) {
     return <TrainEmpty />
   }
 
