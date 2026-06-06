@@ -261,10 +261,6 @@ export default function Miguel() {
     return () => observers.forEach(o => o.disconnect())
   }, [])
 
-  const tickerContent = [...TICKER_ITEMS, ...TICKER_ITEMS].map((t, i) => (
-    <span key={i}>{i % 1 === 0 ? t : ''}{i < TICKER_ITEMS.length * 2 - 1 ? <span key={`dot${i}`} style={{color:'rgba(5,5,5,.4)'}}> ✦ </span> : null}</span>
-  ))
-
   return (
     <div className="mc-root">
       <style>{css}</style>
