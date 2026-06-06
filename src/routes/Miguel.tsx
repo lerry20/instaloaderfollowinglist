@@ -13,17 +13,17 @@ const ACHIEVEMENTS = [
   { icon: '⚡', title: 'Force of Nature', body: 'A presence that changes every room he walks into.' },
   { icon: '💎', title: 'Diamond Standard', body: 'Sets benchmarks the world struggles to match.' },
   { icon: '🌍', title: 'World Ambassador', body: 'Representing culture, style and ambition globally.' },
-  { icon: '🔥', title: 'Unstoppable', body: 'Obstacles don\'t slow him down — they fuel him.' },
+  { icon: '🔥', title: 'Unstoppable', body: 'Obstacles don\'t slow him down. They fuel him.' },
 ]
 
 const PRESS = [
   { quote: '"A phenomenon. Once-in-a-generation talent."', outlet: 'The Global Times' },
   { quote: '"Miguel redefines what it means to be at the top."', outlet: 'Prestige Magazine' },
   { quote: '"The world has never seen anything quite like him."', outlet: 'Fortune Elite' },
-  { quote: '"Effortless excellence — it\'s simply who he is."', outlet: 'Culture Vogue' },
+  { quote: '"Effortless excellence. It\'s simply who he is."', outlet: 'Culture Vogue' },
 ]
 
-const TICKER = ['ICON', 'LEGEND', 'VISIONARY', 'UNSTOPPABLE', 'ELITE', 'GOAT', 'ICONIC', 'WORLD CLASS']
+const TICKER = ['ICON', 'LEGEND', 'VISIONARY', 'UNSTOPPABLE', 'ELITE', 'GOAT', 'ICONIC', 'WORLD CLASS', 'PORTO CAMPEÃO', '🇵🇹 PORTUGAL', 'FORÇA PORTO']
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap');
@@ -349,7 +349,7 @@ export default function Miguel() {
             Born to dominate.<br />Built to inspire.
           </p>
           <div className="mc-hero-line" />
-          <p className="mc-hero-sub">World Icon · Cultural Force · Living Legend</p>
+          <p className="mc-hero-sub">🇵🇹 Portugal · World Icon · Cultural Force · Living Legend</p>
         </div>
         <div className="mc-scroll-hint">
           <span>Scroll</span>
@@ -397,13 +397,13 @@ export default function Miguel() {
               <h2 className="mc-title mc-fade mc-fade-d1">Born to Make History</h2>
               <div className="mc-divider mc-fade mc-fade-d2" />
               <blockquote className="mc-quote-big mc-fade mc-fade-d2">
-                "I didn't choose this life.<br />This life chose me — and I showed up."
+                "I didn't choose this life.<br />This life chose me, and I showed up."
               </blockquote>
               <p className="mc-about-body mc-fade mc-fade-d3">
-                Some people wait for greatness. Miguel Caetano IS greatness. With an energy that commands every room, a style that sets trends before they exist, and a character forged in excellence — he is not simply a person. He is a statement. A movement. An era.
+                Some people wait for greatness. Miguel Caetano IS greatness. With an energy that commands every room, a style that sets trends before they exist, and a character forged in excellence. He is not simply a person. He is a statement. A movement. An era.
               </p>
               <p className="mc-about-body mc-fade mc-fade-d4">
-                Recognised across continents, admired by millions, and studied by those who dare to dream of his level — Miguel represents the pinnacle of what a human being can achieve when they fully commit to being themselves.
+                Recognised across continents, admired by millions, and studied by those who dare to dream of his level. Miguel represents the pinnacle of what a human being can achieve when they fully commit to being themselves.
               </p>
             </div>
           </div>
@@ -446,6 +446,24 @@ export default function Miguel() {
         </div>
       </div>
 
+      {/* PORTO */}
+      <div style={{ background: '#001489', padding: '4rem 2rem', textAlign: 'center', borderTop: '3px solid #c9a84c', borderBottom: '3px solid #c9a84c' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐉💙</div>
+          <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(1.8rem, 5vw, 3rem)', letterSpacing: '.1em', color: '#ffffff', marginBottom: '.5rem' }}>
+            Força FC Porto!
+          </p>
+          <p style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontSize: '1rem', color: 'rgba(255,255,255,.75)', marginBottom: '1.5rem' }}>
+            Proud son of Portugal. Loyal to the blue and white forever.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            {['🇵🇹 Portugal', '💙 FC Porto', '🏆 Campeões', '🐉 Os Dragões'].map(tag => (
+              <span key={tag} style={{ border: '1px solid rgba(255,255,255,.3)', borderRadius: '2rem', padding: '.3rem 1rem', fontSize: '.7rem', letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,.8)' }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* PRESS */}
       <section id="press" style={{ background: 'var(--near-black)' }}>
         <div className="mc-section">
@@ -456,7 +474,7 @@ export default function Miguel() {
               <div key={i} className={`mc-press-card mc-fade mc-fade-d${Math.min(i + 1, 4) as 1|2|3|4}`}>
                 <div className="mc-press-quote-mark">"</div>
                 <p className="mc-press-text">{p.quote.replace(/"/g, '')}</p>
-                <p className="mc-press-outlet">— {p.outlet}</p>
+                <p className="mc-press-outlet">{p.outlet}</p>
               </div>
             ))}
           </div>
@@ -468,7 +486,7 @@ export default function Miguel() {
         <div className="mc-footer-logo">Miguel Caetano</div>
         <p className="mc-footer-tagline">"The standard others are measured by."</p>
         <div className="mc-footer-line" />
-        <p className="mc-footer-copy">© 2024 Miguel Caetano · All Rights Reserved · The Legend Continues</p>
+        <p className="mc-footer-copy">© 2024 Miguel Caetano · All Rights Reserved · 🇵🇹 Made in Portugal · The Legend Continues</p>
       </footer>
     </div>
   )
