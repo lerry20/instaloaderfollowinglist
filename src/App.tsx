@@ -10,6 +10,7 @@ import RoutineEdit from './routes/RoutineEdit'
 import Progress from './routes/Progress'
 import Daily from './routes/Daily'
 import ExerciseDetail from './routes/ExerciseDetail'
+import Miguel from './routes/Miguel'
 import { seedIfEmpty } from './db/seed'
 import { useThemeSync } from './state/theme'
 
@@ -39,6 +40,7 @@ export default function App() {
         <ThemeManager />
         <DebugPanel />
         <Routes>
+          <Route path="/miguel" element={<Miguel />} />
           <Route element={<Layout />}>
             <Route path="/" element={<Train />} />
             <Route path="/train" element={<Train />} />
