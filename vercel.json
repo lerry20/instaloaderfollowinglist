@@ -1,8 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "routes": [
+    { "src": "/miguel/?$", "dest": "/miguel/index.html" },
+    { "src": "/miguel/(.*)", "dest": "/miguel/$1" },
     { "handle": "filesystem" },
-    { "src": "/((?!api/).*)", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "headers": [
     {
